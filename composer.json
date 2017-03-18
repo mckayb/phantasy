@@ -1,0 +1,14 @@
+{
+  "require-dev": {
+      "phpunit/phpunit": "^6.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "PHPFP\\": "src/",
+      "PHPFP\\Tests\\": "tests/"
+    },
+    "files": [
+      "src/Core/functions.php"
+    ]
+  }
+}
