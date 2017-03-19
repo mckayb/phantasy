@@ -1,7 +1,14 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function PHPFP\Core\{identity, compose, curry, semigroupConcat};
+use function PHPFP\Core\{
+  identity,
+  compose,
+  curry,
+  semigroupConcat,
+  prop,
+  map
+};
 
 class FunctionsTest extends TestCase {
   public function testIdentity() {
@@ -96,5 +103,50 @@ class FunctionsTest extends TestCase {
     $a = true;
     $b = false;
     semigroupConcat($a, $b);
+  }
+
+  public function testPropObjects() {
+    $f = new class() {
+      public $test = 'foo';
+    };
+    $g = new class() {
+      public $test = 'bar';
+    };
+
+    $this->assertEquals(array_map(prop('test'), [$f, $g]), ['foo', 'bar']);
+  }
+
+  public function testPropArrays() {
+    $f = [ "test" => "foo" ];
+    $g = [ "test" => "bar" ];
+    $this->assertEquals(array_map(prop('test'), [$f, $g]), ['foo', 'bar']);
+  }
+
+  public function testMapArrays() {
+    $f = function($x) {
+      return $x + 1;
+    };
+
+    $this->assertEquals(map($f, [1, 2, 3]), [2, 3, 4]);
+  }
+
+  public function testMapCurried() {
+    $plusOne = map(function($x) {
+      return $x + 1;
+    });
+    $this->assertEquals($plusOne([1, 2, 3]), [2, 3, 4]);
+  }
+
+  public function testMapCurriedEmptyParams() {
+    $a = map();
+    $b = $a();
+    $c = $b();
+    $d = $c(function($x) {
+      return $x + 1;
+    });
+    $e = $d();
+    $f = $e();
+    $g = $d([2, 4, 6]);
+    $this->assertEquals([3, 5, 7], $g);
   }
 }

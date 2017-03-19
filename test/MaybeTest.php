@@ -244,6 +244,11 @@ class MaybeTest extends TestCase {
     $this->assertEquals(12, $a);
   }
 
+  public function testJustFold() {
+    $a = Maybe::of(3)->fold(15);
+    $this->assertEquals(3, $a);
+  }
+
   public function testNothingMap() {
     $a = Maybe::fromNullable(null)
       ->map(function($x) {
@@ -307,6 +312,11 @@ class MaybeTest extends TestCase {
       return 'bar' . $x;
     })->getOrElse('foo');
     $this->assertEquals('foo', $a);
+  }
+
+  public function testNothingFold() {
+    $a = Maybe::fromNullable(null)->fold(10);
+    $this->assertEquals($a, 10);
   }
 
   public function testMonadLeftIdentity() {

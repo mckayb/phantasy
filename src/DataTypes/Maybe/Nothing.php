@@ -30,6 +30,10 @@ class Nothing {
     return $this->chain($f);
   }
 
+  public function fold($d) {
+    return $this->getOrElse($d);
+  }
+
   // Conversions
   public function toEither($val) {
     return new Left($val);

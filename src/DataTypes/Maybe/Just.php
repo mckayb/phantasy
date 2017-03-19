@@ -39,6 +39,11 @@ class Just {
     return $this->chain($f);
   }
 
+  public function fold($d) {
+    return $this->getOrElse($d);
+  }
+
+  // Transformations
   public function toEither() {
     return new Right($this->__value);
   }

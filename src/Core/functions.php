@@ -1,6 +1,10 @@
 <?php
 namespace PHPFP\Core;
 
+function identity($x) {
+  return $x;
+}
+
 function curry($callable) {
   $ref = new \ReflectionFunction($callable);
 
@@ -26,8 +30,25 @@ function compose(...$fns) {
   }, 'PHPFP\Core\identity');
 }
 
-function identity($x) {
-  return $x;
+function prop($prop) {
+  return function($x) use ($prop) {
+    if (is_object($x)) {
+      return $x->{$prop};
+    } elseif (is_array($x)) {
+      return $x[$prop];
+    }
+  };
+}
+
+function map() {
+  $map = curry(function($f, $x) {
+    $res = [];
+    foreach ($x as $y) {
+      $res[] = $f($y);
+    }
+    return $res;
+  });
+  return $map(...func_get_args());
 }
 
 function semigroupConcat($x, $y) {
