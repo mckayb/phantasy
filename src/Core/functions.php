@@ -30,14 +30,15 @@ function compose(...$fns) {
   }, 'PHPFP\Core\identity');
 }
 
-function prop($prop) {
-  return function($x) use ($prop) {
+function prop() {
+  $prop = curry(function($s, $x) {
     if (is_object($x)) {
-      return $x->{$prop};
+      return $x->{$s};
     } elseif (is_array($x)) {
-      return $x[$prop];
+      return $x[$s];
     }
-  };
+  });
+  return $prop(...func_get_args());
 }
 
 function map() {
@@ -49,6 +50,35 @@ function map() {
     return $res;
   });
   return $map(...func_get_args());
+}
+
+function filter() {
+  $filter = curry(function($f, $x) {
+    $res = [];
+    foreach ($x as $y) {
+      if ($z = $f($y)) {
+        $res[] = $z;
+      }
+    }
+    return $res;
+  });
+  return $filter(...func_get_args());
+}
+
+function reduce() {
+  $reduce = curry(function($f, $x) {
+    $acc = null;
+    foreach ($x as $y) {
+      if (is_null($acc)) {
+        $acc = $y;
+      }
+
+      $acc = $f($acc);
+    }
+    return $acc;
+  });
+
+  return $reduce(...func_get_args());
 }
 
 function semigroupConcat($x, $y) {

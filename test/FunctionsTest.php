@@ -7,7 +7,8 @@ use function PHPFP\Core\{
   curry,
   semigroupConcat,
   prop,
-  map
+  map,
+  filter
 };
 
 class FunctionsTest extends TestCase {
@@ -122,6 +123,14 @@ class FunctionsTest extends TestCase {
     $this->assertEquals(array_map(prop('test'), [$f, $g]), ['foo', 'bar']);
   }
 
+  public function testPropCurried() {
+    $f = [ "test" => "foo" ];
+    $g = [ "test" => "bar" ];
+    $getTest = prop('test');
+    $this->assertEquals($getTest($f), "foo");
+    $this->assertEquals($getTest($g), "bar");
+  }
+
   public function testMapArrays() {
     $f = function($x) {
       return $x + 1;
@@ -148,5 +157,21 @@ class FunctionsTest extends TestCase {
     $f = $e();
     $g = $d([2, 4, 6]);
     $this->assertEquals([3, 5, 7], $g);
+  }
+
+  public function testFilterArrays() {
+    $f = function($x) {
+      return $x % 2 === 0;
+    };
+
+    $this->assertEquals(filter($f, [1, 2, 3, 4]), [2, 4]);
+  }
+
+  public function testFilterCurried() {
+    $isOdd = filter(function($x) {
+      return $x % 2 === 1;
+    });
+
+    $this->assertEquals($isOdd([1, 2, 3, 4]), [1, 3]);
   }
 }
