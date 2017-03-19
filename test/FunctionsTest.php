@@ -8,7 +8,8 @@ use function PHPFP\Core\{
   semigroupConcat,
   prop,
   map,
-  filter
+  filter,
+  reduce
 };
 
 class FunctionsTest extends TestCase {
@@ -173,5 +174,20 @@ class FunctionsTest extends TestCase {
     });
 
     $this->assertEquals($isOdd([1, 2, 3, 4]), [1, 3]);
+  }
+
+  public function testReduceArrays() {
+    $sum = reduce(function($x, $y) {
+      return $x + $y;
+    }, 0, [1, 2, 3]);
+    $this->assertEquals($sum, 6);
+  }
+
+  public function testReduceCurried() {
+    $sum = reduce(function($x, $y) {
+      return $x + $y;
+    });
+    $sumWithInitial6 = $sum(6);
+    $this->assertEquals($sumWithInitial6([1, 2, 3]), 12);
   }
 }

@@ -66,14 +66,10 @@ function filter() {
 }
 
 function reduce() {
-  $reduce = curry(function($f, $x) {
-    $acc = null;
+  $reduce = curry(function($f, $i, $x) {
+    $acc = $i;
     foreach ($x as $y) {
-      if (is_null($acc)) {
-        $acc = $y;
-      }
-
-      $acc = $f($acc);
+      $acc = $f($acc, $y);
     }
     return $acc;
   });
