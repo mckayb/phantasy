@@ -9,7 +9,6 @@ Functional Programming Helpers and Data Types for PHP.
   * (More coming...)
   
 ### Currying
-
 ```
 use function PHPFP\Core\curry;
 
@@ -33,7 +32,7 @@ $bad_json_users = "[{ "id": 1, "name" "Foo" }, { "id": 2, "name": "Bar" }]"; // 
 $good_json_users = "[{ "id": 1, "name: "Foo" }, { "id": 2, "name": "Bar" }]"; // Good json!
 
 function getUserNames($user_json) {
-  Maybe::fromNullable(json_decode($bad_json_str, true))
+  Maybe::fromNullable(json_decode($user_json, true))
     ->map(function($user) {
       return $user["name"];
     })
