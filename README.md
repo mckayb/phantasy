@@ -62,7 +62,7 @@ $parseJSON = function ($file) {
   ... More options
 }
 
-getContents('config.json')
+$getContents('config.json')
   .chain($parseJSON)
   .map(prop('DB_HOST'));
   .fold(function($e) {
