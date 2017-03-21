@@ -30,6 +30,10 @@ class Right {
     return $g($this->__value);
   }
 
+  public function bimap($f, $g) {
+    return new Right($g($this->__value));
+  }
+
   // Aliases
   public function bind($f) {
     return $this->chain($f);

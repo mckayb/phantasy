@@ -82,6 +82,18 @@ class EitherTest extends TestCase {
     $this->assertEquals(new Right(62), $a);
   }
 
+  public function testRightBimap() {
+    $a = Either::of(123)
+      ->bimap(function($lv) {
+        return $rv - 1;
+      }, function($rv) {
+        return $rv + 1;
+      });
+    $this->assertInstanceOf(Right::class, $a);
+    $this->assertEquals(Either::of(124), $a);
+    $this->assertEquals(new Right(124), $a);
+  }
+
   public function testRightFoldOnlyAppliesRightFunction() {
     $a = Either::of(12)->fold(function($x) {
       return $x - 1;
@@ -258,6 +270,16 @@ class EitherTest extends TestCase {
       });
 
     $this->assertEquals("Error", $a);
+  }
+
+  public function testLeftBimap() {
+    $a = (new Left(123))->bimap(function($lv) {
+      return $lv - 1;
+    }, function($rv) {
+      return $rv + 1;
+    });
+    $this->assertInstanceOf(Left::class, $a);
+    $this->assertEquals(new Left(122), $a);
   }
 
   public function testLeftToMaybe() {

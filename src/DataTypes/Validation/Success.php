@@ -13,7 +13,7 @@ class Success {
   }
 
   public function map($f) {
-    return Validation::of($f($this->__value));
+    return new Success($f($this->__value));
   }
 
   public function ap($validationWithFunc) {
@@ -27,6 +27,10 @@ class Success {
 
   public function fold($f, $g) {
     return $g($this->__value);
+  }
+
+  public function bimap($f, $g) {
+    return new Success($g($this->__value));
   }
 
   // Aliases

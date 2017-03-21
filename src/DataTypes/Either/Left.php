@@ -27,6 +27,10 @@ class Left {
     return $f($this->__value);
   }
 
+  public function bimap($f, $g) {
+    return new Left($f($this->__value));
+  }
+
   // Aliases
   public function bind($f) {
     return $this->chain($f);

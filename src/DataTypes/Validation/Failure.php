@@ -27,6 +27,10 @@ class Failure {
     return $f($this->__value);
   }
 
+  public function bimap($f, $g) {
+    return new Failure($f($this->__value));
+  }
+
   // Aliases
   public function cata($f, $g) {
     return $this->fold($f, $g);

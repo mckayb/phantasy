@@ -113,6 +113,19 @@ class ValidationTest extends TestCase {
     $this->assertEquals($b->ap($a), $a);
   }
 
+  public function testSuccessBimap() {
+    $a = Validation::of("foo")
+      ->bimap(function($lv) {
+        return $lv . "baz";
+      }, function($rv) {
+        return $rv . "bar";
+      });
+
+    $this->assertInstanceOf(Success::class, $a);
+    $this->assertEquals(Validation::of("foobar"), $a);
+    $this->assertEquals(new Success("foobar"), $a);
+  }
+
   public function testSuccessToEither() {
     $a = Validation::of("foo")->toEither();
 
@@ -172,6 +185,18 @@ class ValidationTest extends TestCase {
         return 'Success';
       });
     $this->assertEquals($a, 'Error');
+  }
+
+  public function testFailureBimap() {
+    $a = (new Failure("foo"))
+      ->bimap(function($x) {
+        return $x . "baz";
+      }, function($x) {
+        return $x . "bar";
+      });
+
+    $this->assertInstanceOf(Failure::class, $a);
+    $this->assertEquals(new Failure("foobaz"), $a);
   }
 
   public function testFailureToEither() {
