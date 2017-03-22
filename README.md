@@ -64,7 +64,7 @@ $parseJSON = function ($file) {
 
 $getContents('config.json')
   .chain($parseJSON)
-  .map(prop('DB_HOST'));
+  .map(prop('DB_HOST'))
   .fold(function($e) {
     // Do something with the error message
     return handleError($e);
