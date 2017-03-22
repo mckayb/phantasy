@@ -4,51 +4,64 @@ namespace PHPFP\DataTypes\Either;
 
 use PHPFP\DataTypes\Maybe\Just;
 
-class Right {
-  private $__value = null;
+class Right
+{
+    private $value = null;
 
-  public function __construct($val) {
-    $this->__value = $val;
-  }
+    public function __construct($val)
+    {
+        $this->value = $val;
+    }
 
-  public function map($f) {
-    return Either::of($f($this->__value));
-  }
+    public function map($f)
+    {
+        return Either::of($f($this->value));
+    }
 
-  public function ap($eitherWithFunction) {
-    $val = $this->__value;
-    return $eitherWithFunction->map(function($fn) use ($val) {
-      return $fn($val);
-    });
-  }
+    public function ap($eitherWithFunction)
+    {
+        $val = $this->value;
+        return $eitherWithFunction->map(
+            function ($fn) use ($val) {
+                return $fn($val);
+            }
+        );
+    }
 
-  public function chain($f) {
-    return $f($this->__value);
-  }
+    public function chain($f)
+    {
+        return $f($this->value);
+    }
 
-  public function fold($f, $g) {
-    return $g($this->__value);
-  }
+    public function fold($f, $g)
+    {
+        return $g($this->value);
+    }
 
-  public function bimap($f, $g) {
-    return new Right($g($this->__value));
-  }
+    public function bimap($f, $g)
+    {
+        return new Right($g($this->value));
+    }
 
-  // Aliases
-  public function bind($f) {
-    return $this->chain($f);
-  }
+    // Aliases
+    public function bind($f)
+    {
+        return $this->chain($f);
+    }
 
-  public function flatMap($f) {
-    return $this->chain($f);
-  }
+    public function flatMap($f)
+    {
+        return $this->chain($f);
+    }
 
-  public function cata($f, $g) {
-    return $this->fold($f, $g);
-  }
+    public function cata($f, $g)
+    {
+        return $this->fold($f, $g);
+    }
 
-  // Conversions
-  public function toMaybe() {
-    return new Just($this->__value);
-  }
+    // Conversions
+    public function toMaybe()
+    {
+        return new Just($this->value);
+    }
 }

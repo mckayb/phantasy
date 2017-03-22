@@ -1,6 +1,7 @@
 {
   "require-dev": {
-      "phpunit/phpunit": "^6.0"
+    "phpunit/phpunit": "^6.0",
+    "squizlabs/php_codesniffer": "^2.8"
   },
   "autoload": {
     "psr-4": {
@@ -10,5 +11,9 @@
     "files": [
       "src/Core/functions.php"
     ]
+  },
+  "scripts": {
+    "test": "phpunit",
+    "lint": "phpcs --standard=PSR2 ./src"
   }
 }
