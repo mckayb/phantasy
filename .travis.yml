@@ -12,5 +12,9 @@ install:
   - composer install --prefer-source
 
 script:
-  - composer test
+  - mkdir -p build/logs
+  - phpunit --coverage-clover build/logs/clover.xml
   - composer lint
+
+after_success:
+  - vendor/bin/coveralls -v

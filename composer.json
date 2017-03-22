@@ -1,7 +1,8 @@
 {
   "require-dev": {
     "phpunit/phpunit": "^6.0",
-    "squizlabs/php_codesniffer": "^2.8"
+    "squizlabs/php_codesniffer": "^2.8",
+    "satooshi/php-coveralls": "^1.0"
   },
   "autoload": {
     "psr-4": {
