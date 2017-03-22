@@ -1,4 +1,4 @@
-# php-fp
+# php-fp [![Build Status](https://travis-ci.org/mckayb/php-fp.svg?branch=master)](https://travis-ci.org/mckayb/php-fp)
 Functional Programming Helpers and Data Types for PHP.
 
 ## What's Included
