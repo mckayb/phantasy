@@ -5,16 +5,13 @@ php:
   - '7.1'
   - nightly
 
-before_script:
-  - composer self-update
-
 install:
   - composer install --prefer-source
 
 script:
   - mkdir -p build/logs
-  - phpunit --coverage-clover build/logs/clover.xml
+  - composer coverage
   - composer lint
 
 after_success:
-  - vendor/bin/coveralls -v
+  - composer cover
