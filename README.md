@@ -1,4 +1,4 @@
-# php-fp
+# php-fp [![Build Status](https://travis-ci.org/mckayb/php-fp.svg?branch=master)](https://travis-ci.org/mckayb/php-fp)
 Functional Programming Helpers and Data Types for PHP.
 
 ## What's Included
@@ -64,7 +64,7 @@ $parseJSON = function ($file) {
 
 $getContents('config.json')
   .chain($parseJSON)
-  .map(prop('DB_HOST'));
+  .map(prop('DB_HOST'))
   .fold(function($e) {
     // Do something with the error message
     return handleError($e);
