@@ -6,11 +6,11 @@ php:
   - nightly
 
 before_script:
-	- composer self-update
+  - composer self-update
 
 install:
-	- composer install --prefer-source
+  - composer install --prefer-source
 
 script:
-	- composer test
+  - composer test
   - composer lint
