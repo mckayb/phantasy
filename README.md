@@ -74,36 +74,33 @@ $getContents('config.json')
 ### Validation Applicative Functor
 ```
 use PHPFP\DataTypes\Validation\{Validation, Success, Failure};
-$validatePasswordLength = function($attrs) {
-  return isset($attrs['password']) && strlen($attrs['password']) >= 10
-    ? new Success($attrs)
-    : new Failure(["Password must contain at least 10 characters."]);
-};
-
-$validateEmail = function($attrs) {
-  return isset($attrs['email']) && filter_var($attrs['email'], FILTER_VALIDATE_EMAIL) !== false
-    ? new Success($attrs)
-    : new Failure(["Must have a valid email address."]);
-};
-
-$validateName = function($attrs) {
-  return isset($attrs['name']) && strlen($attrs['name']) > 0
-    ? new Success($attrs)
-    : new Failure(["Name must not be empty."]);
-};
 
 $db = new class() {
   public function save($attrs) {
+    // Insert into database...
     return array_merge($attrs, ["id" => 1]);
   }
 };
 
-$createUser = function($input) use (
-  $db,
-  $validateName,
-  $validateEmail,
-  $validatePasswordLength
-) {
+$createUser = function($input) use ($db) {
+  $validatePasswordLength = function($attrs) {
+    return isset($attrs['password']) && strlen($attrs['password']) >= 10
+      ? new Success($attrs)
+      : new Failure(["Password must contain at least 10 characters."]);
+  };
+
+  $validateEmail = function($attrs) {
+    return isset($attrs['email']) && filter_var($attrs['email'], FILTER_VALIDATE_EMAIL) !== false
+      ? new Success($attrs)
+      : new Failure(["Must have a valid email address."]);
+  };
+
+  $validateName = function($attrs) {
+    return isset($attrs['name']) && strlen($attrs['name']) > 0
+      ? new Success($attrs)
+      : new Failure(["Name must not be empty."]);
+  };
+  
   return Validation::of($input)
     ->concat($validateName($input))
     ->concat($validateEmail($input))
@@ -114,7 +111,7 @@ $createUser = function($input) use (
 };
 $createUser([]);
 /*
-new Failure([
+Failure([
   'Name must not be empty.',
   'Must have a valid email address.',
   'Password must contain at least 10 characters.'
@@ -126,7 +123,7 @@ $createUser([
   'email' => 'Bar',
   'password' => 'Baz1234567'
 ]);
-// new Failure(['Must have a valid email address.']);
+// Failure(['Must have a valid email address.']);
 
 $createUser([
   'name' => 'Foo',
@@ -134,7 +131,7 @@ $createUser([
   'password' => 'Baz1234567'
 ]);
 /*
-new Success([
+Success([
   'id' => 1,
   'name' => 'Foo',
   'email' => 'bar@example.com',
