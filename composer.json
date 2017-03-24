@@ -1,4 +1,18 @@
 {
+  "name": "mckayb/php-fp",
+  "description": "A basic functional programming library for PHP",
+  "type": "package",
+  "license": "mit",
+  "authors": [
+    {
+      "name": "McKay Broderick",
+      "email": "mckay.db@gmail.com",
+      "homepage": "https://github.com/mckayb/php-fp"
+    }
+  ],
+  "require": {
+    "php": ">=7.0.0"
+  },
   "require-dev": {
     "phpunit/phpunit": "^6.0",
     "squizlabs/php_codesniffer": "^2.8",
@@ -6,8 +20,7 @@
   },
   "autoload": {
     "psr-4": {
-      "PHPFP\\": "src/",
-      "PHPFP\\Tests\\": "tests/"
+      "PHPFP\\": "src/"
     },
     "files": [
       "src/Core/functions.php"
