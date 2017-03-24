@@ -27,55 +27,116 @@ $add(2, 5) // 7
 ### Maybe Monad
 ```
 use PHPFP\DataTypes\Maybe\Maybe;
+use function PHPFP\Core\{map, prop};
 
-function getUserNames($user_json) {
-  return Maybe::fromNullable(json_decode($user_json, true))
-    ->map(function($user) {
-      return $user["name"];
-    })
+$getUserName = function($json) {
+  return Maybe::fromNullable(json_decode($json, true))
+    ->map(prop('name'))
     ->getOrElse([]);
-}
+};
 
-$bad_json_users = "[{ "id": 1, "name" "Foo" }, { "id": 2, "name": "Bar" }]"; // No : after "name"
-$good_json_users = "[{ "id": 1, "name: "Foo" }, { "id": 2, "name": "Bar" }]"; // Good json!
-getUserNames($bad_json_users); // []
-getUserNames($good_json_users); // ["Foo", "Bar"];
+$bad_json_user = '{"id": 1, "name" "Foo" }'; // No : after "name"
+$good_json_user = '{ "id": 1, "name": "Foo" }'; // Good json!
+
+$getUserName($bad_json_user); // []
+$getUserName($good_json_user); // "Foo"
 ```
 
 ### Either Monad
 ```
-use PHPFP\DataTypes\Either\{Right, Left};
-use function PHPFP\Core\prop;
-
 $getContents = function ($file) {
-  return is_file($file) ? new Right(file_get_contents($file)) : new Left('Not a file!');
-}
+  return is_file($file)
+    ? new Right(file_get_contents($file))
+    : new Left('Not a file!');
+};
 
-$parseJSON = function ($file) {
-  $json = json_decode($file, true);
-  return is_null($json) ? new Right($json) : new Left('Not valid json!');
-}
+$parseJSON = function($json) {
+  return Either::fromNullable(json_decode($json, true));
+};
 
 // config.json
 {
-  "DB_HOST": "foo",
-  ... More options
+  "DB_HOST": "foo"
+  ... More options ...
 }
 
 $getContents('config.json')
-  .chain($parseJSON)
-  .map(prop('DB_HOST'))
-  .fold(function($e) {
-    // Do something with the error message
-    return handleError($e);
+  ->chain($parseJSON)
+  ->map(prop('DB_HOST'))
+  ->fold(function($e) {
+    return 'Error: ' . $e;
   }, function($x) {
     return $x;
-  }; // "foo"
+  });
+// "foo"
 ```
 
 ### Validation Applicative Functor
 ```
-use PHPFP\DataTypes\Validation;
+use PHPFP\DataTypes\Validation\{Validation, Success, Failure};
+$validatePasswordLength = function($attrs) {
+  return isset($attrs['password']) && strlen($attrs['password']) >= 10
+    ? new Success($attrs)
+    : new Failure(["Password must contain at least 10 characters."]);
+};
+
+$validateEmail = function($attrs) {
+  return isset($attrs['email']) && filter_var($attrs['email'], FILTER_VALIDATE_EMAIL) !== false
+    ? new Success($attrs)
+    : new Failure(["Must have a valid email address."]);
+};
+
+$validateName = function($attrs) {
+  return isset($attrs['name']) && strlen($attrs['name']) > 0
+    ? new Success($attrs)
+    : new Failure(["Name must not be empty."]);
+};
+
+$db = new class() {
+  public function save($attrs) {
+    return array_merge($attrs, ["id" => 1]);
+  }
+};
+
+$createUser = function($input) use (
+  $db,
+  $validateName,
+  $validateEmail,
+  $validatePasswordLength
+) {
+  return Validation::of($input)
+    ->concat($validateName($input))
+    ->concat($validateEmail($input))
+    ->concat($validatePasswordLength($input))
+    ->map(function($attrs) use ($db) {
+      return $db->save($attrs);
+    });
+};
+$createUser([]);
+new Failure([
+  'Name must not be empty.',
+  'Must have a valid email address.',
+  'Password must contain at least 10 characters.'
+]);
+
+$createUser([
+  'name' => 'Foo',
+  'email' => 'Bar',
+  'password' => 'Baz1234567'
+]);
+new Failure(['Must have a valid email address.']);
+
+$createUser([
+  'name' => 'Foo',
+  'email' => 'bar@example.com',
+  'password' => 'Baz1234567'
+]);
+new Success([
+  'id' => 1,
+  'name' => 'Foo',
+  'email' => 'bar@example.com',
+  'password' => 'Baz1234567'
+]);
 ```
 
 ## Inspiration
