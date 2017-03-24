@@ -75,7 +75,54 @@ $getContents('config.json')
 
 ### Validation Applicative Functor
 ```
-use PHPFP\DataTypes\Validation;
+use PHPFP\DataTypes\Validation\{Validation, Success, Failure};
+
+$validatePasswordLength = function($attrs) {
+   return strlen($a) >= 10
+     ? Success($attrs['password'])
+     : Failure(["Password must contain at least 10 characters"]);
+};
+
+$validateEmail = function($attrs) {
+  return filter_var($attrs['email'], FILTER_VALIDATE_EMAIL) !== false
+    ? Success($attrs)
+    : Failure(["Must have a valid email address."]);
+};
+
+$validateName = function($attrs) {
+  return isset($attrs['name']) && strlen($attrs['name']) > 0
+    ? Success($attrs)
+    : Failure(["Name must not be empty."]);
+};
+
+function createUser($input) {
+  return Validation::of($input)
+    ->ap($validateName($input))
+    ->ap($validateEmail($input))
+    ->ap($validatePasswordLength($input))
+    ->map(function($attrs) use ($db) {
+      return $db->save($attrs);
+    });
+};
+
+createUser([]);
+// Failure(['Name must not be empty.',
+            'Must have a valid email address.',
+            'Password must contain at least 10 characters'])
+                            
+createUser([
+  'name' => 'Foo',
+  'email' => 'Bar',
+  'password' => 'Baz1234567'
+]);
+// Failure(['Must have a valid email address.'])
+
+createUser([
+  'name' => 'Foo',
+  'email' => 'bar@example.com',
+  'password' => 'Baz1234567'
+]);
+// Success([ 'id' => 1, 'name' => 'Foo' ... ])
 ```
 
 ## Inspiration
