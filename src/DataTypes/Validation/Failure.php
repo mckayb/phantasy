@@ -27,7 +27,8 @@ class Failure
             : new Failure(semigroupConcat($this->value, $v->value));
     }
 
-    public function concat($v) {
+    public function concat($v)
+    {
         return $this->ap($v);
     }
 
