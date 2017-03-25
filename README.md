@@ -1,6 +1,9 @@
 # php-fp [![Build Status](https://travis-ci.org/mckayb/php-fp.svg?branch=master)](https://travis-ci.org/mckayb/php-fp)  [![Coverage Status](https://coveralls.io/repos/github/mckayb/php-fp/badge.svg)](https://coveralls.io/github/mckayb/php-fp)
 Functional Programming Helpers and Data Types for PHP.
 
+## Installation
+`composer require mckayb/php-fp`
+
 ## What's Included
   * Currying, Higher-Order Functions, etc
   * Maybe Monad
