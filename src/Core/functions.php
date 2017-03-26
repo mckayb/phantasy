@@ -1,11 +1,6 @@
 <?php
 namespace PHPFP\Core;
 
-function identity($x)
-{
-    return $x;
-}
-
 function curry($callable)
 {
     $ref = new \ReflectionFunction($callable);
@@ -35,6 +30,12 @@ function compose(...$fns)
         },
         'PHPFP\Core\identity'
     );
+}
+
+const identity = 'PHPFP\Core\identity';
+function identity($x)
+{
+    return $x;
 }
 
 function prop()

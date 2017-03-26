@@ -4,9 +4,40 @@ use PHPUnit\Framework\TestCase;
 use PHPFP\DataTypes\Either\{Either, Left, Right};
 use PHPFP\DataTypes\Maybe\{Maybe, Just, Nothing};
 use PHPFP\DataTypes\Validation\{Validation, Success, Failure};
-use function PHPFP\Core\{map, prop};
+use function PHPFP\Core\{map, prop, identity, curry, compose};
+use const PHPFP\Core\identity;
 
-class ReadmeTest extends TestCase {
+class DocsTest extends TestCase {
+  public function testCallableIdentity() {
+    $this->assertEquals('foobar', Either::fromNullable('foo')
+      ->map(function($x) {
+        return $x . 'bar';
+      })
+      ->fold(identity, identity));
+    $this->assertEquals(1, identity(1));
+  }
+
+  public function testComposeExample() {
+    $data = [
+			[ "title" => "Foo Bar" ],
+			[ "title" => "Foo Baz" ]
+		];
+		$split = curry(function($sep, $str) {
+			return explode($sep, $str);
+		});
+		$join = curry(function($sep, $arr) {
+			return implode($sep, $arr);
+		});
+		$snakeCase = compose(
+			$join('_'),
+			map('strtolower'),
+			$split(' '),
+			prop('title')
+		);
+		$getSnakeTitles = map($snakeCase);
+		$this->assertEquals($getSnakeTitles($data), ["foo_bar", "foo_baz"]);
+  }
+
 	public function testMaybeExample() {
     $getUserName = function($json) {
       return Maybe::fromNullable(json_decode($json, true))
