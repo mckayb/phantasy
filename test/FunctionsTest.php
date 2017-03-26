@@ -160,6 +160,25 @@ class FunctionsTest extends TestCase {
     $this->assertEquals([3, 5, 7], $g);
   }
 
+  public function testMapExample() {
+    $getBox = function($x) {
+      return new class($x) {
+        private $item = null;
+        public function __construct($item) {
+          $this->item = $item;
+        }
+        public function map($f) {
+          return new static($f($this->item));
+        }
+      };
+    };
+    $add = function($x) {
+      return $x + 1;
+    };
+
+    $this->assertEquals(map($add, $getBox(1)), $getBox(2));
+  }
+
   public function testFilterArrays() {
     $f = function($x) {
       return $x % 2 === 0;
@@ -176,6 +195,25 @@ class FunctionsTest extends TestCase {
     $this->assertEquals($isOdd([1, 2, 3, 4]), [1, 3]);
   }
 
+	public function testFilterWithObject() {
+		$getBox = function($x) {
+			return new class($x) {
+				private $items = [];
+				public function __construct($items) {
+					$this->items = $items;
+				}
+				public function filter($f) {
+					return new static(array_values(array_filter($this->items, $f)));
+				}
+      };
+    };
+		$isEven = function($x) {
+			return $x % 2 === 0;
+		};
+		$box = $getBox([1, 2, 3]);
+		$this->assertEquals(filter($isEven, $box), $getBox([2]));
+  }
+
   public function testReduceArrays() {
     $sum = reduce(function($x, $y) {
       return $x + $y;
@@ -189,5 +227,32 @@ class FunctionsTest extends TestCase {
     });
     $sumWithInitial6 = $sum(6);
     $this->assertEquals($sumWithInitial6([1, 2, 3]), 12);
+  }
+
+  public function testReduceWithObject() {
+    $getClass = function($x) {
+      return new class($x) {
+        private $items = [];
+
+        public function __construct($items) {
+          $this->items = $items;
+        }
+
+        public function reduce($f, $i) {
+          return array_reduce($this->items, $f, $i);
+        }
+      };
+    };
+    $isOdd = function($x) {
+      return $x % 2 === 1;
+    };
+    $oddSum = function($sum, $x) use ($isOdd) {
+      if ($isOdd($x)) {
+        return $sum + $x;
+      }
+      return $sum;
+    };
+    $box = $getClass([1, 2, 3]);
+    $this->assertEquals(reduce($oddSum, 0, $box), 4);
   }
 }

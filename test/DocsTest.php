@@ -17,25 +17,64 @@ class DocsTest extends TestCase {
     $this->assertEquals(1, identity(1));
   }
 
+  public function testIdentityExamples() {
+    $this->assertEquals(identity(1), 1);
+    $this->assertEquals(identity('foo'), 'foo');
+    $this->assertEquals(identity(function($x) {
+      return $x;
+    }), function($x) {
+      return $x;
+    });
+
+    $this->assertEquals('foobar', Either::fromNullable('foo')
+      ->map(function($x) {
+        return $x . 'bar';
+      })
+      ->fold(identity, identity));
+  }
+
+  public function testCurryExamples() {
+    $explode = curry('explode');
+    $explodeBySpace = $explode(' ');
+    $this->assertEquals($explodeBySpace('foo bar'), ['foo', 'bar']);
+  }
+
   public function testComposeExample() {
     $data = [
 			[ "title" => "Foo Bar" ],
 			[ "title" => "Foo Baz" ]
 		];
-		$split = curry(function($sep, $str) {
-			return explode($sep, $str);
-		});
-		$join = curry(function($sep, $arr) {
-			return implode($sep, $arr);
-		});
+    $explode = curry('explode');
+    $implode = curry('implode');
 		$snakeCase = compose(
-			$join('_'),
+      $implode('_'),
 			map('strtolower'),
-			$split(' '),
+      $explode(' '),
 			prop('title')
 		);
 		$getSnakeTitles = map($snakeCase);
 		$this->assertEquals($getSnakeTitles($data), ["foo_bar", "foo_baz"]);
+  }
+
+  public function testPropExample() {
+    $item = [ "name" => "Foo", "value" => 15 ];
+		$this->assertEquals(prop('value', $item), 15);
+
+		$getValue = prop('value');
+		$this->assertEquals($getValue($item), 15);
+
+		$data = [
+			[ "name" => "Foo", "value" => 15 ],
+			[ "name" => "Bar", "value" => 10 ]
+		];
+		$this->assertEquals(map(prop('value'), $data), [15, 10]);
+		$this->assertEquals(map(prop('name'), $data), ["Foo", "Bar"]);
+
+		// prop and map are both curried
+		$getValues = map(prop('value'));
+		$getNames = map(prop('name'));
+		$this->assertEquals($getValues($data), [15, 10]);
+		$this->assertEquals($getNames($data), ["Foo", "Bar"]);
   }
 
 	public function testMaybeExample() {

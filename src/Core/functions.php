@@ -7,7 +7,7 @@ function curry($callable)
 
     $recurseFunc = function () use ($ref, &$recurseFunc) {
         $args = func_get_args();
-        if (func_num_args() === $ref->getNumberOfParameters()) {
+        if (func_num_args() === $ref->getNumberOfRequiredParameters()) {
             return $ref->invokeArgs($args);
         } else {
             return function () use ($args, &$recurseFunc) {
@@ -53,11 +53,15 @@ function prop()
 function map()
 {
     $map = curry(function ($f, $x) {
-        $res = [];
-        foreach ($x as $y) {
-            $res[] = $f($y);
+        if (is_object($x) && method_exists($x, 'map')) {
+          return $x->map($f);
+        } else {
+          $res = [];
+          foreach ($x as $y) {
+              $res[] = $f($y);
+          }
+          return $res;
         }
-        return $res;
     });
     return $map(...func_get_args());
 }
@@ -65,13 +69,17 @@ function map()
 function filter()
 {
     $filter = curry(function ($f, $x) {
-        $res = [];
-        foreach ($x as $y) {
-            if ($z = $f($y)) {
-                $res[] = $z;
-            }
+        if (is_object($x) && method_exists($x, 'filter')) {
+          return $x->filter($f);
+        } else {
+          $res = [];
+          foreach ($x as $y) {
+              if ($z = $f($y)) {
+                  $res[] = $z;
+              }
+          }
+          return $res;
         }
-        return $res;
     });
     return $filter(...func_get_args());
 }
@@ -79,11 +87,15 @@ function filter()
 function reduce()
 {
     $reduce = curry(function ($f, $i, $x) {
-        $acc = $i;
-        foreach ($x as $y) {
-            $acc = $f($acc, $y);
+        if (is_object($x) && method_exists($x, 'reduce')) {
+          return $x->reduce($f, $i);
+        } else {
+          $acc = $i;
+          foreach ($x as $y) {
+              $acc = $f($acc, $y);
+          }
+          return $acc;
         }
-        return $acc;
     });
 
     return $reduce(...func_get_args());
