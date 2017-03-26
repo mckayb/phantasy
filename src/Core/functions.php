@@ -32,7 +32,9 @@ function compose(...$fns)
     );
 }
 
+// @codingStandardsIgnoreStart
 const identity = 'PHPFP\Core\identity';
+// @codingStandardsIgnoreEnd
 function identity($x)
 {
     return $x;
@@ -54,13 +56,13 @@ function map()
 {
     $map = curry(function ($f, $x) {
         if (is_object($x) && method_exists($x, 'map')) {
-          return $x->map($f);
+            return $x->map($f);
         } else {
-          $res = [];
-          foreach ($x as $y) {
-              $res[] = $f($y);
-          }
-          return $res;
+            $res = [];
+            foreach ($x as $y) {
+                $res[] = $f($y);
+            }
+            return $res;
         }
     });
     return $map(...func_get_args());
@@ -70,15 +72,15 @@ function filter()
 {
     $filter = curry(function ($f, $x) {
         if (is_object($x) && method_exists($x, 'filter')) {
-          return $x->filter($f);
+            return $x->filter($f);
         } else {
-          $res = [];
-          foreach ($x as $y) {
-              if ($z = $f($y)) {
-                  $res[] = $z;
-              }
-          }
-          return $res;
+            $res = [];
+            foreach ($x as $y) {
+                if ($z = $f($y)) {
+                    $res[] = $z;
+                }
+            }
+            return $res;
         }
     });
     return $filter(...func_get_args());
@@ -88,13 +90,13 @@ function reduce()
 {
     $reduce = curry(function ($f, $i, $x) {
         if (is_object($x) && method_exists($x, 'reduce')) {
-          return $x->reduce($f, $i);
+            return $x->reduce($f, $i);
         } else {
-          $acc = $i;
-          foreach ($x as $y) {
-              $acc = $f($acc, $y);
-          }
-          return $acc;
+            $acc = $i;
+            foreach ($x as $y) {
+                $acc = $f($acc, $y);
+            }
+            return $acc;
         }
     });
 
