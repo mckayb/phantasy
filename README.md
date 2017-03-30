@@ -1,24 +1,21 @@
-# PHP-FP [![Build Status](https://travis-ci.org/mckayb/php-fp.svg?branch=master)](https://travis-ci.org/mckayb/php-fp) [![Coverage Status](https://coveralls.io/repos/github/mckayb/php-fp/badge.svg)](https://coveralls.io/github/mckayb/php-fp)
+# Phantasy [![Build Status](https://travis-ci.org/mckayb/phantasy.svg?branch=master)](https://travis-ci.org/mckayb/phantasy) [![Coverage Status](https://coveralls.io/repos/github/mckayb/phantasy/badge.svg)](https://coveralls.io/github/mckayb/phantasy)
 Functional Programming Helpers and Data Types for PHP.
 
 ## Getting Started
 
 ### Installation
-`composer require mckayb/php-fp`
+`composer require mckayb/phantasy`
 
 ### Usage
 ```
-use PHPFP\DataTypes\Maybe\Maybe;
-use function PHPFP\Core\prop;
+use Phantasy\DataTypes\Maybe\Maybe;
+use function Phantasy\Core\prop;
 
-$users = [
-	[ "name" => "Foo", "email" => "foo@example.com"],
-	[ "name" => "Bar", "email" => "bar@example.com"]
-];
-$names = Maybe::of($users)
+$user = [ "name" => "Foo", "email" => "foo@example.com" ];
+$names = Maybe::of($user)
 	->map(prop('name'))
 	->getOrElse([]);
-// [ "Foo", "Bar" ]
+// "Foo"
 ```
 For more information, read the docs!
 

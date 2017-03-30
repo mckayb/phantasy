@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPFP\DataTypes\Validation;
+namespace Phantasy\DataTypes\Validation;
 
-use PHPFP\DataTypes\Maybe\Just;
-use PHPFP\DataTypes\Either\Right;
+use Phantasy\DataTypes\Maybe\Just;
+use Phantasy\DataTypes\Either\Right;
 
 class Success
 {

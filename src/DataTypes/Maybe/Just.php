@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPFP\DataTypes\Maybe;
+namespace Phantasy\DataTypes\Maybe;
 
-use PHPFP\DataTypes\Either\Right;
+use Phantasy\DataTypes\Either\Right;
 
 class Just
 {

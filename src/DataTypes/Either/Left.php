@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPFP\DataTypes\Either;
+namespace Phantasy\DataTypes\Either;
 
-use PHPFP\DataTypes\Maybe\Nothing;
+use Phantasy\DataTypes\Maybe\Nothing;
 
 class Left
 {

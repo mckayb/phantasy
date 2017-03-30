@@ -1,9 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use PHPFP\DataTypes\Maybe\{Maybe, Just, Nothing};
-use PHPFP\DataTypes\Either\{Either, Left, Right};
-use PHPFP\DataTypes\Validation\{Validation, Success, Failure};
+use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
+use Phantasy\DataTypes\Either\{Either, Left, Right};
+use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 
 class ValidationTest extends TestCase {
   public function testValidationOf() {

@@ -1,5 +1,5 @@
 <?php
-namespace PHPFP\Core;
+namespace Phantasy\Core;
 
 function curry($callable)
 {
@@ -28,12 +28,12 @@ function compose(...$fns)
                 return $f($g($x));
             };
         },
-        'PHPFP\Core\identity'
+        'Phantasy\Core\identity'
     );
 }
 
 // @codingStandardsIgnoreStart
-const identity = 'PHPFP\Core\identity';
+const identity = 'Phantasy\Core\identity';
 // @codingStandardsIgnoreEnd
 function identity($x)
 {

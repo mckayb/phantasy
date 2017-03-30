@@ -1,8 +1,8 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use PHPFP\DataTypes\Maybe\{Maybe, Just, Nothing};
-use PHPFP\DataTypes\Either\{Either, Left, Right};
+use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
+use Phantasy\DataTypes\Either\{Either, Left, Right};
 
 class MaybeTest extends TestCase {
   public function testMaybeOf() {

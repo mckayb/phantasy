@@ -4,10 +4,10 @@
 ### Usage
 ```php
 // If you want to call the function directly.
-use function PHPFP\Core\identity;
+use function Phantasy\Core\identity;
 
 // If you want to pass the function as a callable.
-use const PHPFP\Core\identity;
+use const Phantasy\Core\identity;
 ```
 
 ### Description
@@ -16,9 +16,9 @@ to lift a value into a function, or when you just want to return the value witho
 
 ### Examples
 ```php
-use PHPFP\DataTypes\Either\Either;
-use function PHPFP\Core\identity;
-use const PHPFP\Core\identity as id;
+use Phantasy\DataTypes\Either\Either;
+use function Phantasy\Core\identity;
+use const Phantasy\Core\identity as id;
 
 identity(1);
 // 1
@@ -39,17 +39,17 @@ Either::fromNullable('foo')
 
 ## curry
 ### Usage
-`use function PHPFP\Core\curry;`
+`use function Phantasy\Core\curry;`
 
 ### Description
 Currying is when you call a function with a number of arguments less than the number of required arguments.
 It lets you create new functions by fixing parameters of already defined functions.
-All of the functions in `PHPFP\Core` have been curried for you, eg. `map`, `filter`, `prop`, etc.
+All of the functions in `Phantasy\Core` have been curried for you, eg. `map`, `filter`, `prop`, etc.
 
 
 ### Examples
 ```php
-use function PHPFP\Core\curry;
+use function Phantasy\Core\curry;
 
 $add = curry(function($a, $b) {
   return $a + $b;
@@ -62,7 +62,7 @@ $add2(3); // 5
 $add(2, 3); // 5;
 ```
 ```php
-use function PHPFP\Core\curry;
+use function Phantasy\Core\curry;
 // You can also curry php's internal methods.
 $explode = curry('explode');
 $explodeBySpace = $explode(' ');
@@ -72,7 +72,7 @@ $explodeBySpace('foo bar');
 
 ## compose
 ### Usage
-`use function PHPFP\Core\compose`;
+`use function Phantasy\Core\compose`;
 
 ### Description
 Composition lets you chain results of multiple functions into a single function.
@@ -80,7 +80,7 @@ It helps you to manage nesting and, when combined with currying, helps you creat
 
 ### Examples
 ```php
-use function PHPFP\Core\{compose, prop, map, curry};
+use function Phantasy\Core\{compose, prop, map, curry};
 
 $data = [
   [ "title" => "Foo Bar" ],
@@ -102,14 +102,14 @@ $getSnakeTitles($data);
 
 ## prop
 ### Usage
-`use function PHPFP\Core\prop;`
+`use function Phantasy\Core\prop;`
 
 ### Description
 A helper function for extracting named values out of an array or object.
 
 ### Examples
 ```php
-use function PHPFP\Core\{map, prop};
+use function Phantasy\Core\{map, prop};
 
 $item = [ "name" => "Foo", "value" => 15 ];
 // Call it all at once
@@ -136,12 +136,12 @@ $getNames($data); // ["Foo", "Bar"]
 
 ## map
 ### Usage
-`use function PHPFP\Core\map;`
+`use function Phantasy\Core\map;`
 ### Description
 A simple wrapper around the map method. If the data passed in has a map method, it just calls that. Otherwise, it just iterates over the data and returns an array.
 ### Examples
 ```php
-use function PHPFP\Core\map;
+use function Phantasy\Core\map;
 $add1 = function($x) {
   return $x + 1;
 };
@@ -169,7 +169,7 @@ class Box {
 };
 
 // OtherFile.php
-use function PHPFP\Core\map;
+use function Phantasy\Core\map;
 $box = new Box(1);
 $add = function($x) {
   return $x + 1;
@@ -180,12 +180,12 @@ map($add, $box);
 
 ## filter
 ### Usage
-`use function PHPFP\Core\filter;`
+`use function Phantasy\Core\filter;`
 ### Description
 A simple wrapper around the filter method. If the data passed in has a filter method, it just calls that. Otherwise, it just iterates over the data and returns an array.
 ### Examples
 ```php
-use function PHPFP\Core\filter;
+use function Phantasy\Core\filter;
 
 $isOdd = function($x) {
   return $x % 2 === 1;
@@ -215,7 +215,7 @@ class Box {
 };
 
 // OtherFile.php
-use function PHPFP\Core\filter;
+use function Phantasy\Core\filter;
 $isEven = function($x) {
   return $x % 2 === 0;
 };
@@ -226,12 +226,12 @@ filter($isEven, $box);
 
 ## reduce
 ### Usage
-`use function PHPFP\Core\reduce;`
+`use function Phantasy\Core\reduce;`
 ### Description
 A simple wrapper around the filter method. If the data passed in has a reduce method, it just calls that. Otherwise, it just iterates over the data and returns an array.
 ### Examples
 ```php
-use function PHPFP\Core\reduce;
+use function Phantasy\Core\reduce;
 $total = function($sum, $x) {
   return $sum + $x;
 };
@@ -261,7 +261,7 @@ class Box {
 };
 
 // OtherFile.php
-use function PHPFP\Core\reduce;
+use function Phantasy\Core\reduce;
 $isEven = function($x) {
   return $x % 2 === 0;
 };
@@ -278,13 +278,13 @@ reduce($oddSum, 0, $box);
 
 ## semigroupConcat
 ### Usage
-`use function PHPFP\Core\semigroupConcat;`
+`use function Phantasy\Core\semigroupConcat;`
 ### Description
 Simply concatenates two types together, if the concatenation makes sense,
 or the objects have a concat method.
 ### Examples
 ```php
-use function PHPFP\Core\semigroupConcat;
+use function Phantasy\Core\semigroupConcat;
 
 semigroupConcat([1, 2], [3, 4]);
 // [1, 2, 3, 4]
@@ -305,7 +305,7 @@ class Any {
 }
 
 // OtherFile.php
-use function PHPFP\Core\semigroupConcat;
+use function Phantasy\Core\semigroupConcat;
 
 $a = new Any(true);
 $b = new Any(false);

@@ -1,10 +1,10 @@
 <?php
 
-namespace PHPFP\DataTypes\Validation;
+namespace Phantasy\DataTypes\Validation;
 
-use PHPFP\DataTypes\Either\Left;
-use PHPFP\DataTypes\Maybe\Nothing;
-use function PHPFP\Core\semigroupConcat;
+use Phantasy\DataTypes\Either\Left;
+use Phantasy\DataTypes\Maybe\Nothing;
+use function Phantasy\Core\semigroupConcat;
 
 class Failure
 {

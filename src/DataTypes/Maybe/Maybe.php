@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPFP\DataTypes\Maybe;
+namespace Phantasy\DataTypes\Maybe;
 
 class Maybe
 {

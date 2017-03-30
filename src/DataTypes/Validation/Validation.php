@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPFP\DataTypes\Validation;
+namespace Phantasy\DataTypes\Validation;
 
 class Validation
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPFP\DataTypes\Either;
+namespace Phantasy\DataTypes\Either;
 
 class Either
 {

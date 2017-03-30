@@ -1,11 +1,11 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use PHPFP\DataTypes\Either\{Either, Left, Right};
-use PHPFP\DataTypes\Maybe\{Maybe, Just, Nothing};
-use PHPFP\DataTypes\Validation\{Validation, Success, Failure};
-use function PHPFP\Core\{map, prop, identity, curry, compose};
-use const PHPFP\Core\identity;
+use Phantasy\DataTypes\Either\{Either, Left, Right};
+use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
+use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
+use function Phantasy\Core\{map, prop, identity, curry, compose};
+use const Phantasy\Core\identity;
 
 class DocsTest extends TestCase {
   public function testCallableIdentity() {

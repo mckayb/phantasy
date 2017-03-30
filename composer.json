@@ -1,5 +1,5 @@
 {
-  "name": "mckayb/php-fp",
+  "name": "mckayb/phantasy",
   "description": "A basic functional programming library for PHP",
   "type": "package",
   "license": "mit",
@@ -7,7 +7,7 @@
     {
       "name": "McKay Broderick",
       "email": "mckay.db@gmail.com",
-      "homepage": "https://github.com/mckayb/php-fp"
+      "homepage": "https://github.com/mckayb/phantasy"
     }
   ],
   "require": {
@@ -20,7 +20,7 @@
   },
   "autoload": {
     "psr-4": {
-      "PHPFP\\": "src/"
+      "Phantasy\\": "src/"
     },
     "files": [
       "src/Core/functions.php"

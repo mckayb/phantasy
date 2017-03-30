@@ -1,7 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function PHPFP\Core\{
+use function Phantasy\Core\{
   identity,
   compose,
   curry,
