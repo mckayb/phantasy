@@ -227,7 +227,7 @@ class ValidationTest extends TestCase
     public function testFailureAp()
     {
         $a = new Failure("foo");
-        $b = $a->ap(Validation::of(function($x) {
+        $b = $a->ap(Validation::of(function ($x) {
             return $x . "bar";
         }));
 

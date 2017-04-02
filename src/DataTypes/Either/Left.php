@@ -57,5 +57,6 @@ class Left
     // Conversions
     public function toMaybe()
     {
-        return new Nothing(); }
+        return new Nothing();
+    }
 }
