@@ -31,5 +31,6 @@ Find a bug? Want to make any additions?
 Just create an issue or open up a pull request.
 
 ## Inspiration
-  * [Monet.js](https://github.com/cwmyers/monet.js)
-  * [Folktale.js](https://github.com/origamitower/folktale)
+  * [Monet](https://github.com/cwmyers/monet.js)
+  * [Folktale](https://github.com/origamitower/folktale)
+  * [Fantasy Land](https://github.com/fantasyland/fantasy-land)

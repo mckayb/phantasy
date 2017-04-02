@@ -7,20 +7,20 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-				 stopOnError="false"
-				 stopOnSkipped="false"
+         stopOnError="false"
+         stopOnSkipped="false"
          stopOnRisky="false"
          stopOnIncomplete="false"
          cacheTokens="false"
-				 verbose="false">
-	<testsuites>
-		<testsuite name="Application Test Suite">
-			<directory>./test/</directory>
-		</testsuite>
-	</testsuites>
-	<filter>
-		<whitelist processUncoveredFilesFromWhiteList="true">
-			<directory suffix=".php">./src/</directory>
-		</whitelist>
+         verbose="false">
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>./test/</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhiteList="true">
+            <directory suffix=".php">./src/</directory>
+        </whitelist>
   </filter>
 </phpunit>

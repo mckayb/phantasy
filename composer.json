@@ -28,8 +28,9 @@
   },
   "scripts": {
     "test": "phpunit",
-    "lint": "phpcs --standard=PSR2 ./src",
+    "lint": "phpcs --standard=./ruleset.xml ./src ./test",
+    "lint-fix": "phpcbf --standard=./ruleset.xml ./src ./test",
     "coverage": "phpunit --coverage-clover build/logs/clover.xml",
-    "cover": "coveralls -v"
+    "upload-coverage": "coveralls -v"
   }
 }

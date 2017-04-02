@@ -22,14 +22,16 @@ class Failure
 
     public function ap($v)
     {
-        return $v instanceof Success
-            ? $this
-            : new Failure(semigroupConcat($this->value, $v->value));
+        return $this;
     }
 
     public function concat($v)
     {
-        return $this->ap($v);
+        if ($v instanceof Success) {
+            return $this;
+        } else {
+            return new Failure(semigroupConcat($this->value, $v->value));
+        }
     }
 
     public function fold($f, $g)

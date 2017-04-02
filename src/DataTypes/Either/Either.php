@@ -9,9 +9,9 @@ class Either
         return new Right($val);
     }
 
-    public static function fromNullable($val)
+    public static function fromNullable($val, $msg = null)
     {
-        return is_null($val) ? new Left($val) : new Right($val);
+        return is_null($val) ? new Left($msg) : new Right($val);
     }
 
     public static function tryCatch($f)
@@ -19,7 +19,7 @@ class Either
         try {
             return new Right($f());
         } catch (\Exception $e) {
-            return new Left($e->getMessage());
+            return new Left($e);
         }
     }
 }

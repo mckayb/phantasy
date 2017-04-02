@@ -13,4 +13,4 @@ script:
   - composer lint
 
 after_success:
-  - composer cover
+  - composer upload-coverage

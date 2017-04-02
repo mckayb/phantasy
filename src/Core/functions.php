@@ -42,63 +42,73 @@ function identity($x)
 
 function prop()
 {
-    $prop = curry(function ($s, $x) {
-        if (is_object($x)) {
-            return $x->{$s};
-        } elseif (is_array($x)) {
-            return $x[$s];
+    $prop = curry(
+        function ($s, $x) {
+            if (is_object($x)) {
+                return $x->{$s};
+            } elseif (is_array($x)) {
+                return $x[$s];
+            } else {
+                return null;
+            }
         }
-    });
+    );
     return $prop(...func_get_args());
 }
 
 function map()
 {
-    $map = curry(function ($f, $x) {
-        if (is_object($x) && method_exists($x, 'map')) {
-            return $x->map($f);
-        } else {
-            $res = [];
-            foreach ($x as $y) {
-                $res[] = $f($y);
+    $map = curry(
+        function ($f, $x) {
+            if (is_object($x) && method_exists($x, 'map')) {
+                return $x->map($f);
+            } else {
+                $res = [];
+                foreach ($x as $y) {
+                    $res[] = $f($y);
+                }
+                return $res;
             }
-            return $res;
         }
-    });
+    );
     return $map(...func_get_args());
 }
 
 function filter()
 {
-    $filter = curry(function ($f, $x) {
-        if (is_object($x) && method_exists($x, 'filter')) {
-            return $x->filter($f);
-        } else {
-            $res = [];
-            foreach ($x as $y) {
-                if ($z = $f($y)) {
-                    $res[] = $z;
+    $filter = curry(
+        function ($f, $x) {
+            if (is_object($x) && method_exists($x, 'filter')) {
+                return $x->filter($f);
+            } else {
+                $res = [];
+                foreach ($x as $y) {
+                    if ($z = $f($y)) {
+                        $res[] = $z;
+                    }
                 }
+                return $res;
             }
-            return $res;
         }
-    });
+    );
     return $filter(...func_get_args());
 }
 
 function reduce()
 {
-    $reduce = curry(function ($f, $i, $x) {
-        if (is_object($x) && method_exists($x, 'reduce')) {
-            return $x->reduce($f, $i);
-        } else {
-            $acc = $i;
-            foreach ($x as $y) {
-                $acc = $f($acc, $y);
+    $reduce = curry(
+        function ($f, $i, $x) {
+            if (is_object($x) && method_exists($x, 'reduce')) {
+                return $x->reduce($f, $i);
+            } else {
+                $acc = $i;
+                foreach ($x as $y) {
+                    $acc = $f($acc, $y);
+                }
+                return $acc;
             }
-            return $acc;
         }
-    });
+    );
 
     return $reduce(...func_get_args());
 }

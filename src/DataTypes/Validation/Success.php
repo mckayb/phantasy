@@ -22,9 +22,11 @@ class Success
     public function ap($validationWithFunc)
     {
         $val = $this->value;
-        return $validationWithFunc->map(function ($fn) use ($val) {
-            return $fn($val);
-        });
+        return $validationWithFunc->map(
+            function ($fn) use ($val) {
+                return $fn($val);
+            }
+        );
     }
 
     public function concat($validation)
