@@ -12,7 +12,7 @@ use Phantasy\DataTypes\Maybe\Maybe;
 use function Phantasy\Core\prop;
 
 $user = [ "name" => "Foo", "email" => "foo@example.com" ];
-$names = Maybe::of($user)
+$name = Maybe::of($user)
 	->map(prop('name'))
 	->getOrElse(null);
 // "Foo"
@@ -34,3 +34,4 @@ Just create an issue or open up a pull request.
   * [Monet](https://github.com/cwmyers/monet.js)
   * [Folktale](https://github.com/origamitower/folktale)
   * [Fantasy Land](https://github.com/fantasyland/fantasy-land)
+  * [Daggy](https://github.com/fantasyland/daggy)
