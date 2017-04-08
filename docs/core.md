@@ -212,7 +212,7 @@ A simple wrapper around the ap method found in an Apply.
 Used when you have an Applicative with a function, and an Applicative with a value, and you want to apply the function to the value.
 ### Examples
 ```php
-use function Phantasy\core\ap;
+use function Phantasy\Core\ap;
 use Phantasy\DataTypes\Maybe\Maybe;
 
 $mAdd = Maybe::of(function($x) {
