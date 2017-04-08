@@ -234,7 +234,7 @@ function Type()
             public function __invoke(...$fieldValues)
             {
                 if (count($this->fields) !== count($fieldValues)) {
-                    throw new Exception(
+                    throw new \Exception(
                         'There are '
                         . count($this->fields)
                         . ' fields, but '
@@ -333,9 +333,9 @@ function SumType()
                                 } elseif (isset($cases["_"]) && is_callable($cases["_"])) {
                                     return $cases["_"](...$this->fieldValues);
                                 }
-
                                 throw new \Exception('You didn\'t define a method for ' . $this->tag . '.');
                             }
+
                         };
                     };
                 }

@@ -561,6 +561,106 @@ class FunctionsTest extends TestCase
         $this->assertEquals($d, 'Point3D(1, 2, 3)');
     }
 
+    public function testNewTypeWithNotDefinedFunction()
+    {
+        $Foo = Type('Foo', ['x', 'y']);
+        $a = $Foo(1, 2);
+
+        $this->assertNull($a->test());
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testNewTypeWithWrongNumberOfArguments()
+    {
+        $Foo = Type('Foo', ['x', 'y']);
+        $a = $Foo(12);
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testSumTypeCataWithoutAllTheCases()
+    {
+        $Foo = SumType('Foo', [
+            'A' => ['x', 'y'],
+            'B' => []
+        ]);
+
+        $Foo->test = function () {
+            return $this->cata([]);
+        };
+
+        $a = $Foo->A(1, 2);
+        $a->test();
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testSumTypeCataWithoutTheProperCases()
+    {
+        $Foo = SumType('Foo', [
+            'A' => ['x', 'y'],
+            'B' => []
+        ]);
+
+        $Foo->test = function () {
+            return $this->cata([
+                'C' => function () {
+                    return 'foo';
+                },
+                'D' => function () {
+                    return 'bar';
+                }
+            ]);
+        };
+
+        $a = $Foo->A(1, 2);
+        $a->test();
+    }
+
+    public function testSumTypeCataWithUnderscoreCase()
+    {
+        $Foo = SumType('Foo', [
+            'A' => ['x', 'y'],
+            'B' => []
+        ]);
+
+        $Foo->test = function () {
+            return $this->cata([
+                'C' => function () {
+                    return 'foo';
+                },
+                '_' => function () {
+                    return 'bar';
+                }
+            ]);
+        };
+
+        $a = $Foo->A(1, 2);
+        $b = $Foo->B();
+        $this->assertEquals($a->test(), 'bar');
+        $this->assertEquals($b->test(), 'bar');
+    }
+
+    public function testSumTypeWithUndefinedMethod()
+    {
+        $Foo = SumType('Foo', [
+            'A' => [],
+            'B' => []
+        ]);
+
+        $this->assertNull($Foo->test());
+
+        $a = $Foo->A();
+        $b = $Foo->B();
+
+        $this->assertNull($a->test());
+        $this->assertNull($b->test());
+    }
+
     public function testTrace()
     {
         ini_set('xdebug.overload_var_dump', 0);
