@@ -87,8 +87,8 @@ class FunctionsTest extends TestCase
 
     public function testCurryN()
     {
-        $add = function(...$args) {
-            return array_reduce($args, function($prev, $item) {
+        $add = function (...$args) {
+            return array_reduce($args, function ($prev, $item) {
                 return $prev + $item;
             }, 0);
         };
@@ -241,7 +241,7 @@ class FunctionsTest extends TestCase
 
     public function testFMapArrays()
     {
-        $add1 = function($x) {
+        $add1 = function ($x) {
             return $x + 1;
         };
         $this->assertEquals([2, 3, 4], fmap($add1, [1, 2, 3]));
@@ -295,7 +295,7 @@ class FunctionsTest extends TestCase
 
     public function testAp()
     {
-        $a = Maybe::of(function($x) {
+        $a = Maybe::of(function ($x) {
             return $x + 1;
         });
         $b = Maybe::of(1);
@@ -304,7 +304,7 @@ class FunctionsTest extends TestCase
 
     public function testApCurried()
     {
-        $a = Maybe::of(function($x) {
+        $a = Maybe::of(function ($x) {
             return $x + 1;
         });
         $b = Maybe::of(1);
@@ -409,7 +409,7 @@ class FunctionsTest extends TestCase
 
     public function testLiftA()
     {
-        $add1 = function($x) {
+        $add1 = function ($x) {
             return $x + 1;
         };
         $this->assertEquals(liftA($add1, Maybe::of(2)), Maybe::of(3));
@@ -417,7 +417,7 @@ class FunctionsTest extends TestCase
 
     public function testLiftA2()
     {
-        $add = function($x, $y) {
+        $add = function ($x, $y) {
             return $x + $y;
         };
         $liftedAdd = liftA2(curry($add));
@@ -426,7 +426,7 @@ class FunctionsTest extends TestCase
 
     public function testLiftA3()
     {
-        $add = function($x, $y, $z) {
+        $add = function ($x, $y, $z) {
             return $x + $y + $z;
         };
         $liftedAdd = liftA3(curry($add));
@@ -438,7 +438,7 @@ class FunctionsTest extends TestCase
 
     public function testListA4()
     {
-        $add = function($w, $x, $y, $z) {
+        $add = function ($w, $x, $y, $z) {
             return $w + $x + $y + $z;
         };
         $liftedAdd = liftA4(curry($add));
@@ -450,7 +450,7 @@ class FunctionsTest extends TestCase
 
     public function testLiftA5()
     {
-        $add = function($v, $w, $x, $y, $z) {
+        $add = function ($v, $w, $x, $y, $z) {
             return $v + $w + $x + $y + $z;
         };
         $liftedAdd = liftA5(curry($add));

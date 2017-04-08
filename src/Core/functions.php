@@ -21,7 +21,7 @@ function curry($callable)
 
 function curryN($n, $callable)
 {
-    $curryN = curry(function($n, $callable) {
+    $curryN = curry(function ($n, $callable) {
         $ref = new \ReflectionFunction($callable);
 
         $recurseFunc = function () use ($ref, &$recurseFunc, $n) {
@@ -29,7 +29,7 @@ function curryN($n, $callable)
             if (func_num_args() === $n) {
                 return $ref->invokeArgs($args);
             } else {
-                return function() use ($args, &$recurseFunc) {
+                return function () use ($args, &$recurseFunc) {
                     return $recurseFunc(...array_merge($args, func_get_args()));
                 };
             }
@@ -50,7 +50,8 @@ function compose(...$fns)
                 return $f($g($x));
             };
         },
-        'Phantasy\Core\identity');
+        'Phantasy\Core\identity'
+    );
 }
 
 // @codingStandardsIgnoreStart
@@ -147,7 +148,7 @@ function reduce()
 
 function ap()
 {
-    $ap = curry(function($fa, $a) {
+    $ap = curry(function ($fa, $a) {
         return $a->ap($fa);
     });
 
@@ -156,7 +157,7 @@ function ap()
 
 function semigroupConcat()
 {
-    $semigroupConcat = curry(function($x, $y) {
+    $semigroupConcat = curry(function ($x, $y) {
         if (is_array($x) && is_array($y)) {
             return array_merge($x, $y);
         }
@@ -177,7 +178,7 @@ function semigroupConcat()
 
 function liftA()
 {
-    $liftA = curry(function($f, $a) {
+    $liftA = curry(function ($f, $a) {
         return $a->map($f);
     });
 
@@ -186,7 +187,7 @@ function liftA()
 
 function liftA2()
 {
-    $liftA2 = curry(function($f, $a1, $a2) {
+    $liftA2 = curry(function ($f, $a1, $a2) {
         return $a2->ap($a1->map($f));
     });
 
@@ -195,7 +196,7 @@ function liftA2()
 
 function liftA3()
 {
-    $liftA3 = curry(function($f, $a1, $a2, $a3) {
+    $liftA3 = curry(function ($f, $a1, $a2, $a3) {
         return $a3->ap($a2->ap($a1->map($f)));
     });
 
@@ -204,7 +205,7 @@ function liftA3()
 
 function liftA4()
 {
-    $liftA4 = curry(function($f, $a1, $a2, $a3, $a4) {
+    $liftA4 = curry(function ($f, $a1, $a2, $a3, $a4) {
         return $a4->ap($a3->ap($a2->ap($a1->map($f))));
     });
 
@@ -213,7 +214,7 @@ function liftA4()
 
 function liftA5()
 {
-    $liftA5 = curry(function($f, $a1, $a2, $a3, $a4, $a5) {
+    $liftA5 = curry(function ($f, $a1, $a2, $a3, $a4, $a5) {
         return $a5->ap($a4->ap($a3->ap($a2->ap($a1->map($f)))));
     });
 
@@ -222,14 +223,16 @@ function liftA5()
 
 function Type()
 {
-    $Type = curry(function(string $tag, array $fields) {
+    $Type = curry(function (string $tag, array $fields) {
         return new class($tag, $fields) {
-            public function __construct($tag, $fields) {
+            public function __construct($tag, $fields)
+            {
                 $this->tag = $tag;
                 $this->fields = $fields;
             }
 
-            public function __invoke(...$fieldValues) {
+            public function __invoke(...$fieldValues)
+            {
                 if (count($this->fields) !== count($fieldValues)) {
                     throw new Exception(
                         'There are '
@@ -241,7 +244,7 @@ function Type()
                 }
 
                 $tag = $this->tag;
-                $this->$tag = function(...$fieldValues) {
+                $this->$tag = function (...$fieldValues) {
                     $b = clone $this;
 
                     foreach ($b->fields as $i => $field) {
@@ -261,13 +264,15 @@ function Type()
                 return $this;
             }
 
-            public function __call($method, $args) {
+            public function __call($method, $args)
+            {
                 if (isset($this->$method) && is_callable($this->$method)) {
                     return $this->$method->call($this, ...$args);
                 }
             }
 
-            public function __toString() {
+            public function __toString()
+            {
                 return $this->tag .'(' . implode(', ', $this->fieldValues) . ')';
             }
         };
@@ -278,7 +283,7 @@ function Type()
 
 function SumType()
 {
-    $SumType = curry(function(string $name, array $constructors) {
+    $SumType = curry(function (string $name, array $constructors) {
         return new class($name, $constructors) {
             public function __construct($name, $constructors)
             {

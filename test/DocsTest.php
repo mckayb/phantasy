@@ -1,7 +1,9 @@
 <?php
 
 namespace Phantasy\Tests;
-use PHPUnit\Framework\TestCase; use Phantasy\DataTypes\Either\{Either, Left, Right};
+
+use PHPUnit\Framework\TestCase;
+use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 use function Phantasy\Core\{map, prop, identity, curry, compose, liftA, SumType};
@@ -200,30 +202,30 @@ class DocsTest extends TestCase
             'Nil' => []
         ]);
 
-        $List->map = function($f) {
+        $List->map = function ($f) {
             return $this->cata([
-                'Cons' => function($head, $tail) use ($f) {
+                'Cons' => function ($head, $tail) use ($f) {
                     return $this->Cons($f($head), map($f, $tail));
                 },
-                'Nil' => function() {
+                'Nil' => function () {
                     return $this->Nil();
                 }
             ]);
         };
 
-        $List->toArray = function() {
+        $List->toArray = function () {
             return $this->cata([
-                'Cons' => function($head, $tail) {
+                'Cons' => function ($head, $tail) {
                     return array_merge([$head], $tail);
                 },
-                'Nil' => function() {
+                'Nil' => function () {
                     return [];
                 }
             ]);
         };
 
         $c = $List->Cons(1, [2, 3])
-            ->map(function($x) {
+            ->map(function ($x) {
                 return $x * 2;
             })
             ->toArray();
