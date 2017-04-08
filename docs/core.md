@@ -70,6 +70,32 @@ $explodeBySpace('foo bar');
 // ['foo', 'bar']
 ```
 
+## curryN
+### Usage
+`use function Phantasy\Core\curryN;`
+
+### Descripion
+Used when you want to curry a function, but it has variadic arguments,
+or it has optional parameters that you want to be included in the
+currying.
+
+### Examples
+```php
+use function Phantasy\Core\CurryN;
+
+$addNums = function(...$args) {
+    return array_reduce($args, function($sum, $n) {
+        return $sum + $n;
+    }, 0);
+};
+
+$add4Nums = curryN(4, $addNums);
+$add2MoreNums = $add4Nums(1, 2);
+$add1MoreNum = $add2MoreNums(3);
+$result = $add1MoreNum(4);
+// 10
+```
+
 ## compose
 ### Usage
 `use function Phantasy\Core\compose`;
@@ -128,13 +154,13 @@ $values = map(prop('value'), $data); // [15, 10]
 $names = map(prop('name'), $data); // ["Foo", "Bar"]
 
 // prop and map are both curried
-$getValues = map(prop('values'));
-$getNames = map(prop('names'));
+$getValues = map(prop('value'));
+$getNames = map(prop('name'));
 $getValues($data); // [15, 10]
 $getNames($data); // ["Foo", "Bar"]
 ```
 
-## map
+## map (aliases: fmap)
 ### Usage
 `use function Phantasy\Core\map;`
 ### Description
@@ -176,6 +202,25 @@ $add = function($x) {
 };
 map($add, $box);
 // Box(2)
+```
+
+## ap
+### Usage
+`use function Phantasy\Core\ap;`
+### Description
+A simple wrapper around the ap method found in an Apply.
+Used when you have an Applicative with a function, and an Applicative with a value, and you want to apply the function to the value.
+### Examples
+```php
+use function Phantasy\core\ap;
+use Phantasy\DataTypes\Maybe\Maybe;
+
+$mAdd = Maybe::of(function($x) {
+    return $x + 1;
+});
+$m1 = Maybe::of(1);
+ap($mAdd, $m1);
+// Just(2)
 ```
 
 ## filter
@@ -276,6 +321,190 @@ reduce($oddSum, 0, $box);
 // Box([2]);
 ```
 
+## liftA
+### Usage
+`use function Phantasy\Core\liftA;`
+### Description
+Used to lift a function with one argument across an Applicative Functor.
+In other words, you can use this to call a function with one argument, but use Applicatives as parameters!
+### Examples
+```php
+use function Phantasy\Core\liftA;
+
+liftA('strtolower', Maybe::of('Foo Bar'));
+// Just('foo bar');
+```
+
+## liftA2
+### Usage
+`use function Phantasy\Core\liftA2;`
+### Description
+Used to lift a function with two arguments across Applicative Functors.
+In other words, you can use this to call a function with two arguments, but use Applicatives as parameters!
+One drawback, you have to make sure to curry the function before passing it to liftA2.
+### Examples
+```php
+use function Phantasy\Core\{curry, liftA2};
+
+$add = function($a, $b) {
+    return $a + $b;
+};
+liftA2(curry($add), Either::of(2), Either::of(5));
+// Right(7)
+```
+
+## liftA3
+### Usage
+`use function Phantasy\Core\liftA3;`
+### Description
+Used to lift a function with three arguments across Applicative Functors.
+In other words, you can use this to call a function with three arguments, but use Applicatives as parameters!
+One drawback, you have to make sure to curry the function before passing it to liftA3.
+### Examples
+```php
+use Phantasy\DataTypes\Validation\Validation;
+use function Phantasy\Core\{curry, liftA3};
+
+function connectToDatabase($username, $password, $host) {
+    // Connect to the DB somehow
+    return new DB()->connect([
+        'username' => $username,
+        'password' => $password,
+        'host' => $host
+    ]);
+}
+
+liftA3(
+    curry('connectToDatabase'),
+    Validation::of($username),
+    Validation::of($password),
+    Validation::of($host)
+);
+// Success($connection)
+```
+
+## liftA4
+### Usage
+`use function Phantasy\Core\liftA4;`
+### Description
+Used to lift a function with four arguments across Applicative Functors.
+In other words, you can use this to call a function with four arguments, but use Applicatives as parameters!
+One drawback, you have to make sure to curry the function before passing it to liftA4.
+### Examples
+```php
+use Phantasy\DataTypes\Validation\Validation;
+use function Phantasy\Core\{curry, liftA4};
+
+function connectToDatabase($username, $password, $host, $db_name) {
+    // Connect to the DB somehow
+    return new DB()->connect([
+        'username' => $username,
+        'password' => $password,
+        'host' => $host,
+        'database' => $db_name
+    ]);
+}
+
+liftA4(
+    curry('connectToDatabase'),
+    // Assuming these are defined somewhere...
+    Validation::of($username),
+    Validation::of($password),
+    Validation::of($host),
+    Validation::of($database_name)
+);
+// Success($connection)
+```
+
+
+## liftA5
+### Usage
+`use function Phantasy\Core\liftA5;`
+### Description
+Used to lift a function with five arguments across Applicative Functors.
+In other words, you can use this to call a function with five arguments, but use Applicatives as parameters!
+One drawback, you have to make sure to curry the function before passing it to liftA5.
+### Examples
+```php
+use function Phantasy\Core\{curryN, liftA5};
+use Phantasy\DataTypes\Maybe\Maybe;
+
+function add(...$nums) {
+    $sum = 0;
+    foreach ($nums as $num) {
+        $sum += $num;
+    }
+    return $sum;
+}
+
+// You can also use this with variadic arguments, using curryN.
+// Also, note that liftA5 is also curried, so you can partially
+// apply it's arguments as well.
+$add5Applicatives = liftA5(curryN(5, 'add'));
+
+$add5Applicatives(
+    Maybe::of(1),
+    Maybe::of(2),
+    Maybe::of(3),
+    Maybe::of(4),
+    Maybe::of(5)
+);
+// Just(15)
+```
+
+## trace
+### Usage
+`use function Phantasy\Core\trace;`
+### Description
+Used in debugging in the middle of arrow chaining, when you want
+to view the actual value inside one of your types at a certain point.
+### Examples
+```php
+use Phantasy\DataTypes\Maybe\Maybe;
+use function Phantasy\Core\{curry, map, trace};
+
+function titleCase($str) {
+    return Maybe::fromNullable($str)
+        ->map('trace')
+        ->map(curry('explode')(' '))
+        ->map('trace')
+        ->map(map('ucfirst'))
+        ->map('trace')
+        ->map(curry('implode')(''))
+        ->fold('Invalid string');
+}
+echo titleCase('foo bar');
+// Output:
+// 'foo bar'
+// ['foo', 'bar']
+// ['Foo', 'Bar']
+// 'FooBar'
+
+echo titleCase(null);
+// 'Invalid string'
+```
+
+```php
+use Phantasy\DataTypes\Maybe\Maybe;
+use function Phantasy\Core\{curry, compose, map, trace};
+
+$titleCase = compose(
+    curry('implode')(' ')
+    'trace',
+    map('ucfirst'),
+    'trace',
+    curry('explode')(' '),
+    'trace'
+);
+echo $titleCase('foo bar');
+// Output:
+// 'foo bar'
+// ['foo', 'bar']
+// ['Foo', 'Bar']
+// 'FooBar'
+```
+
+
 ## semigroupConcat
 ### Usage
 `use function Phantasy\Core\semigroupConcat;`
@@ -311,4 +540,146 @@ $a = new Any(true);
 $b = new Any(false);
 semigroupConcat($a, $b);
 // Any(false);
+```
+
+## Type
+### Usage
+`use function Phantasy\Core\Type`;
+
+### Description
+Inspired heavily by [daggy](github.com/fantasy-land/daggy), this function lets you dynamically create a tagged constructor. The best way to learn this is through examples, so let's dive right in.
+
+### Examples
+```php
+use function Phantasy\Core\Type;
+$Car = Type('Car', ['make', 'model']);
+
+// Define a new method for all Car instances
+$Car->drive = function() {
+    echo 'Zoom';
+};
+
+// Now create a representative of that type.
+$suzukiAerio = $Car('Suzuki', 'Aerio');
+// Each gets a tag property to reference what type you've created.
+$suzukiAerio->tag; // 'Car'
+$suzukiAerio->make; // 'Suzuki'
+$suzukiAerio->model; // 'Aerio'
+$suzukiAerio->drive();
+// Output:
+// Zoom
+
+```
+```php
+use function Phantasy\Core\Type;
+$Coordinate = Type('Coordinate', ['x', 'y', 'z']);
+
+// Define a scaling operation for all of the points.
+$Coordinate->scale = function($n) {
+    // Creating a new version of the same
+    // type is allowed as a property inside
+    // of the functions.
+    return $this->Coordinate(
+        $this->x * $n,
+        $this->y * $n,
+        $this->z * $n
+    );
+};
+
+$point = $Coordinate(1, 2, 3);
+$point->x; // 1
+$point->y; // 2
+$point->z; // 3
+
+$newPoint = $point->scale(2);
+$newPoint->x; // 2
+$newPoint->y; // 4
+$newPoint->z; // 6
+```
+
+## SumType
+
+### Usage
+
+### Description
+Inspired heavily by [daggy](github.com/fantasy-land/daggy), this function lets you dynamically create a new sum type, also known as union types. The best way to learn this is through examples, so let's dive right in.
+### Examples
+```php
+use function Phantasy\Core\SumType;
+
+$Option = SumType('Option', [
+    'Some' => ['x'],
+    'None' => []
+]);
+
+// This creates two functions, $Option->Some, and $Option->None
+// which take exactly as many arguments as you defined.
+// So, $Option->Some has one parameter
+// and $Option->None doesn't have any.
+
+$a = $Option->Some(1);
+$b = $Option->None();
+
+// Next, we can define methods on our Option type.
+$Option->map = function($f) {
+    // A useful helper function for working with Sum Types.
+    return $this->cata([
+        'Some' => function ($x) use ($f) {
+            return $this->Some($f($x));
+        },
+        'None' => function () {
+            return $this->None();
+        }
+    ]);
+};
+
+// And all current or future instances of our Option type
+// now have a map method!
+$c = $a->map(function ($x) {
+    return $x + 1;
+});
+// Some(2)
+
+$d = $b->map(function($x) {
+    return $x + 1;
+});
+// None()
+```
+
+```php
+use function Phantasy\Core\{SumType, map};
+
+$List = SumType('List', [
+    'Cons' => ['head', 'tail'],
+    'Nil' => []
+]);
+
+$List->map = function($f) {
+    return $this->cata([
+        'Cons' => function($head, $tail) use ($f) {
+            return $this->Cons($f($head), map($f, $tail));
+        },
+        'Nil' => function() {
+            return $this->Nil();
+        }
+    ]);
+};
+
+$List->toArray = function() {
+    return $this->cata([
+        'Cons' => function($head, $tail) {
+            return array_merge([$head], $tail);
+        },
+        'Nil' => function() {
+            return [];
+        }
+    ]);
+};
+
+$List->Cons(1, [2, 3])
+    ->map(function($x) {
+        return $x * 2;
+    })
+    ->toArray();
+// [2, 4, 6]
 ```

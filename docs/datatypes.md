@@ -290,6 +290,31 @@ Useful for lifting values into the `Validation` context.
 Validation::of(2);
 // Success(2)
 ```
+#### static fromNullable ($val)
+Checks the value that is passed in. If it's null, it returns a `new Failure()`,
+otherwise it returns a `new Success($val)`.
+```php
+$a = null;
+$b = 12;
+Validation::fromNullable($a); // Failure()
+Validation::fromNullable($b); // Success(12)
+```
+#### static tryCatch ($f)
+Performs a function that might throw an exception. If it succeeds,
+it stores the result in a `Just`, with the value of the result of the function. If it throws an exception, it returns a `new Nothing()`.
+```php
+// Throws exceptions
+$connectToDB = function() {
+    return new PDO->connect(
+        'MY_CONNECTION_STR',
+        'MY_USERNAME',
+        'MY_PASSWORD'
+    );
+};
+Validation::tryCatch($connectToDB);
+// If an exception is thrown, it returns Failure()
+// If no exception was thrown, returns Success($connection)
+```
 #### map ($f)
 Used to transform the value inside of our `Validation`.
 Applies the function `$f` to the value inside of our instance.
@@ -308,7 +333,7 @@ If the instance is a `Failure`, it just returns the instance.
 // Failure('There was a problem')
 ```
 #### ap (Validation $v)
-Used when have a `Validation` with a function, and a `Validation` with a value, and we want to apply that function to our value.
+Used when you have a `Validation` with a function, and a `Validation` with a value, and we want to apply that function to our value.
 If the instance is a `Success` it applies the function inside of `$v` to our instance.
 ```php
 $a = Validation::of(1);

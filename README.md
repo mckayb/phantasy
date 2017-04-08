@@ -14,7 +14,7 @@ use function Phantasy\Core\prop;
 $user = [ "name" => "Foo", "email" => "foo@example.com" ];
 $names = Maybe::of($user)
 	->map(prop('name'))
-	->getOrElse([]);
+	->getOrElse(null);
 // "Foo"
 ```
 For more information, read the docs!

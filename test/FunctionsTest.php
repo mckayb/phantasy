@@ -1,16 +1,27 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
+use Phantasy\DataTypes\Maybe\Maybe;
 use function Phantasy\Core\{
   identity,
   compose,
   curry,
-  semigroupConcat,
+  curryN,
   prop,
   map,
+  fmap,
+  ap,
   filter,
   reduce,
-  monoidEmpty
+  trace,
+  liftA,
+  liftA2,
+  liftA3,
+  liftA4,
+  liftA5,
+  semigroupConcat,
+  Type,
+  SumType
 };
 
 class FunctionsTest extends TestCase
@@ -72,6 +83,25 @@ class FunctionsTest extends TestCase
         $this->assertEquals($add111, 3);
         $this->assertEquals($add122, 5);
         $this->assertEquals($add123, 6);
+    }
+
+    public function testCurryN()
+    {
+        $add = function(...$args) {
+            return array_reduce($args, function($prev, $item) {
+                return $prev + $item;
+            }, 0);
+        };
+
+        $add4Nums = curryN(4, $add);
+        $add3NumsTo1 = $add4Nums(1);
+        $add2NumsTo2 = $add3NumsTo1(1);
+        $add1NumTo3 = $add2NumsTo2(1);
+
+        $this->assertEquals($add1NumTo3(1), 4);
+        $this->assertEquals($add2NumsTo2(1, 2), 5);
+        $this->assertEquals($add3NumsTo1(1, 2, 3), 7);
+        $this->assertEquals($add4Nums(1, 2, 3, 4), 10);
     }
 
     public function testSemigroupConcatArrays()
@@ -209,6 +239,79 @@ class FunctionsTest extends TestCase
         $this->assertEquals(map($add, $getBox(1)), $getBox(2));
     }
 
+    public function testFMapArrays()
+    {
+        $add1 = function($x) {
+            return $x + 1;
+        };
+        $this->assertEquals([2, 3, 4], fmap($add1, [1, 2, 3]));
+    }
+
+    public function testFMapCurried()
+    {
+        $plusOne = fmap(
+            function ($x) {
+                return $x + 1;
+            }
+        );
+        $this->assertEquals($plusOne([1, 2, 3]), [2, 3, 4]);
+    }
+
+    public function testFMapCurriedEmptyParams()
+    {
+        $a = fmap();
+        $b = $a();
+        $c = $b();
+        $d = $c(function ($x) {
+            return $x + 1;
+        });
+        $e = $d();
+        $f = $e();
+        $g = $d([2, 4, 6]);
+        $this->assertEquals([3, 5, 7], $g);
+    }
+
+    public function testFMapExample()
+    {
+        $getBox = function ($x) {
+            return new class($x) {
+                private $item = null;
+                public function __construct($item)
+                {
+                    $this->item = $item;
+                }
+                public function map($f)
+                {
+                    return new static($f($this->item));
+                }
+            };
+        };
+        $add = function ($x) {
+            return $x + 1;
+        };
+
+        $this->assertEquals(fmap($add, $getBox(1)), $getBox(2));
+    }
+
+    public function testAp()
+    {
+        $a = Maybe::of(function($x) {
+            return $x + 1;
+        });
+        $b = Maybe::of(1);
+        $this->assertEquals(Maybe::of(2), ap($a, $b));
+    }
+
+    public function testApCurried()
+    {
+        $a = Maybe::of(function($x) {
+            return $x + 1;
+        });
+        $b = Maybe::of(1);
+        $apPlusOne = ap($a);
+        $this->assertEquals(Maybe::of(2), $apPlusOne($b));
+    }
+
     public function testFilterArrays()
     {
         $f = function ($x) {
@@ -302,5 +405,170 @@ class FunctionsTest extends TestCase
         };
         $box = $getClass([1, 2, 3]);
         $this->assertEquals(reduce($oddSum, 0, $box), 4);
+    }
+
+    public function testLiftA()
+    {
+        $add1 = function($x) {
+            return $x + 1;
+        };
+        $this->assertEquals(liftA($add1, Maybe::of(2)), Maybe::of(3));
+    }
+
+    public function testLiftA2()
+    {
+        $add = function($x, $y) {
+            return $x + $y;
+        };
+        $liftedAdd = liftA2(curry($add));
+        $this->assertEquals($liftedAdd(Maybe::of(2), Maybe::of(3)), Maybe::of(5));
+    }
+
+    public function testLiftA3()
+    {
+        $add = function($x, $y, $z) {
+            return $x + $y + $z;
+        };
+        $liftedAdd = liftA3(curry($add));
+        $this->assertEquals(
+            $liftedAdd(Maybe::of(1), Maybe::of(2), Maybe::of(3)),
+            Maybe::of(6)
+        );
+    }
+
+    public function testListA4()
+    {
+        $add = function($w, $x, $y, $z) {
+            return $w + $x + $y + $z;
+        };
+        $liftedAdd = liftA4(curry($add));
+        $this->assertEquals(
+            $liftedAdd(Maybe::of(1), Maybe::of(2), Maybe::of(3), Maybe::of(4)),
+            Maybe::of(10)
+        );
+    }
+
+    public function testLiftA5()
+    {
+        $add = function($v, $w, $x, $y, $z) {
+            return $v + $w + $x + $y + $z;
+        };
+        $liftedAdd = liftA5(curry($add));
+        $this->assertEquals(
+            $liftedAdd(Maybe::of(1), Maybe::of(2), Maybe::of(3), Maybe::of(4), Maybe::of(5)),
+            Maybe::of(15)
+        );
+    }
+
+    public function testOptionSumType()
+    {
+        $option = SumType('Option', [
+            'Some' => ['x'],
+            'None' => []
+        ]);
+        ob_start();
+        echo $option;
+        $d = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals($d, 'Option');
+
+        $a = $option->Some(1);
+        $b = $option->None();
+
+        $option->map = function ($f) {
+            return $this->cata([
+                'Some' => function ($x) use ($f) {
+                    return $this->Some($f($x));
+                },
+                'None' => function () {
+                    return $this->None();
+                }
+            ]);
+        };
+
+        $c = $a->map(function ($x) {
+            return $x + 1;
+        });
+        $d = $b->map(function ($x) {
+            return $x + 1;
+        });
+        $this->assertEquals($option->Some(2), $c);
+        $this->assertEquals($option->None(), $d);
+    }
+
+    public function testMultipleValueSumType()
+    {
+        $foo = SumType('Foo', [
+            'A' => ['a', 'b'],
+            'B' => ['c', 'd']
+        ]);
+
+        $a = $foo->A('foo', 'bar');
+        $b = $foo->B('foo', 'baz');
+
+        ob_start();
+        echo $a;
+        $d = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals($d, 'Foo.A(foo, bar)');
+
+        $foo->map = function ($f) {
+            return $this->cata([
+                'A' => function ($a, $b) use ($f) {
+                    return $this->A($f($a), $f($b));
+                },
+                'B' => function ($c, $d) use ($f) {
+                    return $this->B($f($c), $d);
+                }
+            ]);
+        };
+
+        $c = $a->map(function ($x) {
+            return $x . 'test';
+        });
+        $d = $b->map(function ($x) {
+            return $x . 'tester';
+        });
+
+        $this->assertEquals($foo->A('footest', 'bartest'), $c);
+        $this->assertEquals($foo->B('footester', 'baz'), $d);
+    }
+
+    public function testNewType()
+    {
+        ini_set('xdebug.overload_var_dump', 0);
+        $Point3D = Type('Point3D', ['x', 'y', 'z']);
+
+        $a = $Point3D(1, 2, 3);
+        $this->assertEquals($a->x, 1);
+        $this->assertEquals($a->y, 2);
+        $this->assertEquals($a->z, 3);
+
+        $Point3D->scale = function ($n) {
+            return $this->Point3D($n * $this->x, $n * $this->y, $n * $this->z);
+        };
+
+        $b = $a->scale(2);
+        $this->assertEquals($b->x, 2);
+        $this->assertEquals($b->y, 4);
+        $this->assertEquals($b->z, 6);
+
+        ob_start();
+        echo $a;
+        $d = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEquals($d, 'Point3D(1, 2, 3)');
+    }
+
+    public function testTrace()
+    {
+        ini_set('xdebug.overload_var_dump', 0);
+        ob_start();
+        $a = trace('Hello!');
+        $b = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals(trim($b), 'string(6) "Hello!"');
+        $this->assertEquals($a, 'Hello!');
     }
 }
