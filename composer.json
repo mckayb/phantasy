@@ -23,7 +23,8 @@
       "Phantasy\\": "src/"
     },
     "files": [
-      "src/Core/functions.php"
+      "src/Core/functions.php",
+      "src/Core/php-functions.php"
     ]
   },
   "scripts": {
