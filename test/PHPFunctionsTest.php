@@ -80,12 +80,63 @@ use function Phantasy\Core\PHP\{
     strcoll,
     strcspn,
     strcspn3,
-    strcspn4
+    strcspn4,
+    strip_tags,
+    strip_tags2,
+    stripcslashes,
+    stripos,
+    stripos3,
+    stripslashes,
+    stristr,
+    stristr3,
+    strlen,
+    strnatcasecmp,
+    strnatcmp,
+    strncasecmp,
+    strncmp,
+    strpbrk,
+    strpos,
+    strpos3,
+    strrchr,
+    strrev,
+    strripos,
+    strripos3,
+    strrpos,
+    strrpos3,
+    strspn,
+    strspn3,
+    strspn4,
+    strstr,
+    strstr3,
+    strtok,
+    strtok1,
+    strtolower,
+    strtoupper,
+    strtr,
+    substr_compare,
+    substr_compare4,
+    substr_compare5,
+    substr_count,
+    substr_count3,
+    substr_count4,
+    substr_replace,
+    substr_replace4,
+    substr,
+    substr3,
+    trim,
+    trim2,
+    ucfirst,
+    ucwords,
+    ucwords2,
+    wordwrap,
+    wordwrap2,
+    wordwrap3,
+    wordwrap4
 };
 
 class PHPFunctionsTest extends TestCase
 {
-    function testExplode()
+    public function testExplode()
     {
         $this->assertEquals(explode(' ', 'foo bar'), \explode(' ', 'foo bar'));
         $this->assertEquals(explode(' ', 'foo bar'), ['foo', 'bar']);
@@ -94,7 +145,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($explodeBySpace('foo bar'), ['foo', 'bar']);
     }
 
-    function testImplode()
+    public function testImplode()
     {
         $arr = ['one', 'two', 'three'];
         $this->assertEquals(implode(',', $arr), \implode(',', $arr));
@@ -104,7 +155,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($joinByComma($arr), 'one,two,three');
     }
 
-    function testAddCSlashes()
+    public function testAddCSlashes()
     {
         $this->assertEquals(addcslashes('A..z', 'foo[ ]'), \addcslashes('foo[ ]', 'A..z'));
         $this->assertEquals(addcslashes('A..z', 'foo[ ]'), '\f\o\o\[ \]');
@@ -113,7 +164,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($addCSlashesAToZ('foo[ ]'), '\f\o\o\[ \]');
     }
 
-    function testAddSlashes()
+    public function testAddSlashes()
     {
         $str = "Is your name O'Reilly?";
 
@@ -124,7 +175,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($addSlashes($str), "Is your name O\'Reilly?");
     }
 
-    function testBin2Hex()
+    public function testBin2Hex()
     {
         $this->assertEquals(bin2hex('test'), \bin2hex('test'));
         $this->assertEquals(bin2hex('test'), '74657374');
@@ -133,7 +184,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($bin2Hex('test'), '74657374');
     }
 
-    function testChop()
+    public function testChop()
     {
         $this->assertEquals(chop("test\n"), \chop("test\n"));
         $this->assertEquals(chop("test\n"), "test");
@@ -142,7 +193,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($chop("test\n"), "test");
     }
 
-    function testChop2()
+    public function testChop2()
     {
         $this->assertEquals(chop2("World!", "Hello World!"), \chop("Hello World!", "World!"));
         $this->assertEquals(chop2("World!", "Hello World!"), "Hello ");
@@ -151,7 +202,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($chopWorld("Hello World!"), "Hello ");
     }
 
-    function testChr()
+    public function testChr()
     {
         $this->assertEquals(chr(046), \chr(046));
         $this->assertEquals(chr(046), "&");
@@ -160,7 +211,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($chr(046), "&");
     }
 
-    function testChunkSplit()
+    public function testChunkSplit()
     {
         $this->assertEquals(chunk_split("test"), \chunk_split("test"));
         $this->assertEquals(chunk_split("test"), "test\r\n");
@@ -169,7 +220,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($chunkSplit("test"), "test\r\n");
     }
 
-    function testChunkSplit2()
+    public function testChunkSplit2()
     {
         $this->assertEquals(chunk_split2(2, "test"), \chunk_split("test", 2));
         $this->assertEquals(chunk_split2(2, "test"), "te\r\nst\r\n");
@@ -178,7 +229,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($chunkSplitLen2("test"), "te\r\nst\r\n");
     }
 
-    function testChunkSplit3()
+    public function testChunkSplit3()
     {
         $this->assertEquals(chunk_split3(2, '.', 'test'), \chunk_split('test', 2, '.'));
         $this->assertEquals(chunk_split3(2, '.', "test"), "te.st.");
@@ -189,7 +240,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($chunkSplitLen2Dot("test"), "te.st.");
     }
 
-    function testConvertCyrString()
+    public function testConvertCyrString()
     {
         $str = "Good Morning..";
         $expected = "Good Morning..";
@@ -200,25 +251,25 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($convertFromWToA($str), $expected);
     }
 
-    function testConvertUUDecode()
+    public function testConvertUUDecode()
     {
         $this->assertEquals(convert_uudecode("+22!L;W9E(%!(4\"$`\n`"), \convert_uudecode("+22!L;W9E(%!(4\"$`\n`"));
         $this->assertEquals(convert_uudecode("+22!L;W9E(%!(4\"$`\n`"), 'I love PHP!');
     }
 
-    function testConvertUUEncode()
+    public function testConvertUUEncode()
     {
         $this->assertEquals(convert_uuencode('I love PHP!'), \convert_uuencode('I love PHP!'));
         $this->assertEquals(convert_uuencode('I love PHP!'), "+22!L;W9E(%!(4\"$`\n`\n");
     }
 
-    function testCountChars()
+    public function testCountChars()
     {
         $this->assertEquals(count_chars('Test'), \count_chars('Test'));
         $res = count_chars('Test');
         $this->assertCount(256, $res);
 
-        $this->assertEquals(array_filter($res, function($x) {
+        $this->assertEquals(array_filter($res, function ($x) {
             return $x > 0;
         }), [
             '84' => 1,
@@ -228,7 +279,7 @@ class PHPFunctionsTest extends TestCase
         ]);
     }
 
-    function testCountChars2()
+    public function testCountChars2()
     {
         $this->assertEquals(count_chars2(1, 'Test'), \count_chars('Test', 1));
         $this->assertEquals(count_chars2(1, 'Test'), [
@@ -247,7 +298,7 @@ class PHPFunctionsTest extends TestCase
         ]);
     }
 
-    function testCrc32()
+    public function testCrc32()
     {
         $this->assertEquals(crc32('test'), \crc32('test'));
         $this->assertEquals(crc32('test'), 3632233996);
@@ -256,19 +307,19 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($crc32('test'), 3632233996);
     }
 
-    function testCrypt()
+    public function testCrypt()
     {
         $this->assertEquals(crypt('Foo', 'Test'), \crypt('Test', 'Foo'));
         $this->assertEquals(crypt('Foo', 'Test'), 'Foh5xTm5Uw31I');
     }
 
-    function testHex2Bin()
+    public function testHex2Bin()
     {
         $this->assertEquals(hex2bin('6578616d706c65206865782064617461'), \hex2bin('6578616d706c65206865782064617461'));
         $this->assertEquals(hex2bin('6578616d706c65206865782064617461'), 'example hex data');
     }
 
-    function testHtmlSpecialCharsDecode()
+    public function testHtmlSpecialCharsDecode()
     {
         $this->assertEquals(
             htmlspecialchars_decode('<p>this -&gt; &quot;</p>\n'),
@@ -280,7 +331,7 @@ class PHPFunctionsTest extends TestCase
         );
     }
 
-    function testHtmlSpecialCharsDecode2()
+    public function testHtmlSpecialCharsDecode2()
     {
         $this->assertEquals(
             htmlspecialchars_decode2(ENT_NOQUOTES, '<p>this -&gt; &quot;</p>\n'),
@@ -294,7 +345,7 @@ class PHPFunctionsTest extends TestCase
         );
     }
 
-    function testJoin()
+    public function testJoin()
     {
         $arr = ['one', 'two', 'three'];
         $this->assertEquals(join(',', $arr), \join(',', $arr));
@@ -304,7 +355,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($joinByComma($arr), 'one,two,three');
     }
 
-    function testLcFirst()
+    public function testLcFirst()
     {
         $this->assertEquals(lcfirst('HelloWorld'), \lcfirst('HelloWorld'));
         $this->assertEquals(lcfirst('HelloWorld'), 'helloWorld');
@@ -313,33 +364,33 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($lcFirst('HelloWorld'), 'helloWorld');
     }
 
-    function testLevenshtein()
+    public function testLevenshtein()
     {
         $this->assertEquals(levenshtein('carrrot', 'carrot'), \levenshtein('carrrot', 'carrot'));
     }
 
-    function testLevenshtein5()
+    public function testLevenshtein5()
     {
         $a = '1 apple';
         $b = '2 apples';
         $this->assertEquals(levenshtein5(1, 0, 0, $a, $b), \levenshtein($a, $b, 1, 0, 0));
     }
 
-    function testLTrim()
+    public function testLTrim()
     {
         $a = "\t\tThese are a few words :) ...  ";
         $this->assertEquals(ltrim($a), \ltrim($a));
         $this->assertEquals(ltrim($a), "These are a few words :) ...  ");
     }
 
-    function testLTrim2()
+    public function testLTrim2()
     {
         $a = "\t\tThese are a few words :) ...  ";
         $this->assertEquals(ltrim2(" \t.", $a), \ltrim($a, " \t."));
         $this->assertEquals(ltrim2(" \t.", $a), "These are a few words :) ...  ");
     }
 
-    function testMd5File()
+    public function testMd5File()
     {
         $this->assertEquals(
             md5_file(realpath(dirname(__FILE__)) . '/fixtures/config.json'),
@@ -352,7 +403,7 @@ class PHPFunctionsTest extends TestCase
         );
     }
 
-    function testMd5File2()
+    public function testMd5File2()
     {
         $this->assertEquals(
             md5_file2(true, realpath(dirname(__FILE__)) . '/fixtures/config.json'),
@@ -360,7 +411,7 @@ class PHPFunctionsTest extends TestCase
         );
     }
 
-    function testMd5()
+    public function testMd5()
     {
         $str = 'apple';
         $expected = '1f3870be274f6c49b3e31a0c6728957f';
@@ -369,19 +420,19 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals(md5($str), $expected);
     }
 
-    function testMd52()
+    public function testMd52()
     {
         $str = 'apple';
         $this->assertEquals(md52(true, $str), \md5($str, true));
     }
 
-    function testMetaphone()
+    public function testMetaphone()
     {
         $this->assertEquals(metaphone('programming'), \metaphone('programming'));
         $this->assertEquals(metaphone('programming'), 'PRKRMNK');
     }
 
-    function testMetaphone2()
+    public function testMetaphone2()
     {
         $this->assertEquals(metaphone2(5, 'programming'), \metaphone('programming', 5));
         $this->assertEquals(metaphone2(5, 'programming'), 'PRKRM');
@@ -390,7 +441,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($metaphone5Phonemes('programming'), 'PRKRM');
     }
 
-    function testMoneyFormat()
+    public function testMoneyFormat()
     {
         $num = 1234.56;
         setlocale(LC_MONETARY, 'en_IN');
@@ -398,7 +449,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals(money_format('%i', $num), 'INR 1,234.56');
     }
 
-    function testNLLangInfo()
+    public function testNLLangInfo()
     {
         $this->assertEquals(nl_langinfo(MON_1), \nl_langinfo(MON_1));
         $this->assertEquals(nl_langinfo(MON_1), "January");
@@ -407,14 +458,14 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($nlLangInfo(MON_1), "January");
     }
 
-    function testNL2BR()
+    public function testNL2BR()
     {
         $str = "foo isn't\n bar";
         $this->assertEquals(nl2br($str), \nl2br($str));
         $this->assertEquals(nl2br($str), "foo isn't<br />\n bar");
     }
 
-    function testNL2BR2()
+    public function testNL2BR2()
     {
         $str = "Welcome\r\nThis is my HTML document";
         $expected = "Welcome<br>\r\nThis is my HTML document";
@@ -426,7 +477,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($nl2brNotXHtml($str), $expected);
     }
 
-    function testNumberFormat()
+    public function testNumberFormat()
     {
         $num = 1234.56;
         $this->assertEquals(number_format($num), \number_format($num));
@@ -436,7 +487,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($numFormat($num), '1,235');
     }
 
-    function testNumberFormat2()
+    public function testNumberFormat2()
     {
         $num = 1234.56;
         $this->assertEquals(number_format2(2, $num), \number_format($num, 2));
@@ -446,7 +497,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($formatTo2Decimals($num), '1,234.56');
     }
 
-    function testNumberFormat4()
+    public function testNumberFormat4()
     {
         $num = 1234.56;
         $this->assertEquals(number_format4(2, ',', ' ', $num), \number_format($num, 2, ',', ' '));
@@ -456,7 +507,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($frNumberFormat($num), '1 234,56');
     }
 
-    function testOrd()
+    public function testOrd()
     {
         $str = "\n";
         $this->assertEquals(ord($str), \ord($str));
@@ -466,7 +517,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($ord($str), 10);
     }
 
-    function testParseStr()
+    public function testParseStr()
     {
         $str = "first=value&arr[]=foo+bar&arr[]=baz";
         $output = parse_str($str);
@@ -474,7 +525,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($output, $expected);
     }
 
-    function testQuotemeta()
+    public function testQuotemeta()
     {
         $str = "Hello world. (can you hear me?)";
         $expected = "Hello world\. \(can you hear me\?\)";
@@ -485,7 +536,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($quotemeta($str), $expected);
     }
 
-    function testRTrim()
+    public function testRTrim()
     {
         $this->assertEquals(rtrim("test\n"), \rtrim("test\n"));
         $this->assertEquals(rtrim("test\n"), "test");
@@ -494,7 +545,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($rtrim("test\n"), "test");
     }
 
-    function testRTrim2()
+    public function testRTrim2()
     {
         $this->assertEquals(rtrim2("World!", "Hello World!"), \rtrim("Hello World!", "World!"));
         $this->assertEquals(rtrim2("World!", "Hello World!"), "Hello ");
@@ -503,7 +554,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($rtrimWorld("Hello World!"), "Hello ");
     }
 
-    function testSHA1File()
+    public function testSHA1File()
     {
         $this->assertEquals(
             sha1_file(realpath(dirname(__FILE__)) . '/fixtures/config.json'),
@@ -516,7 +567,7 @@ class PHPFunctionsTest extends TestCase
         );
     }
 
-    function testSHA1File2()
+    public function testSHA1File2()
     {
         $this->assertEquals(
             sha1_file2(false, realpath(dirname(__FILE__)) . '/fixtures/config.json'),
@@ -530,7 +581,7 @@ class PHPFunctionsTest extends TestCase
         );
     }
 
-    function testSha1()
+    public function testSha1()
     {
         $str = 'apple';
         $expected = 'd0be2dc421be4fcd0172e5afceea3970e2f3d940';
@@ -542,13 +593,13 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($sha1($str), $expected);
     }
 
-    function testSha12()
+    public function testSha12()
     {
         $str = 'apple';
         $this->assertEquals(sha12(true, $str), \sha1($str, true));
     }
 
-    function testSimilarText()
+    public function testSimilarText()
     {
         $a = 'This is a test!';
         $b = 'A test, this is!';
@@ -559,7 +610,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($similarToA($b), 7);
     }
 
-    function testSimilarTextPct()
+    public function testSimilarTextPct()
     {
         $a = 'This is a test!';
         $b = 'A test, this is!';
@@ -572,7 +623,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($similarToA($b), $expected);
     }
 
-    function testSoundex()
+    public function testSoundex()
     {
         $str = 'Euler';
         $expected = 'E460';
@@ -583,7 +634,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($soundex($str), $expected);
     }
 
-    function testStrGetCSV()
+    public function testStrGetCSV()
     {
         $str = 'a,b';
         $this->assertEquals(str_getcsv($str), \str_getcsv($str));
@@ -593,7 +644,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($strGetCSV($str), ['a', 'b']);
     }
 
-    function testStrGetCSV2()
+    public function testStrGetCSV2()
     {
         $str = 'a.b';
         $this->assertEquals(str_getcsv2('.', $str), \str_getcsv($str, '.'));
@@ -603,7 +654,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($getCSVDotSep($str), ['a', 'b']);
     }
 
-    function testStrGetCSV3()
+    public function testStrGetCSV3()
     {
         $str = '&a&.&b&';
         $this->assertEquals(str_getcsv3('.', '&', $str), \str_getcsv($str, '.', '&'));
@@ -614,7 +665,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($getCSVDotSepAmpEnclosure($str), ['a', 'b']);
     }
 
-    function testStrGetCSV4()
+    public function testStrGetCSV4()
     {
         $str = '&^a&.&^b&';
         $this->assertEquals(str_getcsv4('.', '&', '^', $str), \str_getcsv($str, '.', '&', '^'));
@@ -624,7 +675,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($getCSVDotSepAmpEnclosureCaretEscape($str), ['^a', '^b']);
     }
 
-    function testStrIReplace()
+    public function testStrIReplace()
     {
         $str = 'This is a test!';
         $this->assertEquals(str_ireplace('!', '.', $str), \str_ireplace('!', '.', $str));
@@ -634,7 +685,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($quiet($str), 'This is a test.');
     }
 
-    function testStrIReplaceCount()
+    public function testStrIReplaceCount()
     {
         $str = 'This is a test!';
         \str_ireplace('!', '.', $str, $count);
@@ -645,7 +696,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($quiet($str), 1);
     }
 
-    function testStrPad()
+    public function testStrPad()
     {
         $str = 'Alien';
         $this->assertEquals(str_pad(6, $str), \str_pad($str, 6));
@@ -655,7 +706,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($padTo6($str), 'Alien ');
     }
 
-    function testStrPad3()
+    public function testStrPad3()
     {
         $str = 'Alien';
         $this->assertEquals(str_pad3(6, '-', $str), \str_pad($str, 6, '-'));
@@ -666,7 +717,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($padTo6WithDash($str), 'Alien-');
     }
 
-    function testStrPad4()
+    public function testStrPad4()
     {
         $str = 'Alien';
         $this->assertEquals(str_pad4(7, '-', STR_PAD_LEFT, $str), \str_pad($str, 7, '-', STR_PAD_LEFT));
@@ -677,7 +728,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($padTo7WithDashOnTheLeft($str), '--Alien');
     }
 
-    function testStrRepeat()
+    public function testStrRepeat()
     {
         $this->assertEquals(str_repeat(2, 'a'), \str_repeat('a', 2));
         $this->assertEquals(str_repeat(2, 'a'), 'aa');
@@ -686,7 +737,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($repeatTwice('a'), 'aa');
     }
 
-    function testStrReplace()
+    public function testStrReplace()
     {
         $str = 'This is a test!';
         $this->assertEquals(str_replace('!', '.', $str), \str_replace('!', '.', $str));
@@ -696,7 +747,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($quiet($str), 'This is a test.');
     }
 
-    function testStrReplaceCount()
+    public function testStrReplaceCount()
     {
         $str = 'This is a test!';
         \str_replace('!', '.', $str, $count);
@@ -707,7 +758,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($quiet($str), 1);
     }
 
-    function testStrRot13()
+    public function testStrRot13()
     {
         $str = 'PHP 4.3.0';
         $expected = 'CUC 4.3.0';
@@ -718,7 +769,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($strRot13($str), $expected);
     }
 
-    function testStrShuffle()
+    public function testStrShuffle()
     {
         $str = 'abcdefg';
         $this->assertEquals(strlen(str_shuffle($str)), strlen(\str_shuffle($str)));
@@ -727,7 +778,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals(strlen($shuffle($str)), strlen(\str_shuffle($str)));
     }
 
-    function testStrSplit()
+    public function testStrSplit()
     {
         $str = 'abc';
         $this->assertEquals(str_split($str), \str_split($str));
@@ -737,7 +788,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($strSplit($str), ['a', 'b', 'c']);
     }
 
-    function testStrSplit2()
+    public function testStrSplit2()
     {
         $str = 'abc';
         $this->assertEquals(str_split2(2, $str), \str_split($str, 2));
@@ -747,7 +798,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($strSplit2($str), ['ab', 'c']);
     }
 
-    function testStrWordCount()
+    public function testStrWordCount()
     {
         $str = 'This is a test.';
         $this->assertEquals(str_word_count($str), \str_word_count($str));
@@ -757,7 +808,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($wc($str), 4);
     }
 
-    function testStrWordCount2()
+    public function testStrWordCount2()
     {
         $str = 'This is a test.';
         $this->assertEquals(str_word_count2(1, $str), \str_word_count($str, 1));
@@ -767,7 +818,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($words($str), ['This', 'is', 'a', 'test']);
     }
 
-    function testStrWordCount3()
+    public function testStrWordCount3()
     {
         $str = 'This is a test.';
         $this->assertEquals(str_word_count3(0, "\ ", $str), \str_word_count($str, 0, "\ "));
@@ -777,7 +828,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($wc($str), 1);
     }
 
-    function testStrCaseCmp()
+    public function testStrCaseCmp()
     {
         $a = 'a';
         $b = 'b';
@@ -788,7 +839,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($cmpWitha($b), -1);
     }
 
-    function testStrChr()
+    public function testStrChr()
     {
         $email  = 'name@example.com';
         $this->assertEquals(strchr('@', $email), \strchr($email, '@'));
@@ -798,7 +849,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($searchForAt($email), '@example.com');
     }
 
-    function testStrChr3()
+    public function testStrChr3()
     {
         $email  = 'name@example.com';
         $this->assertEquals(strchr3(true, '@', $email), \strchr($email, '@', true));
@@ -808,7 +859,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($searchForAt($email), 'name');
     }
 
-    function testStrCmp()
+    public function testStrCmp()
     {
         $a = 'a';
         $b = 'b';
@@ -819,7 +870,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($cmpWitha($b), -1);
     }
 
-    function testStrColl()
+    public function testStrColl()
     {
         $a = 'a';
         $b = 'b';
@@ -830,7 +881,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($cmpWitha($b), -1);
     }
 
-    function testStrcspn()
+    public function testStrcspn()
     {
         $a = 'abcd';
         $b = 'apple';
@@ -841,7 +892,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($strcspnB($a), \strcspn($a, $b));
     }
 
-    function testStrcspn3()
+    public function testStrcspn3()
     {
         $a = 'abcdhelloabcd';
         $b = 'abcd';
@@ -852,7 +903,7 @@ class PHPFunctionsTest extends TestCase
         $this->assertEquals($f($b, $a), \strcspn($a, $b, -9));
     }
 
-    function testStrcspn4()
+    public function testStrcspn4()
     {
         $a = 'abcdhelloabcd';
         $b = 'abcd';
@@ -861,5 +912,507 @@ class PHPFunctionsTest extends TestCase
 
         $f = strcspn4(-9, -5);
         $this->assertEquals($f($b, $a), \strcspn($a, $b, -9, -5));
+    }
+
+    public function testStripTags()
+    {
+        $text = '<p>Test paragraph.</p><!-- Comment --> <a href="#fragment">Other text</a>';
+        $this->assertEquals(strip_tags($text), \strip_tags($text));
+
+        $stripTags = strip_tags();
+        $this->assertEquals($stripTags($text), \strip_tags($text));
+    }
+
+    public function testStripTags2()
+    {
+        $text = '<p>Test paragraph.</p><!-- Comment --> <a href="#fragment">Other text</a>';
+        $this->assertEquals(strip_tags2('<p><a>', $text), \strip_tags($text, '<p><a>'));
+
+        $stripTagsKeepPAndA = strip_tags2('<p><a>');
+        $this->assertEquals($stripTagsKeepPAndA($text), \strip_tags($text, '<p><a>'));
+    }
+
+    public function testStripCSlashes()
+    {
+        $str = '\f\o\o\[ \]';
+        $this->assertEquals(stripcslashes($str), \stripcslashes($str));
+
+        $stripcslashes = stripcslashes();
+        $this->assertEquals($stripcslashes($str), \stripcslashes($str));
+    }
+
+    public function testStripos()
+    {
+        $findme    = 'a';
+        $mystring1 = 'xyz';
+        $mystring2 = 'ABC';
+
+        $pos1 = stripos($findme, $mystring1);
+        $pos2 = stripos($findme, $mystring2);
+
+        $this->assertEquals($pos1, \stripos($mystring1, $findme));
+        $this->assertEquals($pos2, \stripos($mystring2, $findme));
+
+        $findA = stripos($findme);
+        $this->assertEquals($findA($mystring1), \stripos($mystring1, $findme));
+        $this->assertEquals($findA($mystring2), \stripos($mystring2, $findme));
+    }
+
+    public function testStripos3()
+    {
+        $findme    = 'a';
+        $mystring1 = 'xyz';
+        $mystring2 = 'ABC';
+
+        $pos1 = stripos3(1, $findme, $mystring1);
+        $pos2 = stripos3(1, $findme, $mystring2);
+
+        $this->assertEquals($pos1, \stripos($mystring1, $findme, 1));
+        $this->assertEquals($pos2, \stripos($mystring2, $findme, 1));
+
+        $findA = stripos3(1, $findme);
+        $this->assertEquals($findA($mystring1), \stripos($mystring1, $findme, 1));
+        $this->assertEquals($findA($mystring2), \stripos($mystring2, $findme, 1));
+    }
+
+    public function testStripslashes()
+    {
+        $str = "Is your name O\'reilly?";
+        $this->assertEquals(stripslashes($str), \stripslashes($str));
+
+        $stripslashes = stripslashes();
+        $this->assertEquals($stripslashes($str), \stripslashes($str));
+    }
+
+    public function testStristr()
+    {
+        $str = 'This is a test foo';
+        $this->assertEquals(stristr('test', $str), \stristr($str, 'test'));
+
+        $afterTest = stristr('test');
+        $this->assertEquals($afterTest($str), \stristr($str, 'test'));
+    }
+
+    public function testStristr3()
+    {
+        $str = 'This is a test foo';
+        $this->assertEquals(stristr3(true, 'test', $str), \stristr($str, 'test', true));
+
+        $beforeTest = stristr3(true, 'test');
+        $this->assertEquals($beforeTest($str), \stristr($str, 'test', true));
+    }
+
+    public function testStrlen()
+    {
+        $str = 'This is a test';
+        $this->assertEquals(strlen($str), \strlen($str));
+
+        $strlen = strlen();
+        $this->assertEquals($strlen($str), \strlen($str));
+    }
+
+    public function testStrnatcasecmp()
+    {
+        $a = 'A';
+        $b = 'B';
+
+        $this->assertEquals(strnatcasecmp($a, $b), \strnatcasecmp($a, $b));
+
+        $cmpA = strnatcasecmp($a);
+        $this->assertEquals($cmpA($b), \strnatcasecmp($a, $b));
+    }
+
+    public function testStrnatcmp()
+    {
+        $a = 'A';
+        $b = 'B';
+        $this->assertEquals(strnatcmp($a, $b), \strnatcmp($a, $b));
+
+        $cmpA = strnatcmp($a);
+        $this->assertEquals($cmpA($b), \strnatcmp($a, $b));
+    }
+
+    public function testStrncasecmp()
+    {
+        $a = 'This is a foo.';
+        $b = 'This is a bar.';
+
+        $this->assertEquals(strncasecmp(5, $a, $b), \strncasecmp($a, $b, 5));
+
+        $cmpFirst5 = strncasecmp(5);
+        $this->assertEquals($cmpFirst5($a, $b), \strncasecmp($a, $b, 5));
+    }
+
+    public function testStrncmp()
+    {
+        $a = 'This is a foo.';
+        $b = 'This is a bar.';
+
+        $this->assertEquals(strncmp(5, $a, $b), \strncmp($a, $b, 5));
+
+        $cmpFirst5 = strncmp(5);
+        $this->assertEquals($cmpFirst5($a, $b), \strncmp($a, $b, 5));
+    }
+
+    public function testStrpbrk()
+    {
+        $text = 'This is a Simple text.';
+        $this->assertEquals(strpbrk('mi', $text), \strpbrk($text, 'mi'));
+
+        $stripmi = strpbrk('mi');
+        $this->assertEquals($stripmi($text), \strpbrk($text, 'mi'));
+    }
+
+    public function testStrpos()
+    {
+        $mystring = 'abc';
+        $findme   = 'a';
+        $this->assertEquals(strpos($findme, $mystring), \strpos($mystring, $findme));
+
+        $findA = strpos($findme);
+        $this->assertEquals($findA($mystring), \strpos($mystring, $findme));
+    }
+
+    public function testStrpos3()
+    {
+        $mystring = 'abc';
+        $findme   = 'a';
+        $this->assertEquals(strpos3(1, $findme, $mystring), \strpos($mystring, $findme, 1));
+
+        $findAAfterFirst = strpos3(1, $findme);
+        $this->assertEquals($findAAfterFirst($mystring), \strpos($mystring, $findme, 1));
+    }
+
+    public function testStrrchr()
+    {
+        $mystring = 'abc';
+        $findme   = 'a';
+        $this->assertEquals(strrchr($findme, $mystring), \strrchr($mystring, $findme));
+
+        $findA = strrchr($findme);
+        $this->assertEquals($findA($mystring), \strrchr($mystring, $findme));
+    }
+
+    public function testStrrev()
+    {
+        $a = 'abc';
+        $this->assertEquals(strrev($a), \strrev($a));
+        $strrev = strrev();
+        $this->assertEquals($strrev($a), \strrev($a));
+    }
+
+    public function testStrripos()
+    {
+        $haystack = 'ababcd';
+        $needle   = 'aB';
+
+        $this->assertEquals(strripos($needle, $haystack), \strripos($haystack, $needle));
+
+        $searchForNeedle = strripos($needle);
+        $this->assertEquals($searchForNeedle($haystack), \strripos($haystack, $needle));
+    }
+
+    public function testStrripos3()
+    {
+        $haystack = 'ababcd';
+        $needle   = 'aB';
+
+        $this->assertEquals(strripos3(1, $needle, $haystack), \strripos($haystack, $needle, 1));
+
+        $searchForNeedleAfter1 = strripos3(1, $needle);
+        $this->assertEquals($searchForNeedleAfter1($haystack), \strripos($haystack, $needle, 1));
+    }
+
+    public function testStrrpos()
+    {
+        $haystack = 'ababcd';
+        $needle   = 'aB';
+
+        $this->assertEquals(strrpos($needle, $haystack), \strrpos($haystack, $needle));
+
+        $searchForNeedle = strrpos($needle);
+        $this->assertEquals($searchForNeedle($haystack), \strrpos($haystack, $needle));
+    }
+
+    public function testStrrpos3()
+    {
+        $haystack = 'ababcd';
+        $needle   = 'aB';
+
+        $this->assertEquals(strrpos3(1, $needle, $haystack), \strrpos($haystack, $needle, 1));
+
+        $searchForNeedleAfter1 = strrpos3(1, $needle);
+        $this->assertEquals($searchForNeedleAfter1($haystack), \strrpos($haystack, $needle, 1));
+    }
+
+    public function testStrspn()
+    {
+        $this->assertEquals(strspn("o", "foo"), \strspn("foo", "o"));
+        $strspnOMask = strspn("o");
+        $this->assertEquals($strspnOMask("foo"), \strspn("foo", "o"));
+    }
+
+    public function testStrspn3()
+    {
+        $this->assertEquals(strspn3(1, "o", "foo"), \strspn("foo", "o", 1));
+        $strspnOMaskAfter1 = strspn3(1, "o");
+        $this->assertEquals($strspnOMaskAfter1("foo"), \strspn("foo", "o", 1));
+    }
+
+    public function testStrspn4()
+    {
+        $this->assertEquals(strspn4(1, 2, "o", "foo"), \strspn("foo", "o", 1, 2));
+        $strspnOMask1To2 = strspn4(1, 2, "o");
+        $this->assertEquals($strspnOMask1To2("foo"), \strspn("foo", "o", 1, 2));
+    }
+
+    public function testStrstr()
+    {
+        $email  = 'name@example.com';
+        $this->assertEquals(strstr('@', $email), \strstr($email, '@'));
+
+        $searchAt = strstr('@');
+        $this->assertEquals($searchAt($email), \strstr($email, '@'));
+    }
+
+    public function testStrstr3()
+    {
+        $email  = 'name@example.com';
+        $this->assertEquals(strstr3(true, '@', $email), \strstr($email, '@', true));
+
+        $searchBeforeAt = strstr3(true, '@');
+        $this->assertEquals($searchBeforeAt($email), \strstr($email, '@', true));
+    }
+
+    public function testStrtok()
+    {
+        $str = 'This is a test';
+
+        $tok = \strtok($str, ' ');
+        $arr = [$tok];
+        while ($tok !== false) {
+            $tok = \strtok(' ');
+            $arr[] = $tok;
+        }
+
+        $tok2 = strtok(' ', $str);
+        $arr2 = [$tok2];
+        while ($tok2 !== false) {
+            $tok2 = strtok1(' ');
+            $arr2[] = $tok2;
+        }
+        $this->assertEquals($arr, $arr2);
+    }
+
+    public function testStrtolower()
+    {
+        $str = 'This has been a fine Test!';
+        $this->assertEquals(strtolower($str), \strtolower($str));
+        $strtolower = strtolower();
+        $this->assertEquals($strtolower($str), \strtolower($str));
+    }
+
+    public function testStrtoupper()
+    {
+        $str = 'This has been a fine Test!';
+        $this->assertEquals(strtoupper($str), \strtoupper($str));
+        $strtoupper = strtoupper();
+        $this->assertEquals($strtoupper($str), \strtoupper($str));
+    }
+
+    public function testStrtr3Params()
+    {
+        $this->assertEquals(strtr("ab", "01", "baab"), \strtr("baab", "ab", "01"));
+
+        $strtr = strtr();
+        $strtrSwapabWith01 = $strtr("ab", "01");
+        $this->assertEquals($strtrSwapabWith01("baab"), \strtr("baab", "ab", "01"));
+    }
+
+    public function testStrtr2Params()
+    {
+        $trans = ["h" => "-", "hello" => "hi", "hi" => "hello"];
+        $str = "hi all, I said hello";
+        $this->assertEquals(strtr($trans, $str), \strtr($str, $trans));
+
+        $strtr = strtr();
+        $strTranslateSwapHiHello = $strtr($trans);
+        $this->assertEquals($strTranslateSwapHiHello($str), \strtr($str, $trans));
+    }
+
+    public function testSubstrCompare()
+    {
+        $a = "abcde";
+        $b = "bc";
+
+        $this->assertEquals(substr_compare(1, $b, $a), \substr_compare($a, $b, 1));
+
+        $cmp1 = substr_compare(1);
+        $this->assertEquals($cmp1($b, $a), \substr_compare($a, $b, 1));
+    }
+
+    public function testSubstrCompare4()
+    {
+        $a = "abcde";
+        $b = "bc";
+
+        $this->assertEquals(substr_compare4(2, 1, $b, $a), \substr_compare($a, $b, 1, 2));
+        $cmp1 = substr_compare4(2, 1);
+        $this->assertEquals($cmp1($b, $a), \substr_compare($a, $b, 1, 2));
+    }
+
+    public function testSubstrCompare5()
+    {
+        $a = "abcde";
+        $b = "BC";
+
+        $this->assertEquals(substr_compare5(true, 2, 1, $b, $a), \substr_compare($a, $b, 1, 2, true));
+
+        $cmp = substr_compare5(true, 2, 1);
+        $this->assertEquals($cmp($b, $a), \substr_compare($a, $b, 1, 2, true));
+    }
+
+    public function testSubstrCount()
+    {
+        $text = 'This is a test';
+        $this->assertEquals(substr_count('is', $text), \substr_count($text, 'is'));
+
+        $countIs = substr_count('is');
+        $this->assertEquals($countIs($text), \substr_count($text, 'is'));
+    }
+
+    public function testSubstrCount3()
+    {
+        $text = 'This is a test';
+        $this->assertEquals(substr_count3(3, 'is', $text), \substr_count($text, 'is', 3));
+
+        $countIsAfter3 = substr_count3(3, 'is');
+        $this->assertEquals($countIsAfter3($text), \substr_count($text, 'is', 3));
+    }
+
+    public function testSubstrCount4()
+    {
+        $text = 'This is a test';
+
+        $this->assertEquals(substr_count4(3, 3, 'is', $text), \substr_count($text, 'is', 3, 3)); // 2
+        $countIsFrom3To6 = substr_count4(3, 3, 'is');
+        $this->assertEquals($countIsFrom3To6($text), \substr_count($text, 'is', 3, 3));
+    }
+
+    public function testSubstrReplace()
+    {
+        $str = 'ABCDEFGH:/MNRPQR/';
+        $this->assertEquals(substr_replace(0, 'bob', $str), \substr_replace($str, 'bob', 0));
+
+        $replaceStrWithBob = substr_replace(0, 'bob');
+        $this->assertEquals($replaceStrWithBob($str), \substr_replace($str, 'bob', 0));
+    }
+
+    public function testSubstrReplace4()
+    {
+        $str = 'ABCDEFGH:/MNRPQR/';
+        $this->assertEquals(
+            substr_replace4(strlen($str), 0, 'bob', $str),
+            \substr_replace($str, 'bob', 0, strlen($str))
+        );
+
+        $replaceStrWithBob = substr_replace4(strlen($str), 0, 'bob');
+        $this->assertEquals(
+            $replaceStrWithBob($str),
+            \substr_replace($str, 'bob', 0, strlen($str))
+        );
+    }
+
+    public function testSubstr()
+    {
+        $this->assertEquals(substr(-1, "abcdef"), \substr("abcdef", -1));
+
+        $takeLast = substr(-1);
+        $this->assertEquals($takeLast("abcdef"), \substr("abcdef", -1));
+    }
+
+    public function testSubstr3()
+    {
+        $this->assertEquals(substr3(1, -3, "abcdef"), \substr("abcdef", -3, 1));
+        $takeThirdFromEnd = substr3(1, -3);
+        $this->assertEquals($takeThirdFromEnd("abcdef"), \substr("abcdef", -3, 1));
+    }
+
+    public function testTrim()
+    {
+        $str = " abcd \n";
+        $this->assertEquals(trim($str), \trim($str));
+
+        $trim = trim();
+        $this->assertEquals($trim($str), \trim($str));
+    }
+
+    public function testTrim2()
+    {
+        $str = " abcdx";
+        $this->assertEquals(trim2("x", $str), \trim($str, "x"));
+
+        $trimX = trim2("x");
+        $this->assertEquals($trimX($str), \trim($str, "x"));
+    }
+
+    public function testUcFirst()
+    {
+        $str = "abcd";
+        $this->assertEquals(ucfirst($str), \ucfirst($str));
+        $ucfirst = ucfirst();
+        $this->assertEquals($ucfirst($str), \ucfirst($str));
+    }
+
+    public function testUcWords()
+    {
+        $str = "hello world!";
+        $this->assertEquals(ucwords($str), \ucwords($str));
+        $ucwords = ucwords();
+        $this->assertEquals($ucwords($str), \ucwords($str));
+    }
+
+    public function testUcWords2()
+    {
+        $str = "hello|world!";
+        $this->assertEquals(ucwords2("|", $str), \ucwords($str, "|"));
+        $ucWordsSplitByPipe = ucwords2("|");
+        $this->assertEquals($ucWordsSplitByPipe($str), \ucwords($str, "|"));
+    }
+
+    public function testWordwrap()
+    {
+        $str = "The quick brown fox jumps over the lazy dog.";
+        $this->assertEquals(wordwrap($str), \wordwrap($str));
+        $wordwrap = wordwrap();
+
+        $this->assertEquals($wordwrap($str), \wordwrap($str));
+    }
+
+    public function testWordwrap2()
+    {
+        $str = "The quick brown fox jumps over the lazy dog.";
+        $this->assertEquals(wordwrap2(10, $str), \wordwrap($str, 10));
+        $wordwrap10 = wordwrap2(10);
+
+        $this->assertEquals($wordwrap10($str), \wordwrap($str, 10));
+    }
+
+    public function testWordwrap3()
+    {
+        $str = "The quick brown fox jumps over the lazy dog.";
+        $this->assertEquals(wordwrap3('<br/>', 10, $str), \wordwrap($str, 10, '<br/>'));
+        $wordwrap10 = wordwrap3('<br/>', 10);
+
+        $this->assertEquals($wordwrap10($str), \wordwrap($str, 10, '<br/>'));
+    }
+
+    public function testWordwrap4()
+    {
+        $str = "The quick brown fox jumps over the lazy dog.";
+        $this->assertEquals(wordwrap4(true, '<br/>', 10, $str), \wordwrap($str, 10, '<br/>', true));
+        $wordwrap10 = wordwrap4(true, '<br/>', 10);
+
+        $this->assertEquals($wordwrap10($str), \wordwrap($str, 10, '<br/>', true));
     }
 }
