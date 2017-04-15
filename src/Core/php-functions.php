@@ -823,3 +823,584 @@ function wordwrap4()
         return \wordwrap($str, $width, $break, $cut);
     })(...func_get_args());
 }
+
+function array_change_key_case()
+{
+    return curry('\array_change_key_case')(...func_get_args());
+}
+
+function array_change_key_case2()
+{
+    return curry(function ($case, $arr) {
+        return \array_change_key_case($arr, $case);
+    })(...func_get_args());
+}
+
+function array_chunk()
+{
+    return curry(function ($size, $arr) {
+        return \array_chunk($arr, $size);
+    })(...func_get_args());
+}
+
+function array_chunk3()
+{
+    return curry(function ($preserveKeys, $size, $arr) {
+        return \array_chunk($arr, $size, $preserveKeys);
+    })(...func_get_args());
+}
+
+function array_column()
+{
+    return curry(function ($column_key, $input) {
+        return \array_column($input, $column_key);
+    })(...func_get_args());
+}
+
+function array_column3()
+{
+    return curry(function ($index_key, $column_key, $input) {
+        return \array_column($input, $column_key, $index_key);
+    })(...func_get_args());
+}
+
+function array_combine()
+{
+    return curry('\array_combine')(...func_get_args());
+}
+
+function array_count_values()
+{
+    return curry('\array_count_values')(...func_get_args());
+}
+
+function array_diff_assoc()
+{
+    return curry('\array_diff_assoc')(...func_get_args());
+}
+
+function array_diff_key()
+{
+    return curry('\array_diff_key')(...func_get_args());
+}
+
+function array_diff_uassoc()
+{
+    return curry(function ($f, $a, $b) {
+        return \array_diff_uassoc($a, $b, $f);
+    })(...func_get_args());
+}
+
+function array_diff_ukey()
+{
+    return curry(function ($f, $a, $b) {
+        return \array_diff_ukey($a, $b, $f);
+    })(...func_get_args());
+}
+
+function array_diff()
+{
+    return curry('\array_diff')(...func_get_args());
+}
+
+function array_fill_keys()
+{
+    return curry(function ($val, $arr) {
+        return \array_fill_keys($arr, $val);
+    })(...func_get_args());
+}
+
+function array_fill()
+{
+    return curry('\array_fill')(...func_get_args());
+}
+
+function array_filter()
+{
+    return curry(function ($f, $a) {
+        return \array_filter($a, $f);
+    })(...func_get_args());
+}
+
+function array_filter3()
+{
+    return curry(function ($flag, $f, $a) {
+        return \array_filter($a, $f, $flag);
+    })(...func_get_args());
+}
+
+function array_flip()
+{
+    return curry('\array_flip')(...func_get_args());
+}
+
+function array_intersect_assoc()
+{
+    return curry('\array_intersect_assoc')(...func_get_args());
+}
+
+function array_intersect_key()
+{
+    return curry('\array_intersect_key')(...func_get_args());
+}
+
+function array_intersect_uassoc()
+{
+    return curry(function ($f, $a, $b) {
+        return \array_intersect_uassoc($a, $b, $f);
+    })(...func_get_args());
+}
+
+function array_intersect_ukey()
+{
+    return curry(function ($f, $a, $b) {
+        return \array_intersect_ukey($a, $b, $f);
+    })(...func_get_args());
+}
+
+function array_intersect()
+{
+    return curry('\array_intersect')(...func_get_args());
+}
+
+function array_key_exists()
+{
+    return curry('\array_key_exists')(...func_get_args());
+}
+
+function key_exists()
+{
+    return curry('\key_exists')(...func_get_args());
+}
+
+function array_keys()
+{
+    return curry('\array_keys')(...func_get_args());
+}
+
+function array_keys2()
+{
+    return curry(function ($searchVal, $arr) {
+        return \array_keys($arr, $searchVal);
+    })(...func_get_args());
+}
+
+function array_keys3()
+{
+    return curry(function ($strict, $searchVal, $arr) {
+        return \array_keys($arr, $searchVal, $strict);
+    })(...func_get_args());
+}
+
+function array_map()
+{
+    return curry('\array_map')(...func_get_args());
+}
+
+function array_merge_recursive()
+{
+    return curry(function ($a, $b) {
+        return \array_merge_recursive($a, $b);
+    })(...func_get_args());
+}
+
+function array_merge()
+{
+    return curry(function ($a, $b) {
+        return \array_merge($a, $b);
+    })(...func_get_args());
+}
+
+function array_pad()
+{
+    return curry(function ($size, $value, $arr) {
+        return \array_pad($arr, $size, $value);
+    })(...func_get_args());
+}
+
+function array_product()
+{
+    return curry('\array_product')(...func_get_args());
+}
+
+function array_rand()
+{
+    return curry('\array_rand')(...func_get_args());
+}
+
+function array_rand2()
+{
+    return curry(function ($num, $arr) {
+        return \array_rand($arr, $num);
+    })(...func_get_args());
+}
+
+function array_reduce()
+{
+    return curry(function ($f, $i, $x) {
+        return \array_reduce($x, $f, $i);
+    })(...func_get_args());
+}
+
+function array_replace_recursive()
+{
+    return curry(function ($replacements, $base) {
+        return \array_replace_recursive($base, $replacements);
+    })(...func_get_args());
+}
+
+function array_replace()
+{
+    return curry(function ($replacements, $base) {
+        return \array_replace($base, $replacements);
+    })(...func_get_args());
+}
+
+function array_reverse()
+{
+    return curry('\array_reverse')(...func_get_args());
+}
+
+function array_reverse2()
+{
+    return curry(function ($preserveKeys, $arr) {
+        return \array_reverse($arr, $preserveKeys);
+    })(...func_get_args());
+}
+
+function array_search()
+{
+    return curry('\array_search')(...func_get_args());
+}
+
+function array_search3()
+{
+    return curry(function ($strict, $needle, $haystack) {
+        return \array_search($needle, $haystack, $strict);
+    })(...func_get_args());
+}
+
+function array_slice()
+{
+    return curry(function ($offset, $arr) {
+        return \array_slice($arr, $offset);
+    })(...func_get_args());
+}
+
+function array_slice3()
+{
+    return curry(function ($length, $offset, $arr) {
+        return \array_slice($arr, $offset, $length);
+    })(...func_get_args());
+}
+
+function array_slice4()
+{
+    return curry(function ($preserveKeys, $length, $offset, $arr) {
+        return \array_slice($arr, $offset, $length, $preserveKeys);
+    })(...func_get_args());
+}
+
+function array_sum()
+{
+    return curry('\array_sum')(...func_get_args());
+}
+
+function array_udiff_assoc()
+{
+    return curry(function ($f, $a1, $a2) {
+        return \array_udiff_assoc($a1, $a2, $f);
+    })(...func_get_args());
+}
+
+function array_udiff_uassoc()
+{
+    return curry(function ($f, $g, $a1, $a2) {
+        return \array_udiff_uassoc($a1, $a2, $f, $g);
+    })(...func_get_args());
+}
+
+function array_udiff()
+{
+    return curry(function ($f, $a1, $a2) {
+        return \array_udiff($a1, $a2, $f);
+    })(...func_get_args());
+}
+
+function array_uintersect_assoc()
+{
+    return curry(function ($f, $a1, $a2) {
+        return \array_uintersect_assoc($a1, $a2, $f);
+    })(...func_get_args());
+}
+
+function array_uintersect_uassoc()
+{
+    return curry(function ($f, $g, $a1, $a2) {
+        return \array_uintersect_uassoc($a1, $a2, $f, $g);
+    })(...func_get_args());
+}
+
+function array_uintersect()
+{
+    return curry(function ($f, $a1, $a2) {
+        return \array_uintersect($a1, $a2, $f);
+    })(...func_get_args());
+}
+
+function array_unique()
+{
+    return curry('\array_unique')(...func_get_args());
+}
+
+function array_unique2()
+{
+    return curry(function ($sortFlags, $arr) {
+        return \array_unique($arr, $sortFlags);
+    })(...func_get_args());
+}
+
+function count()
+{
+    return curry('\count')(...func_get_args());
+}
+
+function count2()
+{
+    return curry(function ($mode, $arr) {
+        return \count($arr, $mode);
+    })(...func_get_args());
+}
+
+function sizeof()
+{
+    return curry('\sizeof')(...func_get_args());
+}
+
+function sizeof2()
+{
+    return curry(function ($mode, $arr) {
+        return \sizeof($arr, $mode);
+    })(...func_get_args());
+}
+
+function in_array()
+{
+    return curry('\in_array')(...func_get_args());
+}
+
+function in_array3()
+{
+    return curry(function ($strict, $needle, $haystack) {
+        return \in_array($needle, $haystack, $strict);
+    })(...func_get_args());
+}
+
+function range()
+{
+    return curry('\range')(...func_get_args());
+}
+
+function range3()
+{
+    return curry(function ($step, $start, $end) {
+        return \range($start, $end, $step);
+    })(...func_get_args());
+}
+
+function shuffle()
+{
+    return curry(function ($arr) {
+        \shuffle($arr);
+        return $arr;
+    })(...func_get_args());
+}
+
+function rsort()
+{
+    return curry(function ($arr) {
+        \rsort($arr);
+        return $arr;
+    })(...func_get_args());
+}
+
+function rsort2()
+{
+    return curry(function ($sortFlags, $arr) {
+        \rsort($arr, $sortFlags);
+        return $arr;
+    })(...func_get_args());
+}
+
+function krsort()
+{
+    return curry(function ($arr) {
+        \krsort($arr);
+        return $arr;
+    })(...func_get_args());
+}
+
+function krsort2()
+{
+    return curry(function ($sortFlags, $arr) {
+        \krsort($arr, $sortFlags);
+        return $arr;
+    })(...func_get_args());
+}
+
+function ksort()
+{
+    return curry(function ($arr) {
+        \ksort($arr);
+        return $arr;
+    })(...func_get_args());
+}
+
+function ksort2()
+{
+    return curry(function ($sortFlags, $arr) {
+        \ksort($arr, $sortFlags);
+        return $arr;
+    })(...func_get_args());
+}
+
+function natcasesort()
+{
+    return curry(function ($arr) {
+        \natcasesort($arr);
+        return $arr;
+    })(...func_get_args());
+}
+
+function natsort()
+{
+    return curry(function ($arr) {
+        \natsort($arr);
+        return $arr;
+    })(...func_get_args());
+}
+
+function arsort()
+{
+    return curry(function ($arr) {
+        \arsort($arr);
+        return $arr;
+    })(...func_get_args());
+}
+
+function arsort2()
+{
+    return curry(function ($sortFlags, $arr) {
+        \arsort($arr, $sortFlags);
+        return $arr;
+    })(...func_get_args());
+}
+
+function asort()
+{
+    return curry(function ($arr) {
+        \asort($arr);
+        return $arr;
+    })(...func_get_args());
+}
+
+function asort2()
+{
+    return curry(function ($sortFlags, $arr) {
+        \asort($arr, $sortFlags);
+        return $arr;
+    })(...func_get_args());
+}
+
+function sort()
+{
+    return curry(function ($arr) {
+        \sort($arr);
+        return $arr;
+    })(...func_get_args());
+}
+
+function sort2()
+{
+    return curry(function ($sortFlags, $arr) {
+        \sort($arr, $sortFlags);
+        return $arr;
+    })(...func_get_args());
+}
+
+function uasort()
+{
+    return curry(function ($f, $arr) {
+        \uasort($arr, $f);
+        return $arr;
+    })(...func_get_args());
+}
+
+function uksort()
+{
+    return curry(function ($f, $arr) {
+        \uksort($arr, $f);
+        return $arr;
+    })(...func_get_args());
+}
+
+function usort()
+{
+    return curry(function ($f, $arr) {
+        \usort($arr, $f);
+        return $arr;
+    })(...func_get_args());
+}
+
+function array_push()
+{
+    return curry(function ($value, $arr) {
+        return \array_merge($arr, [$value]);
+    })(...func_get_args());
+}
+
+function array_pop()
+{
+    return curry(function ($arr) {
+        return \array_pop($arr);
+    })(...func_get_args());
+}
+
+function array_shift()
+{
+    return curry(function ($arr) {
+        return \array_shift($arr);
+    })(...func_get_args());
+}
+
+function array_unshift()
+{
+    return curry(function ($elem, $arr) {
+        \array_unshift($arr, $elem);
+        return $arr;
+    })(...func_get_args());
+}
+
+function array_splice()
+{
+    return curry(function ($offset, $input) {
+        \array_splice($input, $offset);
+        return $input;
+    })(...func_get_args());
+}
+
+function array_splice3()
+{
+    return curry(function ($offset, $length, $input) {
+        \array_splice($input, $offset, $length);
+        return $input;
+    })(...func_get_args());
+}
+
+function array_splice4()
+{
+    return curry(function ($offset, $length, $replacement, $input) {
+        \array_splice($input, $offset, $length, $replacement);
+        return $input;
+    })(...func_get_args());
+}

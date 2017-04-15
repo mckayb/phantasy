@@ -131,7 +131,94 @@ use function Phantasy\Core\PHP\{
     wordwrap,
     wordwrap2,
     wordwrap3,
-    wordwrap4
+    wordwrap4,
+    array_change_key_case,
+    array_change_key_case2,
+    array_chunk,
+    array_chunk3,
+    array_column,
+    array_column3,
+    array_combine,
+    array_count_values,
+    array_diff_assoc,
+    array_diff_key,
+    array_diff_uassoc,
+    array_diff_ukey,
+    array_diff,
+    array_fill_keys,
+    array_fill,
+    array_filter,
+    array_filter3,
+    array_flip,
+    array_intersect_assoc,
+    array_intersect_key,
+    array_intersect_uassoc,
+    array_intersect_ukey,
+    array_intersect,
+    array_key_exists,
+    key_exists,
+    array_keys,
+    array_keys2,
+    array_keys3,
+    array_map,
+    array_merge_recursive,
+    array_merge,
+    array_pad,
+    array_product,
+    array_rand,
+    array_rand2,
+    array_reduce,
+    array_replace_recursive,
+    array_replace,
+    array_reverse,
+    array_reverse2,
+    array_search,
+    array_search3,
+    array_slice,
+    array_slice3,
+    array_slice4,
+    array_sum,
+    array_udiff_assoc,
+    array_udiff_uassoc,
+    array_udiff,
+    array_uintersect,
+    array_uintersect_assoc,
+    array_uintersect_uassoc,
+    array_unique,
+    array_unique2,
+    count,
+    count2,
+    sizeof,
+    sizeof2,
+    in_array,
+    in_array3,
+    range,
+    range3,
+    rsort,
+    rsort2,
+    krsort,
+    krsort2,
+    ksort,
+    ksort2,
+    natcasesort,
+    natsort,
+    arsort,
+    arsort2,
+    asort,
+    asort2,
+    sort,
+    sort2,
+    uasort,
+    uksort,
+    usort,
+    array_push,
+    array_pop,
+    array_shift,
+    array_unshift,
+    array_splice,
+    array_splice3,
+    array_splice4,
+    shuffle
 };
 
 class PHPFunctionsTest extends TestCase
@@ -269,7 +356,7 @@ class PHPFunctionsTest extends TestCase
         $res = count_chars('Test');
         $this->assertCount(256, $res);
 
-        $this->assertEquals(array_filter($res, function ($x) {
+        $this->assertEquals(\array_filter($res, function ($x) {
             return $x > 0;
         }), [
             '84' => 1,
@@ -1414,5 +1501,1098 @@ class PHPFunctionsTest extends TestCase
         $wordwrap10 = wordwrap4(true, '<br/>', 10);
 
         $this->assertEquals($wordwrap10($str), \wordwrap($str, 10, '<br/>', true));
+    }
+
+    public function testArrayChangeKeyCase()
+    {
+        $arr = ["FirSt" => 1, "SecOnd" => 4];
+
+        $this->assertEquals(array_change_key_case($arr), \array_change_key_case($arr));
+
+        $changeKeyCase = array_change_key_case();
+        $this->assertEquals($changeKeyCase($arr), \array_change_key_case($arr));
+    }
+
+    public function testArrayChangeKeyCase2()
+    {
+        $arr = ["FirSt" => 1, "SecOnd" => 4];
+        $this->assertEquals(array_change_key_case2(CASE_UPPER, $arr), \array_change_key_case($arr, CASE_UPPER));
+
+        $upperKeys = array_change_key_case2(CASE_UPPER);
+        $this->assertEquals($upperKeys($arr), \array_change_key_case($arr, CASE_UPPER));
+    }
+
+    public function testArrayChunk()
+    {
+        $arr = ['a', 'b', 'c', 'd', 'e'];
+        $this->assertEquals(array_chunk(2, $arr), \array_chunk($arr, 2));
+
+        $chunk2 = array_chunk(2);
+        $this->assertEquals($chunk2($arr), \array_chunk($arr, 2));
+    }
+
+    public function testArrayChunk3()
+    {
+        $arr = ['a', 'b', 'c', 'd', 'e'];
+        $this->assertEquals(array_chunk3(true, 2, $arr), \array_chunk($arr, 2, true));
+
+        $chunk2 = array_chunk3(true, 2);
+        $this->assertEquals($chunk2($arr), \array_chunk($arr, 2, true));
+    }
+
+    public function testArrayColumn()
+    {
+        $records = [
+            [
+                'id' => 2135,
+                'first_name' => 'John',
+                'last_name' => 'Doe'
+            ],
+            [
+                'id' => 3245,
+                'first_name' => 'Sally',
+                'last_name' => 'Smith'
+            ],
+            [
+                'id' => 5342,
+                'first_name' => 'Jane',
+                'last_name' => 'Jones'
+            ],
+            [
+                'id' => 5623,
+                'first_name' => 'Peter',
+                'last_name' => 'Doe'
+            ]
+        ];
+
+        $this->assertEquals(array_column('first_name', $records), \array_column($records, 'first_name'));
+        $firstNames = array_column('first_name');
+        $this->assertEquals($firstNames($records), \array_column($records, 'first_name'));
+    }
+
+    public function testArrayColumn3()
+    {
+        $records = [
+            [
+                'id' => 2135,
+                'first_name' => 'John',
+                'last_name' => 'Doe'
+            ],
+            [
+                'id' => 3245,
+                'first_name' => 'Sally',
+                'last_name' => 'Smith'
+            ],
+            [
+                'id' => 5342,
+                'first_name' => 'Jane',
+                'last_name' => 'Jones'
+            ],
+            [
+                'id' => 5623,
+                'first_name' => 'Peter',
+                'last_name' => 'Doe'
+            ]
+        ];
+
+        $this->assertEquals(array_column3('id', 'first_name', $records), \array_column($records, 'first_name', 'id'));
+        $firstNames = array_column3('id', 'first_name');
+        $this->assertEquals($firstNames($records), \array_column($records, 'first_name', 'id'));
+    }
+
+    public function testArrayCombine()
+    {
+        $a = ['green', 'red', 'yellow'];
+        $b = ['avocado', 'apple', 'banana'];
+        $this->assertEquals(array_combine($a, $b), \array_combine($a, $b));
+
+        $combineA = array_combine($a);
+        $this->assertEquals($combineA($b), \array_combine($a, $b));
+    }
+
+    public function testArrayCountValues()
+    {
+        $a = ['a', 'b', 'c', 'd', 'e', 'f'];
+        $this->assertEquals(array_count_values($a), \array_count_values($a));
+
+        $countVals = array_count_values();
+        $this->assertEquals($countVals($a), \array_count_values($a));
+    }
+
+    public function testArrayDiffAssoc()
+    {
+        $a = ['a', 'b', 'c', 'd'];
+        $b = ['c', 'd', 'e', 'f'];
+
+        $this->assertEquals(array_diff_assoc($a, $b), \array_diff_assoc($a, $b));
+
+        $diffA = array_diff_assoc($a);
+        $this->assertEquals($diffA($b), \array_diff_assoc($a, $b));
+    }
+
+    public function testArrayDiffKey()
+    {
+        $a = ['blue' => 1, 'red' => 2, 'green' => 3, 'purple' => 4];
+        $b = ['green' => 5, 'blue' => 6, 'yellow' => 7, 'cyan' => 8];
+
+        $this->assertEquals(array_diff_key($a, $b), \array_diff_key($a, $b));
+        $diffA = array_diff_key($a);
+        $this->assertEquals($diffA($b), \array_diff_key($a, $b));
+    }
+
+    public function testArrayDiffUAssoc()
+    {
+        $a = ['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red'];
+        $b = ['a' => 'green', 'yellow', 'red'];
+        $func = function ($a, $b) {
+            if ($a === $b) {
+                return 0;
+            }
+
+            return $a > $b ? 1 : -1;
+        };
+
+        $this->assertEquals(array_diff_uassoc($func, $a, $b), \array_diff_uassoc($a, $b, $func));
+        $diffFunc = array_diff_uassoc($func);
+        $this->assertEquals($diffFunc($a, $b), \array_diff_uassoc($a, $b, $func));
+    }
+
+    public function testArrayDiffUKey()
+    {
+        $func = function ($key1, $key2) {
+            if ($key1 === $key2) {
+                return 0;
+            } elseif ($key1 > $key2) {
+                return 1;
+            } else {
+                return -1;
+            }
+        };
+
+        $a = ['blue' => 1, 'red' => 2, 'green' => 3, 'purple' => 4];
+        $b = ['green' => 5, 'blue' => 6, 'yellow' => 7, 'cyan' => 8];
+        $this->assertEquals(array_diff_ukey($func, $a, $b), \array_diff_ukey($a, $b, $func));
+
+        $diffFunc = array_diff_ukey($func);
+        $this->assertEquals($diffFunc($a, $b), \array_diff_ukey($a, $b, $func));
+    }
+
+    public function testArrayDiff()
+    {
+        $a = ['a' => 'green', 'red', 'blue', 'red'];
+        $b = ['b' => 'green', 'yellow', 'red'];
+
+        $this->assertEquals(array_diff($a, $b), \array_diff($a, $b));
+        $diffA = array_diff($a);
+        $this->assertEquals($diffA($b), \array_diff($a, $b));
+    }
+
+    public function testArrayFillKeys()
+    {
+        $keys = ['foo', 5, 10, 'bar'];
+        $this->assertEquals(array_fill_keys('banana', $keys), \array_fill_keys($keys, 'banana'));
+
+        $fillKeysBanana = array_fill_keys('banana');
+        $this->assertEquals($fillKeysBanana($keys), \array_fill_keys($keys, 'banana'));
+    }
+
+    public function testArrayFill()
+    {
+        $this->assertEquals(array_fill(5, 6, 'banana'), \array_fill(5, 6, 'banana'));
+
+        $fill6StartingAt5 = array_fill(5, 6);
+        $this->assertEquals($fill6StartingAt5('banana'), \array_fill(5, 6, 'banana'));
+    }
+
+    public function testArrayFilter()
+    {
+        $a = [1, 2, 3, 4, 5];
+        $isEven = function ($x) {
+            return $x % 2 === 0;
+        };
+        $this->assertEquals(array_filter($isEven, $a), \array_filter($a, $isEven));
+
+        $filterEvens = array_filter($isEven);
+        $this->assertEquals($filterEvens($a), \array_filter($a, $isEven));
+    }
+
+    public function testArrayFilter3()
+    {
+        $a = ['a' => 20, 'b' => 10, 'c' => 5, 'd' => 0];
+        $notA = function ($x) {
+            return $x !== 'a';
+        };
+
+        $this->assertEquals(
+            array_filter3(ARRAY_FILTER_USE_KEY, $notA, $a),
+            \array_filter($a, $notA, ARRAY_FILTER_USE_KEY)
+        );
+
+        $filterKeys = array_filter3(ARRAY_FILTER_USE_KEY);
+        $filterKeysThatArentA = $filterKeys($notA);
+        $this->assertEquals(
+            $filterKeysThatArentA($a),
+            \array_filter($a, $notA, ARRAY_FILTER_USE_KEY)
+        );
+    }
+
+    public function testArrayFlip()
+    {
+        $arr = ['oranges', 'apples', 'pears'];
+        $this->assertEquals(array_flip($arr), \array_flip($arr));
+
+        $arrayFlip = array_flip();
+        $this->assertEquals($arrayFlip($arr), \array_flip($arr));
+    }
+
+    public function testArrayIntersectAssoc()
+    {
+        $arr = ["a" => "green", "b" => "brown", "c" => "blue", "red"];
+        $arr2 = ["a" => "green", "b" => "yellow", "blue", "red"];
+        $result_array = array_intersect_assoc($arr, $arr2);
+
+        $this->assertEquals(
+            array_intersect_assoc($arr, $arr2),
+            \array_intersect_assoc($arr, $arr2)
+        );
+
+        $arrayIntersectArr = array_intersect_assoc($arr);
+        $this->assertEquals(
+            $arrayIntersectArr($arr2),
+            \array_intersect_assoc($arr, $arr2)
+        );
+    }
+
+    public function testArrayIntersectKey()
+    {
+        $a = ['blue' => 1, 'red' => 2, 'green' => 3, 'purple' => 4];
+        $b = ['green' => 5, 'blue' => 6, 'yellow' => 7, 'cyan' => 8];
+        $this->assertEquals(array_intersect_key($a, $b), \array_intersect_key($a, $b));
+
+        $intersect = array_intersect_key($a);
+        $this->assertEquals($intersect($b), \array_intersect_key($a, $b));
+    }
+
+    public function testArrayIntersectUAssoc()
+    {
+        $arr1 = ["a" => "green", "b" => "brown", "c" => "blue", "red"];
+        $arr2 = ["a" => "GREEN", "B" => "brown", "yellow", "red"];
+
+        $this->assertEquals(
+            array_intersect_uassoc(strcasecmp(), $arr1, $arr2),
+            \array_intersect_uassoc($arr1, $arr2, 'strcasecmp')
+        );
+    }
+
+    public function testArrayIntersectUKey()
+    {
+        $keyCompare = function ($key1, $key2) {
+            if ($key1 === $key2) {
+                return 0;
+            } elseif ($key1 > $key2) {
+                return 1;
+            }
+            return -1;
+        };
+
+        $a = ['blue' => 1, 'red' => 2, 'green' => 3, 'purple' => 4];
+        $b = ['green' => 5, 'blue' => 6, 'yellow' => 7, 'cyan' => 8];
+
+        $this->assertEquals(
+            array_intersect_ukey($keyCompare, $a, $b),
+            \array_intersect_ukey($a, $b, $keyCompare)
+        );
+
+        $arrKeyComp = array_intersect_ukey($keyCompare);
+        $this->assertEquals($arrKeyComp($a, $b), \array_intersect_ukey($a, $b, $keyCompare));
+    }
+
+    public function testArrayIntersect()
+    {
+        $arr1 = ["a" => "green", "red", "blue"];
+        $arr2 = ["b" => "green", "yellow", "red"];
+        $this->assertEquals(array_intersect($arr1, $arr2), \array_intersect($arr1, $arr2));
+
+        $intersect1 = array_intersect($arr1);
+        $this->assertEquals($intersect1($arr2), \array_intersect($arr1, $arr2));
+    }
+
+    public function testArrayKeyExists()
+    {
+        $arr = ["a" => "green", "b" => "blue"];
+        $this->assertEquals(array_key_exists('a', $arr), \array_key_exists('a', $arr));
+        $arrHasKeyA = array_key_exists('a');
+        $this->assertEquals($arrHasKeyA($arr), \array_key_exists('a', $arr));
+    }
+
+    public function testKeyExists()
+    {
+        $arr = ["a" => "green", "b" => "blue"];
+        $this->assertEquals(key_exists('a', $arr), \key_exists('a', $arr));
+        $arrHasKeyA = key_exists('a');
+        $this->assertEquals($arrHasKeyA($arr), \key_exists('a', $arr));
+    }
+
+    public function testArrayKeys()
+    {
+        $arr = ["a" => "green", "b" => "blue"];
+        $this->assertEquals(array_keys($arr), \array_keys($arr));
+        $arrKeys = array_keys();
+        $this->assertEquals($arrKeys($arr), \array_keys($arr));
+    }
+
+    public function testArrayKeys2()
+    {
+        $arr = ['a', 'b', 'c', 'd', 'a', 'b', 'a'];
+        $this->assertEquals(array_keys2('a', $arr), \array_keys($arr, 'a'));
+        $aKeys = array_keys2('a');
+        $this->assertEquals($aKeys($arr), \array_keys($arr, 'a'));
+    }
+
+    public function testArrayKeys3()
+    {
+        $arr = ['a', 'b', 'c', 'd', 'a', 'b', 'a'];
+        $this->assertEquals(array_keys3(true, 'a', $arr), \array_keys($arr, 'a', true));
+        $aKeys = array_keys3(true, 'a');
+        $this->assertEquals($aKeys($arr), \array_keys($arr, 'a', true));
+    }
+
+    public function testArrayMap()
+    {
+        $arr = [1, 2, 3, 4];
+        $f = function ($x) {
+            return $x + 1;
+        };
+        $this->assertEquals(array_map($f, $arr), \array_map($f, $arr));
+        $addOne = array_map($f);
+        $this->assertEquals($addOne($arr), \array_map($f, $arr));
+    }
+
+    public function testArrayMergeRecursive()
+    {
+        $ar1 = ["color" => ["favorite" => "red"], 5];
+        $ar2 = [10, "color" => ["favorite" => "green", "blue"]];
+        $this->assertEquals(array_merge_recursive($ar1, $ar2), \array_merge_recursive($ar1, $ar2));
+        $mergeAr1 = array_merge_recursive($ar1);
+        $this->assertEquals($mergeAr1($ar2), \array_merge_recursive($ar1, $ar2));
+    }
+
+    public function testArrayMerge()
+    {
+        $arr1 = ["color" => "red", 2, 4];
+        $arr2 = ["a", "b", "color" => "green", "shape" => "trapezoid", 4];
+        $result = array_merge($arr1, $arr2);
+        $this->assertEquals(array_merge($arr1, $arr2), \array_merge($arr1, $arr2));
+        $mergeArr1 = array_merge($arr1);
+        $this->assertEquals($mergeArr1($arr2), \array_merge($arr1, $arr2));
+    }
+
+    public function testArrayPad()
+    {
+        $arr = [12, 10, 9];
+        $this->assertEquals(array_pad(5, 0, $arr), \array_pad($arr, 5, 0));
+        $padTo5WithZero = array_pad(5, 0);
+        $this->assertEquals($padTo5WithZero($arr), \array_pad($arr, 5, 0));
+    }
+
+    public function testArrayProduct()
+    {
+        $arr = [1, 2, 3, 4];
+        $this->assertEquals(array_product($arr), \array_product($arr));
+        $prod = array_product();
+        $this->assertEquals($prod($arr), \array_product($arr));
+    }
+
+    public function testArrayRand()
+    {
+        $arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        $x = array_rand($arr);
+        $this->assertGreaterThanOrEqual(0, $x);
+        $this->assertLessThanOrEqual(9, $x);
+
+        $arrRand = array_rand();
+        $y = $arrRand($arr);
+        $this->assertGreaterThanOrEqual(0, $y);
+        $this->assertLessThanOrEqual(9, $y);
+    }
+
+    public function testArrayRand2()
+    {
+        $input = ["Neo", "Morpheus", "Trinity", "Cypher", "Tank"];
+        $randKeys = array_rand2(2, $input);
+        $this->assertCount(2, $randKeys);
+        foreach ($randKeys as $val) {
+            $this->assertTrue($val >= 0);
+            $this->assertTrue($val <= 4);
+            $this->assertTrue(\in_array($input[$val], $input));
+        }
+    }
+
+    public function testArrayReduce()
+    {
+        $arr = [1, 2, 3, 4];
+        $f = function ($sum, $x) {
+            return $sum + $x;
+        };
+        $this->assertEquals(
+            array_reduce($f, 0, $arr),
+            \array_reduce($arr, $f, 0)
+        );
+
+        $sumArr = array_reduce($f);
+        $sumArrStartingAt5 = $sumArr(5);
+        $this->assertEquals($sumArrStartingAt5($arr), \array_reduce($arr, $f, 5));
+    }
+
+    public function testArrayReplaceRecursive()
+    {
+        $base = ['citrus' => ['orange'], 'berries' => ['blackberry', 'raspberry']];
+        $replacements = ['citrus' => ['pineapple'], 'berries' => ['blueberry']];
+
+        $this->assertEquals(
+            array_replace_recursive($replacements, $base),
+            \array_replace_recursive($base, $replacements)
+        );
+
+        $replace = array_replace_recursive($replacements);
+        $this->assertEquals(
+            $replace($base),
+            \array_replace_recursive($base, $replacements)
+        );
+    }
+
+    public function testArrayReplace()
+    {
+        $base = ["orange", "banana", "apple", "raspberry"];
+        $replacements = [0 => "pineapple", 4 => "cherry"];
+
+        $this->assertEquals(
+            array_replace($replacements, $base),
+            \array_replace($base, $replacements)
+        );
+
+        $replace = array_replace($replacements);
+        $this->assertEquals($replace($base), \array_replace($base, $replacements));
+    }
+
+    public function testArrayReverse()
+    {
+        $arr = ['php', 4.0, ['green', 'red']];
+        $this->assertEquals(array_reverse($arr), \array_reverse($arr));
+        $reverse = array_reverse();
+        $this->assertEquals($reverse($arr), \array_reverse($arr));
+    }
+
+    public function testArrayReverse2()
+    {
+        $arr = ['php', 4.0, ['green', 'red']];
+        $this->assertEquals(array_reverse2(true, $arr), \array_reverse($arr, true));
+        $reverseKeepKeys = array_reverse2(true);
+        $this->assertEquals($reverseKeepKeys($arr), \array_reverse($arr, true));
+    }
+
+    public function testArraySearch()
+    {
+        $arr = ['blue', 'red', 'green', 'red'];
+        $this->assertEquals(array_search('green', $arr), \array_search('green', $arr));
+        $searchForGreen = array_search('green');
+        $this->assertEquals($searchForGreen($arr), \array_search('green', $arr));
+    }
+
+    public function testArraySearch3()
+    {
+        $arr = ['blue', 'red', 'green', 'red'];
+        $this->assertEquals(array_search3(true, 'green', $arr), \array_search('green', $arr, true));
+        $strictSearchForGreen = array_search3(true, 'green');
+        $this->assertEquals($strictSearchForGreen($arr), \array_search('green', $arr, true));
+    }
+
+    public function testArraySlice()
+    {
+        $arr = [0, 1, 2, 3];
+        $this->assertEquals(array_slice(1, $arr), \array_slice($arr, 1));
+        $sliceAfter1 = array_slice(1);
+        $this->assertEquals($sliceAfter1($arr), \array_slice($arr, 1));
+    }
+
+    public function testArraySlice3()
+    {
+        $arr = [0, 1, 2, 3];
+        $this->assertEquals(array_slice3(2, 1, $arr), \array_slice($arr, 1, 2));
+        $slice1To2 = array_slice3(2, 1);
+        $this->assertEquals($slice1To2($arr), \array_slice($arr, 1, 2));
+    }
+
+    public function testArraySlice4()
+    {
+        $arr = [0, 1, 2, 3];
+        $this->assertEquals(array_slice4(true, 2, 1, $arr), \array_slice($arr, 1, 2, true));
+        $slice1To2 = array_slice4(true, 2, 1);
+        $this->assertEquals($slice1To2($arr), \array_slice($arr, 1, 2, true));
+    }
+
+    public function testArraySum()
+    {
+        $arr = [1, 2, 3, 4];
+        $this->assertEquals(array_sum($arr), \array_sum($arr));
+        $sumArr = array_sum();
+        $this->assertEquals($sumArr($arr), \array_sum($arr));
+    }
+
+    public function testArrayUDiffAssoc()
+    {
+        $a = [
+            0 => 5,
+            1 => 4,
+            2 => 3,
+            3 => 2,
+            4 => 1,
+            5 => 0
+        ];
+        $b = [
+            6 => 1,
+            5 => 2,
+            4 => 3,
+            3 => 4,
+            2 => 7,
+            1 => 6
+        ];
+        $f = function ($x, $y) {
+            return $x - $y;
+        };
+        $this->assertEquals(array_udiff_assoc($f, $a, $b), \array_udiff_assoc($a, $b, $f));
+        $diff = array_udiff_assoc($f);
+        $this->assertEquals($diff($a, $b), \array_udiff_assoc($a, $b, $f));
+    }
+
+    public function testArrayUDiffUAssoc()
+    {
+        $keyCmp = function ($a, $b) {
+            if ($a === $b) {
+                return 0;
+            }
+            return $b > $a ? -1 : 1;
+        };
+
+        $valueCmp = function ($a, $b) {
+            if ($a === $b) {
+                return 0;
+            }
+            return $a > $a ? -1 : 1;
+        };
+
+        $a1 = ['a' => 'red', 'b' => 'green', 'c' => 'blue'];
+        $a2 = ['a' => 'red', 'b' => 'green', 'c' => 'green'];
+
+        $this->assertEquals(
+            array_udiff_uassoc($keyCmp, $valueCmp, $a1, $a2),
+            \array_udiff_uassoc($a1, $a2, $keyCmp, $valueCmp)
+        );
+
+        $diff = array_udiff_uassoc($keyCmp, $valueCmp);
+        $this->assertEquals(
+            $diff($a1, $a2),
+            \array_udiff_uassoc($a1, $a2, $keyCmp, $valueCmp)
+        );
+    }
+
+    public function testArrayUDiff()
+    {
+        $cmp = function ($a, $b) {
+            if ($a === $b) {
+                return 0;
+            }
+            return $b > $a ? -1 : 1;
+        };
+
+        $a1 = ['a' => 'red', 'b' => 'green', 'c' => 'blue'];
+        $a2 = ['a' => 'red', 'b' => 'green', 'e' => 'green'];
+
+        $this->assertEquals(array_udiff($cmp, $a1, $a2), \array_udiff($a1, $a2, $cmp));
+        $diff = array_udiff($cmp);
+        $this->assertEquals($diff($a1, $a2), \array_udiff($a1, $a2, $cmp));
+    }
+
+    public function testArrayUIntersect()
+    {
+        $arr1 = ["a" => "green", "b" => "brown", "c" => "blue", "red"];
+        $arr2 = ["a" => "GREEN", "B" => "brown", "yellow", "red"];
+
+        $this->assertEquals(
+            array_uintersect("strcasecmp", $arr1, $arr2),
+            \array_uintersect($arr1, $arr2, "strcasecmp")
+        );
+
+        $uintersectStrCaseCmp = array_uintersect("strcasecmp");
+        $this->assertEquals(
+            $uintersectStrCaseCmp($arr1, $arr2),
+            \array_uintersect($arr1, $arr2, "strcasecmp")
+        );
+    }
+
+    public function testArrayUIntersectAssoc()
+    {
+        $arr1 = ["a" => "green", "b" => "brown", "c" => "blue", "red"];
+        $arr2 = ["a" => "GREEN", "B" => "brown", "yellow", "red"];
+
+        $this->assertEquals(
+            array_uintersect_assoc("strcasecmp", $arr1, $arr2),
+            \array_uintersect_assoc($arr1, $arr2, "strcasecmp")
+        );
+
+        $intersectStrCaseCmp = array_uintersect_assoc("strcasecmp");
+        $this->assertEquals(
+            $intersectStrCaseCmp($arr1, $arr2),
+            \array_uintersect_assoc($arr1, $arr2, "strcasecmp")
+        );
+    }
+
+    public function testArrayUIntersectUAssoc()
+    {
+        $arr1 = ["a" => "green", "b" => "brown", "c" => "blue", "red"];
+        $arr2 = ["a" => "GREEN", "B" => "brown", "yellow", "red"];
+
+        $this->assertEquals(
+            array_uintersect_uassoc("strcasecmp", "strcmp", $arr1, $arr2),
+            \array_uintersect_uassoc($arr1, $arr2, "strcasecmp", "strcmp")
+        );
+
+        $intersect = array_uintersect_uassoc("strcasecmp", "strcmp");
+        $this->assertEquals(
+            $intersect($arr1, $arr2),
+            \array_uintersect_uassoc($arr1, $arr2, "strcasecmp", "strcmp")
+        );
+    }
+
+    public function testArrayUnique()
+    {
+        $arr = [1, 2, 3, 1, 2, 3, 4];
+        $this->assertEquals(array_unique($arr), \array_unique($arr));
+        $arrUnique = array_unique();
+        $this->assertEquals($arrUnique($arr), \array_unique($arr));
+    }
+
+    public function testArrayUnique2()
+    {
+        $arr = ['1', '2', '3', '1', '2', '3', '4'];
+        $this->assertEquals(array_unique2(SORT_NUMERIC, $arr), \array_unique($arr, SORT_NUMERIC));
+        $uniqueSortNumeric = array_unique2(SORT_NUMERIC);
+        $this->assertEquals($uniqueSortNumeric($arr), \array_unique($arr, SORT_NUMERIC));
+    }
+
+    public function testCount()
+    {
+        $arr = [1, 2, 3, 4];
+        $this->assertEquals(count($arr), \count($arr));
+        $count = count();
+        $this->assertEquals($count($arr), \count($arr));
+    }
+
+    public function testCount2()
+    {
+        $arr = [[1, 2], [3, 4]];
+        $this->assertEquals(count2(COUNT_RECURSIVE, $arr), \count($arr, COUNT_RECURSIVE));
+        $deepCount = count2(COUNT_RECURSIVE);
+        $this->assertEquals($deepCount($arr), \count($arr, COUNT_RECURSIVE));
+    }
+
+    public function testSizeof()
+    {
+        $arr = [1, 2, 3, 4];
+        $this->assertEquals(sizeof($arr), sizeof($arr));
+        $sizeof = sizeof();
+        $this->assertEquals($sizeof($arr), sizeof($arr));
+    }
+
+    public function testSizeof2()
+    {
+        $arr = [[1, 2], [3, 4]];
+        $this->assertEquals(sizeof2(COUNT_RECURSIVE, $arr), \sizeof($arr, COUNT_RECURSIVE));
+        $deepCount = sizeof2(COUNT_RECURSIVE);
+        $this->assertEquals($deepCount($arr), \sizeof($arr, COUNT_RECURSIVE));
+    }
+
+    public function testInArray()
+    {
+        $arr = ['foo', 'bar'];
+        $this->assertEquals(in_array('foo', $arr), \in_array('foo', $arr));
+        $inArray = in_array('foo');
+        $this->assertEquals($inArray($arr), \in_array('foo', $arr));
+    }
+
+    public function testInArray3()
+    {
+        $arr = [1, 2, 3];
+        $this->assertEquals(in_array3(true, '1', $arr), \in_array('1', $arr, true));
+        $inArray = in_array3(true, '1');
+        $this->assertEquals($inArray($arr), \in_array('foo', $arr, true));
+    }
+
+    public function testRange()
+    {
+        $this->assertEquals(range(2, 5), \range(2, 5));
+        $startAt2 = range(2);
+        $this->assertEquals($startAt2(5), \range(2, 5));
+    }
+
+    public function testRange3()
+    {
+        $this->assertEquals(range3(10, 2, 30), \range(2, 30, 10));
+        $step10StartAt2 = range3(10, 2);
+        $this->assertEquals($step10StartAt2(30), \range(2, 30, 10));
+    }
+
+    public function testShuffle()
+    {
+        // Make it highly unlikely that the shuffled array would
+        // come back to the same settings.
+        $arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+        $shuffled = shuffle($arr);
+
+        $this->assertNotEquals($shuffled, $arr);
+        $this->assertCount(15, $arr);
+        $this->assertCount(15, $shuffled);
+
+        $shuffle = shuffle();
+        $shuffledArr = $shuffle($arr);
+        $this->assertNotEquals($arr, $shuffledArr);
+        $this->assertCount(15, $arr);
+        $this->assertCount(15, $shuffledArr);
+    }
+
+    public function testRSort()
+    {
+        $arr = [1, 2, 3];
+        $this->assertEquals(rsort($arr), [3, 2, 1]);
+        $this->assertEquals($arr, [1, 2, 3]);
+
+        $rsort = rsort();
+        $this->assertEquals($rsort($arr), [3, 2, 1]);
+        $this->assertEquals($arr, [1, 2, 3]);
+    }
+
+    public function testRSort2()
+    {
+        $arr = ['1', '2', '3'];
+        $this->assertEquals(rsort2(SORT_NUMERIC, $arr), ['3', '2', '1']);
+        $this->assertEquals($arr, ['1', '2', '3']);
+
+        $numericReverseSort = rsort2(SORT_NUMERIC);
+        $this->assertEquals($numericReverseSort($arr), ['3', '2', '1']);
+    }
+
+    public function testKrSort()
+    {
+        $arr = ['1' => 3, '2' => 2, '3' => 1];
+        $this->assertEquals(krsort($arr), ['3' => 1, '2' => 2, '1' => 3]);
+        $this->assertEquals($arr, ['1' => 3, '2' => 2, '3' => 1]);
+
+        $reverseKeySort = krsort();
+        $this->assertEquals($reverseKeySort($arr), ['3' => 1, '2' => 2, '1' => 3]);
+    }
+
+    public function testKrSort2()
+    {
+        $arr = ['1' => 3, '2' => 2, '3' => 1];
+        $this->assertEquals(krsort2(SORT_NUMERIC, $arr), ['3' => 1, '2' => 2, '1' => 3]);
+        $this->assertEquals($arr, ['1' => 3, '2' => 2, '3' => 1]);
+
+        $reverseKeySort = krsort2(SORT_NUMERIC);
+        $this->assertEquals($reverseKeySort($arr), ['3' => 1, '2' => 2, '1' => 3]);
+    }
+
+    public function testKSort()
+    {
+        $fruits = ['d' => 'lemon', 'a' => 'orange', 'b' => 'banana', 'c' => 'apple'];
+        $expected = ['a' => 'orange', 'b' => 'banana', 'c' => 'apple', 'd' => 'lemon'];
+        $this->assertTrue(ksort($fruits) === $expected);
+        $this->assertFalse($fruits === $expected);
+
+        $ksort = ksort();
+        $this->assertTrue($ksort($fruits) === $expected);
+        $this->assertFalse($fruits === $expected);
+    }
+
+    public function testKSort2()
+    {
+        $fruits = ['1' => 'lemon', '3' => 'orange', '2' => 'banana', '0' => 'apple'];
+        $expected = ['0' => 'apple', '1' => 'lemon', '2' => 'banana', '3' => 'orange'];
+        $this->assertTrue(ksort2(SORT_NUMERIC, $fruits) === $expected);
+        $this->assertFalse($fruits === $expected);
+
+        $ksort = ksort2(SORT_NUMERIC);
+        $this->assertTrue($ksort($fruits) === $expected);
+        $this->assertFalse($fruits === $expected);
+    }
+
+    public function testNatCaseSort()
+    {
+        $arr = ['IMG0.png', 'img12.png', 'img10.png', 'img2.png', 'img1.png', 'IMG3.png'];
+        $expected = [
+            0 => 'IMG0.png',
+            4 => 'img1.png',
+            3 => 'img2.png',
+            5 => 'IMG3.png',
+            2 => 'img10.png',
+            1 => 'img12.png'
+        ];
+        $this->assertTrue(natcasesort($arr) === $expected);
+        $this->assertFalse($arr === $expected);
+
+        $natCaseSort = natcasesort();
+        $this->assertTrue($natCaseSort($arr) === $expected);
+        $this->assertFalse($arr === $expected);
+    }
+
+    public function testNatSort()
+    {
+        $arr = ["img12.png", "img10.png", "img2.png", "img1.png"];
+        $expected = [
+            3 => 'img1.png',
+            2 => 'img2.png',
+            1 => 'img10.png',
+            0 => 'img12.png'
+        ];
+
+        $this->assertTrue(natsort($arr) === $expected);
+        $this->assertFalse($arr === $expected);
+
+        $natSort = natsort();
+        $this->assertTrue($natSort($arr) === $expected);
+        $this->assertFalse($arr === $expected);
+    }
+
+    public function testArSort()
+    {
+        $fruits = ["d" => "lemon", "a" => "orange", "b" => "banana", "c" => "apple"];
+        $expected = [
+            'a' => 'orange',
+            'd' => 'lemon',
+            'b' => 'banana',
+            'c' => 'apple'
+        ];
+
+        $this->assertTrue(arsort($fruits) === $expected);
+        $this->assertFalse($fruits === $expected);
+
+        $arsort = arsort();
+        $this->assertTrue($arsort($fruits) === $expected);
+        $this->assertFalse($fruits === $expected);
+    }
+
+    public function testArSort2()
+    {
+        $fruits = ["d" => "3", "a" => "4", "b" => "2", "c" => "1"];
+        $expected = [
+            'a' => '4',
+            'd' => '3',
+            'b' => '2',
+            'c' => '1'
+        ];
+
+        $this->assertTrue(arsort2(SORT_NUMERIC, $fruits) === $expected);
+        $this->assertFalse($fruits === $expected);
+
+        $arsort = arsort2(SORT_NUMERIC);
+        $this->assertTrue($arsort($fruits) === $expected);
+        $this->assertFalse($fruits === $expected);
+    }
+
+    public function testASort()
+    {
+        $fruits = ["d" => "lemon", "a" => "orange", "b" => "banana", "c" => "apple"];
+        $expected = [
+            'c' => 'apple',
+            'b' => 'banana',
+            'd' => 'lemon',
+            'a' => 'orange'
+        ];
+
+        $this->assertTrue(asort($fruits) === $expected);
+        $this->assertFalse($fruits === $expected);
+
+        $asort = asort();
+        $this->assertTrue($asort($fruits) === $expected);
+        $this->assertFalse($fruits === $expected);
+    }
+
+    public function testASort2()
+    {
+        $fruits = ["d" => "3", "a" => "4", "b" => "2", "c" => "1"];
+        $expected = [
+            'c' => '1',
+            'b' => '2',
+            'd' => '3',
+            'a' => '4'
+        ];
+
+        $this->assertTrue(asort2(SORT_NUMERIC, $fruits) === $expected);
+        $this->assertFalse($fruits === $expected);
+
+        $asort = asort2(SORT_NUMERIC);
+        $this->assertTrue($asort($fruits) === $expected);
+        $this->assertFalse($fruits === $expected);
+    }
+
+    public function testSort()
+    {
+        $arr = [3, 2, 4, 1];
+        $expected = [1, 2, 3, 4];
+        $this->assertTrue(sort($arr) === $expected);
+        $this->assertFalse($arr === $expected);
+
+        $sort = sort();
+        $this->assertTrue($sort($arr) === $expected);
+        $this->assertFalse($arr === $expected);
+    }
+
+    public function testSort2()
+    {
+        $arr = ['3', '2', '4', '1'];
+        $expected = ['1', '2', '3', '4'];
+        $this->assertTrue(sort2(SORT_NUMERIC, $arr) === $expected);
+        $this->assertFalse($arr === $expected);
+
+        $sort = sort2(SORT_NUMERIC);
+        $this->assertTrue($sort($arr) === $expected);
+        $this->assertFalse($arr === $expected);
+    }
+
+    public function testUASort()
+    {
+        $arr = [
+            'a' => 4,
+            'b' => 8,
+            'c' => -1,
+            'd' => -9,
+            'e' => 2,
+            'f' => 5,
+            'g' => 3,
+            'h' => -4
+        ];
+        $expected = [
+            'd' => -9,
+            'h' => -4,
+            'c' => -1,
+            'e' => 2,
+            'g' => 3,
+            'a' => 4,
+            'f' => 5,
+            'b' => 8
+        ];
+        $f = function ($a, $b) {
+            if ($a == $b) {
+                return 0;
+            }
+            return ($a < $b) ? -1 : 1;
+        };
+        $this->assertTrue(uasort($f, $arr) === $expected);
+        $this->assertFalse($arr === $expected);
+
+        $sortOffF = uasort($f);
+        $this->assertTrue($sortOffF($arr) === $expected);
+        $this->assertFalse($arr === $expected);
+    }
+
+    public function testUKSort()
+    {
+        $cmp = function ($a, $b) {
+            $a = preg_replace('@^(a|an|the) @', '', $a);
+            $b = preg_replace('@^(a|an|the) @', '', $b);
+            return strcasecmp($a, $b);
+        };
+
+        $a = ["John" => 1, "the Earth" => 2, "an apple" => 3, "a banana" => 4];
+
+        $expected = [
+            'an apple' => 3,
+            'a banana' => 4,
+            'the Earth' => 2,
+            'John' => 1
+        ];
+        $this->assertTrue(uksort($cmp, $a) === $expected);
+        $this->assertFalse($a === $expected);
+
+        $keySortCmp = uksort($cmp);
+        $this->assertTrue($keySortCmp($a) === $expected);
+        $this->assertFalse($a === $expected);
+    }
+
+    public function testUSort()
+    {
+        $cmp = function ($a, $b) {
+            if ($a == $b) {
+                return 0;
+            }
+            return ($a < $b) ? -1 : 1;
+        };
+
+        $a = [3, 2, 5, 6, 1];
+        $expected = [1, 2, 3, 5, 6];
+
+        $this->assertTrue(usort($cmp, $a) === $expected);
+        $this->assertFalse($a === $expected);
+
+        $usortCmp = usort($cmp);
+        $this->assertTrue($usortCmp($a) === $expected);
+        $this->assertFalse($a === $expected);
+    }
+
+    public function testArrayPush()
+    {
+        $arr = [1, 2];
+        $expected = [1, 2, 3];
+        $this->assertEquals(array_push(3, $arr), $expected);
+        $this->assertEquals($arr, [1, 2]);
+
+        $push3 = array_push(3);
+        $this->assertEquals($push3($arr), $expected);
+        $this->assertEquals($arr, [1, 2]);
+    }
+
+    public function testArrayPop()
+    {
+        $arr = [1, 2];
+        $expected = 2;
+        $this->assertEquals(array_pop($arr), $expected);
+        $this->assertEquals($arr, [1, 2]);
+    }
+
+    public function testArrayShift()
+    {
+        $arr = [1, 2];
+        $expected = 1;
+        $this->assertEquals(array_shift($arr), $expected);
+        $this->assertEquals($arr, [1, 2]);
+    }
+
+    public function testArrayUnshift()
+    {
+        $arr = [1, 2];
+        $expected = [3, 1, 2];
+        $this->assertEquals(array_unshift(3, $arr), $expected);
+        $this->assertEquals($arr, [1, 2]);
+
+        $prepend3 = array_unshift(3);
+        $this->assertEquals($prepend3($arr), $expected);
+        $this->assertEquals($arr, [1, 2]);
+    }
+
+    public function testArraySplice()
+    {
+        $arr = ['red', 'green', 'blue', 'yellow'];
+        $this->assertEquals(array_splice(2, $arr), ['red', 'green']);
+    }
+
+    public function testArraySplice3()
+    {
+        $arr = ['red', 'green', 'blue', 'yellow'];
+        $this->assertEquals(array_splice3(1, -1, $arr), ['red', 'yellow']);
+    }
+
+    public function testArraySplice4()
+    {
+        $arr = ['red', 'green', 'blue', 'yellow'];
+        $this->assertEquals(array_splice4(1, -1, ['black', 'maroon'], $arr), ['red', 'black', 'maroon', 'yellow']);
     }
 }
