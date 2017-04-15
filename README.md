@@ -1,4 +1,4 @@
-# Phantasy [![Build Status](https://travis-ci.org/mckayb/phantasy.svg?branch=master)](https://travis-ci.org/mckayb/phantasy) [![Coverage Status](https://coveralls.io/repos/github/mckayb/phantasy/badge.svg)](https://coveralls.io/github/mckayb/phantasy)
+# Phantasy [![Build Status](https://travis-ci.org/mckayb/phantasy.svg?branch=master)](https://travis-ci.org/mckayb/phantasy) [![Coverage Status](https://coveralls.io/repos/github/mckayb/phantasy/badge.svg?branch=master)](https://coveralls.io/github/mckayb/phantasy)
 Functional Programming Helpers and Data Types for PHP.
 
 ## Getting Started
