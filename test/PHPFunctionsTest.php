@@ -148,6 +148,7 @@ use function Phantasy\Core\PHP\{
     array_fill_keys,
     array_fill,
     array_filter,
+    array_filter2,
     array_filter3,
     array_flip,
     array_intersect_assoc,
@@ -340,14 +341,21 @@ class PHPFunctionsTest extends TestCase
 
     public function testConvertUUDecode()
     {
-        $this->assertEquals(convert_uudecode("+22!L;W9E(%!(4\"$`\n`"), \convert_uudecode("+22!L;W9E(%!(4\"$`\n`"));
-        $this->assertEquals(convert_uudecode("+22!L;W9E(%!(4\"$`\n`"), 'I love PHP!');
+        $str = "+22!L;W9E(%!(4\"$`\n`";
+        $this->assertEquals(convert_uudecode($str), \convert_uudecode($str));
+        $this->assertEquals(convert_uudecode($str), 'I love PHP!');
+
+        $convertUUDecode = convert_uudecode();
+        $this->assertEquals($convertUUDecode($str), 'I love PHP!');
     }
 
     public function testConvertUUEncode()
     {
         $this->assertEquals(convert_uuencode('I love PHP!'), \convert_uuencode('I love PHP!'));
         $this->assertEquals(convert_uuencode('I love PHP!'), "+22!L;W9E(%!(4\"$`\n`\n");
+
+        $convertUUEncode = convert_uuencode();
+        $this->assertEquals($convertUUEncode('I love PHP!'), "+22!L;W9E(%!(4\"$`\n`\n");
     }
 
     public function testCountChars()
@@ -398,12 +406,18 @@ class PHPFunctionsTest extends TestCase
     {
         $this->assertEquals(crypt('Foo', 'Test'), \crypt('Test', 'Foo'));
         $this->assertEquals(crypt('Foo', 'Test'), 'Foh5xTm5Uw31I');
+
+        $crypt = crypt('Foo');
+        $this->assertEquals($crypt('Test'), 'Foh5xTm5Uw31I');
     }
 
     public function testHex2Bin()
     {
         $this->assertEquals(hex2bin('6578616d706c65206865782064617461'), \hex2bin('6578616d706c65206865782064617461'));
         $this->assertEquals(hex2bin('6578616d706c65206865782064617461'), 'example hex data');
+
+        $hex2Bin = hex2bin();
+        $this->assertEquals($hex2Bin('6578616d706c65206865782064617461'), 'example hex data');
     }
 
     public function testHtmlSpecialCharsDecode()
@@ -454,6 +468,11 @@ class PHPFunctionsTest extends TestCase
     public function testLevenshtein()
     {
         $this->assertEquals(levenshtein('carrrot', 'carrot'), \levenshtein('carrrot', 'carrot'));
+
+        $getLevenWithCarrot = levenshtein('carrot');
+        $this->assertEquals($getLevenWithCarrot('carrrot'), \levenshtein('carrot', 'carrrot'));
+
+        $this->assertEquals($getLevenWithCarrot('carrrot'), 1);
     }
 
     public function testLevenshtein5()
@@ -461,6 +480,9 @@ class PHPFunctionsTest extends TestCase
         $a = '1 apple';
         $b = '2 apples';
         $this->assertEquals(levenshtein5(1, 0, 0, $a, $b), \levenshtein($a, $b, 1, 0, 0));
+
+        $levenshteinInsCost = levenshtein5(1, 0, 0);
+        $this->assertEquals($levenshteinInsCost($a, $b), \levenshtein($a, $b, 1, 0, 0));
     }
 
     public function testLTrim()
@@ -468,6 +490,9 @@ class PHPFunctionsTest extends TestCase
         $a = "\t\tThese are a few words :) ...  ";
         $this->assertEquals(ltrim($a), \ltrim($a));
         $this->assertEquals(ltrim($a), "These are a few words :) ...  ");
+
+        $ltrim = ltrim();
+        $this->assertEquals($ltrim($a), \ltrim($a));
     }
 
     public function testLTrim2()
@@ -488,12 +513,24 @@ class PHPFunctionsTest extends TestCase
             md5_file(realpath(dirname(__FILE__)) . '/fixtures/config.json'),
             '625b7290ee67ba3bb84ebe1fa5c32fbe'
         );
+
+        $md5File = md5_file();
+        $this->assertEquals(
+            $md5File(realpath(dirname(__FILE__)) . '/fixtures/config.json'),
+            '625b7290ee67ba3bb84ebe1fa5c32fbe'
+        );
     }
 
     public function testMd5File2()
     {
         $this->assertEquals(
             md5_file2(true, realpath(dirname(__FILE__)) . '/fixtures/config.json'),
+            \md5_file(realpath(dirname(__FILE__)) . '/fixtures/config.json', true)
+        );
+
+        $md5WithRawOutput = md5_file2(true);
+        $this->assertEquals(
+            $md5WithRawOutput(realpath(dirname(__FILE__)) . '/fixtures/config.json'),
             \md5_file(realpath(dirname(__FILE__)) . '/fixtures/config.json', true)
         );
     }
@@ -505,18 +542,27 @@ class PHPFunctionsTest extends TestCase
 
         $this->assertEquals(md5($str), \md5($str));
         $this->assertEquals(md5($str), $expected);
+
+        $md5 = md5();
+        $this->assertEquals($md5($str), $expected);
     }
 
     public function testMd52()
     {
         $str = 'apple';
         $this->assertEquals(md52(true, $str), \md5($str, true));
+
+        $md5RawOutput = md52(true);
+        $this->assertEquals($md5RawOutput($str), \md5($str, true));
     }
 
     public function testMetaphone()
     {
         $this->assertEquals(metaphone('programming'), \metaphone('programming'));
         $this->assertEquals(metaphone('programming'), 'PRKRMNK');
+
+        $metaphone = metaphone();
+        $this->assertEquals($metaphone('programming'), 'PRKRMNK');
     }
 
     public function testMetaphone2()
@@ -534,6 +580,9 @@ class PHPFunctionsTest extends TestCase
         setlocale(LC_MONETARY, 'en_IN');
         $this->assertEquals(money_format('%i', $num), \money_format('%i', $num));
         $this->assertEquals(money_format('%i', $num), 'INR 1,234.56');
+
+        $moneyFormat = money_format('%i');
+        $this->assertEquals($moneyFormat($num), 'INR 1,234.56');
     }
 
     public function testNLLangInfo()
@@ -550,6 +599,9 @@ class PHPFunctionsTest extends TestCase
         $str = "foo isn't\n bar";
         $this->assertEquals(nl2br($str), \nl2br($str));
         $this->assertEquals(nl2br($str), "foo isn't<br />\n bar");
+
+        $nl2br = nl2br();
+        $this->assertEquals($nl2br($str), "foo isn't<br />\n bar");
     }
 
     public function testNL2BR2()
@@ -610,6 +662,9 @@ class PHPFunctionsTest extends TestCase
         $output = parse_str($str);
         \parse_str($str, $expected);
         $this->assertEquals($output, $expected);
+
+        $parseStr = parse_str();
+        $this->assertEquals($parseStr($str), $expected);
     }
 
     public function testQuotemeta()
@@ -652,6 +707,12 @@ class PHPFunctionsTest extends TestCase
             sha1_file(realpath(dirname(__FILE__)) . '/fixtures/config.json'),
             '7b25c66924c90da0ffd45fa1e78f858d37cae7bc'
         );
+
+        $sha1File = sha1_file();
+        $this->assertEquals(
+            $sha1File(realpath(dirname(__FILE__)) . '/fixtures/config.json'),
+            '7b25c66924c90da0ffd45fa1e78f858d37cae7bc'
+        );
     }
 
     public function testSHA1File2()
@@ -684,6 +745,9 @@ class PHPFunctionsTest extends TestCase
     {
         $str = 'apple';
         $this->assertEquals(sha12(true, $str), \sha1($str, true));
+
+        $sha1NoRaw = sha12(false);
+        $this->assertEquals($sha1NoRaw($str), \sha1($str, false));
     }
 
     public function testSimilarText()
@@ -807,12 +871,12 @@ class PHPFunctionsTest extends TestCase
     public function testStrPad4()
     {
         $str = 'Alien';
-        $this->assertEquals(str_pad4(7, '-', STR_PAD_LEFT, $str), \str_pad($str, 7, '-', STR_PAD_LEFT));
-        $this->assertEquals(str_pad4(7, '-', STR_PAD_LEFT, $str), '--Alien');
+        $this->assertEquals(str_pad4(STR_PAD_LEFT, 7, '-', $str), \str_pad($str, 7, '-', STR_PAD_LEFT));
+        $this->assertEquals(str_pad4(STR_PAD_LEFT, 7, '-', $str), '--Alien');
 
-        $padTo7 = str_pad4(7);
-        $padTo7WithDashOnTheLeft = $padTo7('-', STR_PAD_LEFT);
-        $this->assertEquals($padTo7WithDashOnTheLeft($str), '--Alien');
+        $padLeft = str_pad4(STR_PAD_LEFT);
+        $padTo7WithDashOnLeft = $padLeft(7, '-');
+        $this->assertEquals($padTo7WithDashOnLeft($str), '--Alien');
     }
 
     public function testStrRepeat()
@@ -1030,7 +1094,7 @@ class PHPFunctionsTest extends TestCase
 
     public function testStripos()
     {
-        $findme    = 'a';
+        $findme = 'a';
         $mystring1 = 'xyz';
         $mystring2 = 'ABC';
 
@@ -1289,6 +1353,16 @@ class PHPFunctionsTest extends TestCase
             $arr2[] = $tok2;
         }
         $this->assertEquals($arr, $arr2);
+
+        $strtok = strtok(' ');
+        $tok3 = $strtok($str);
+        $arr3 = [$tok3];
+        while ($tok3 !== false) {
+            $tok3 = strtok1(' ');
+            $arr3[] = $tok3;
+        }
+
+        $this->assertEquals($arr, $arr3);
     }
 
     public function testStrtolower()
@@ -1381,9 +1455,9 @@ class PHPFunctionsTest extends TestCase
     {
         $text = 'This is a test';
 
-        $this->assertEquals(substr_count4(3, 3, 'is', $text), \substr_count($text, 'is', 3, 3)); // 2
-        $countIsFrom3To6 = substr_count4(3, 3, 'is');
-        $this->assertEquals($countIsFrom3To6($text), \substr_count($text, 'is', 3, 3));
+        $this->assertEquals(substr_count4(4, 3, 'is', $text), \substr_count($text, 'is', 3, 4)); // 2
+        $countIsFrom3To7 = substr_count4(4, 3, 'is');
+        $this->assertEquals($countIsFrom3To7($text), \substr_count($text, 'is', 3, 4));
     }
 
     public function testSubstrReplace()
@@ -1698,21 +1772,29 @@ class PHPFunctionsTest extends TestCase
 
     public function testArrayFill()
     {
-        $this->assertEquals(array_fill(5, 6, 'banana'), \array_fill(5, 6, 'banana'));
+        $this->assertEquals(array_fill(6, 5, 'banana'), \array_fill(5, 6, 'banana'));
 
-        $fill6StartingAt5 = array_fill(5, 6);
+        $fill6StartingAt5 = array_fill(6, 5);
         $this->assertEquals($fill6StartingAt5('banana'), \array_fill(5, 6, 'banana'));
     }
 
     public function testArrayFilter()
     {
+        $a = ['foo', false, -1, null, ''];
+        $this->assertEquals(array_filter($a), \array_filter($a));
+        $filter = array_filter();
+        $this->assertEquals($filter($a), \array_filter($a));
+    }
+
+    public function testArrayFilter2()
+    {
         $a = [1, 2, 3, 4, 5];
         $isEven = function ($x) {
             return $x % 2 === 0;
         };
-        $this->assertEquals(array_filter($isEven, $a), \array_filter($a, $isEven));
+        $this->assertEquals(array_filter2($isEven, $a), \array_filter($a, $isEven));
 
-        $filterEvens = array_filter($isEven);
+        $filterEvens = array_filter2($isEven);
         $this->assertEquals($filterEvens($a), \array_filter($a, $isEven));
     }
 
@@ -2078,7 +2160,7 @@ class PHPFunctionsTest extends TestCase
             if ($a === $b) {
                 return 0;
             }
-            return $a > $a ? -1 : 1;
+            return $a > $b ? -1 : 1;
         };
 
         $a1 = ['a' => 'red', 'b' => 'green', 'c' => 'blue'];
@@ -2582,17 +2664,27 @@ class PHPFunctionsTest extends TestCase
     {
         $arr = ['red', 'green', 'blue', 'yellow'];
         $this->assertEquals(array_splice(2, $arr), ['red', 'green']);
+
+        $splice2 = array_splice(2);
+        $this->assertEquals($splice2($arr), ['red', 'green']);
     }
 
     public function testArraySplice3()
     {
         $arr = ['red', 'green', 'blue', 'yellow'];
         $this->assertEquals(array_splice3(1, -1, $arr), ['red', 'yellow']);
+
+        $splice = array_splice3(1, -1);
+        $this->assertEquals($splice($arr), ['red', 'yellow']);
     }
 
     public function testArraySplice4()
     {
         $arr = ['red', 'green', 'blue', 'yellow'];
         $this->assertEquals(array_splice4(1, -1, ['black', 'maroon'], $arr), ['red', 'black', 'maroon', 'yellow']);
+
+        $splice = array_splice4(1, -1);
+        $spliceWithReplacements = $splice(['black', 'maroon']);
+        $this->assertEquals($spliceWithReplacements($arr), ['red', 'black', 'maroon', 'yellow']);
     }
 }

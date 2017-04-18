@@ -362,7 +362,7 @@ function str_pad3()
 
 function str_pad4()
 {
-    return curry(function ($length, $padStr, $padType, $str) {
+    return curry(function ($padType, $length, $padStr, $str) {
         return \str_pad($str, $length, $padStr, $padType);
     })(...func_get_args());
 }
@@ -912,10 +912,18 @@ function array_fill_keys()
 
 function array_fill()
 {
+    return curry(function ($num, $startIndex, $value) {
+        return \array_fill($startIndex, $num, $value);
+    })(...func_get_args());
     return curry('\array_fill')(...func_get_args());
 }
 
 function array_filter()
+{
+    return curry('\array_filter')(...func_get_args());
+}
+
+function array_filter2()
 {
     return curry(function ($f, $a) {
         return \array_filter($a, $f);
