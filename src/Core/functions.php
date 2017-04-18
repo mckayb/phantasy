@@ -19,7 +19,7 @@ function curry($callable)
     return $recurseFunc;
 }
 
-function curryN($n, $callable)
+function curryN()
 {
     $curryN = curry(function ($n, $callable) {
         $ref = new \ReflectionFunction($callable);
