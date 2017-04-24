@@ -2777,7 +2777,10 @@ class PHPFunctionsTest extends TestCase
         );
 
         $createPacificNauruDate = date_create2(new DateTimeZone('Pacific/Nauru'));
-        $this->assertEquals($createPacificNauruDate('2017-01-01'), \date_create('2017-01-01', new DateTimeZone('Pacific/Nauru')));
+        $this->assertEquals(
+            $createPacificNauruDate('2017-01-01'),
+            \date_create('2017-01-01', new DateTimeZone('Pacific/Nauru'))
+        );
     }
 
     public function testDateAdd()
@@ -2878,7 +2881,10 @@ class PHPFunctionsTest extends TestCase
         );
 
         $createPacificNauruDate = date_create_immutable2(new DateTimeZone('Pacific/Nauru'));
-        $this->assertEquals($createPacificNauruDate('2017-01-01'), \date_create_immutable('2017-01-01', new DateTimeZone('Pacific/Nauru')));
+        $this->assertEquals(
+            $createPacificNauruDate('2017-01-01'),
+            \date_create_immutable('2017-01-01', new DateTimeZone('Pacific/Nauru'))
+        );
     }
 
     public function testDateDateSet()

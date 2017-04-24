@@ -1479,7 +1479,7 @@ function date_add()
 
 function date_date_set()
 {
-    return curry(function($year, $month, $day, \DateTime $object) {
+    return curry(function ($year, $month, $day, \DateTime $object) {
         return \date_date_set(clone $object, $year, $month, $day);
     })(...func_get_args());
 }
@@ -1522,14 +1522,14 @@ function date_interval_format()
 
 function date_isodate_set()
 {
-    return curry(function($year, $week, \DateTime $object) {
+    return curry(function ($year, $week, \DateTime $object) {
         return \date_isodate_set(clone $object, $year, $week);
     })(...func_get_args());
 }
 
 function date_isodate_set4()
 {
-    return curry(function($year, $week, $day, \DateTime $object) {
+    return curry(function ($year, $week, $day, \DateTime $object) {
         return \date_isodate_set(clone $object, $year, $week, $day);
     })(...func_get_args());
 }
