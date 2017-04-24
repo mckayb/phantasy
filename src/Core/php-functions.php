@@ -1412,3 +1412,408 @@ function array_splice4()
         return $input;
     })(...func_get_args());
 }
+
+function checkdate()
+{
+    return curry('\checkdate')(...func_get_args());
+}
+
+function date_create_from_format()
+{
+    return curry('\date_create_from_format')(...func_get_args());
+}
+
+function date_create_from_format3()
+{
+    return curry(function (\DateTimeZone $timezone, $format, $time) {
+        return \date_create_from_format($format, $time, $timezone);
+    })(...func_get_args());
+}
+
+function date_create_immutable_from_format()
+{
+    return curry('\date_create_immutable_from_format')(...func_get_args());
+}
+
+function date_create_immutable_from_format3()
+{
+    return curry(function (\DateTimeZone $timezone, $format, $time) {
+        return \date_create_immutable_from_format($format, $time, $timezone);
+    })(...func_get_args());
+}
+
+function date_create_immutable1()
+{
+    return curry(function ($time) {
+        return \date_create_immutable($time);
+    })(...func_get_args());
+}
+
+function date_create_immutable2()
+{
+    return curry(function (\DateTimeZone $timezone, $time) {
+        return \date_create_immutable($time, $timezone);
+    })(...func_get_args());
+}
+
+function date_create1()
+{
+    return curry(function ($time) {
+        return \date_create($time);
+    })(...func_get_args());
+}
+
+function date_create2()
+{
+    return curry(function (\DateTimeZone $timezone, $time) {
+        return \date_create($time, $timezone);
+    })(...func_get_args());
+}
+
+function date_add()
+{
+    return curry(function ($interval, $date) {
+        return \date_add(clone $date, $interval);
+    })(...func_get_args());
+}
+
+function date_date_set()
+{
+    return curry(function($year, $month, $day, \DateTime $object) {
+        return \date_date_set(clone $object, $year, $month, $day);
+    })(...func_get_args());
+}
+
+function date_default_timezone_set()
+{
+    return curry('\date_default_timezone_set')(...func_get_args());
+}
+
+function date_diff()
+{
+    return curry('\date_diff')(...func_get_args());
+}
+
+function date_diff3()
+{
+    return curry(function ($absolute, \DateTimeInterface $d1, \DateTimeInterface $d2) {
+        return \date_diff($d1, $d2, $absolute);
+    })(...func_get_args());
+}
+
+function date_format()
+{
+    return curry(function ($format, \DateTimeInterface $object) {
+        return \date_format($object, $format);
+    })(...func_get_args());
+}
+
+function date_interval_create_from_date_string()
+{
+    return curry('\date_interval_create_from_date_string')(...func_get_args());
+}
+
+function date_interval_format()
+{
+    return curry(function ($format, \DateInterval $obj) {
+        return \date_interval_format($obj, $format);
+    })(...func_get_args());
+}
+
+function date_isodate_set()
+{
+    return curry(function($year, $week, \DateTime $object) {
+        return \date_isodate_set(clone $object, $year, $week);
+    })(...func_get_args());
+}
+
+function date_isodate_set4()
+{
+    return curry(function($year, $week, $day, \DateTime $object) {
+        return \date_isodate_set(clone $object, $year, $week, $day);
+    })(...func_get_args());
+}
+
+function date_modify()
+{
+    return curry(function ($modify, \DateTime $object) {
+        return \date_modify(clone $object, $modify);
+    })(...func_get_args());
+}
+
+function date_offset_get()
+{
+    return curry('\date_offset_get')(...func_get_args());
+}
+
+function date_parse_from_format()
+{
+    return curry('\date_parse_from_format')(...func_get_args());
+}
+
+function date_parse()
+{
+    return curry('\date_parse')(...func_get_args());
+}
+
+function date_sub()
+{
+    return curry(function (\DateInterval $interval, \DateTime $object) {
+        return \date_sub(clone $object, $interval);
+    })(...func_get_args());
+}
+
+function date_sun_info()
+{
+    return curry(function ($latitude, $longitude, $time) {
+        return \date_sun_info($time, $latitude, $longitude);
+    })(...func_get_args());
+}
+
+function date_sunrise()
+{
+    return curry('\date_sunrise')(...func_get_args());
+}
+
+function date_sunrise2()
+{
+    return curry(function ($format, $timestamp) {
+        return \date_sunrise($timestamp, $format);
+    })(...func_get_args());
+}
+
+function date_sunset()
+{
+    return curry('\date_sunset')(...func_get_args());
+}
+
+function date_sunset2()
+{
+    return curry(function ($format, $timestamp) {
+        return \date_sunset($timestamp, $format);
+    })(...func_get_args());
+}
+
+function date_time_set()
+{
+    return curry(function ($hour, $minute, $object) {
+        return \date_time_set(clone $object, $hour, $minute);
+    })(...func_get_args());
+}
+
+function date_time_set4()
+{
+    return curry(function ($hour, $minute, $second, $object) {
+        return \date_time_set(clone $object, $hour, $minute, $second);
+    })(...func_get_args());
+}
+
+function date_timestamp_get()
+{
+    return curry('\date_timestamp_get')(...func_get_args());
+}
+
+function date_timestamp_set()
+{
+    return curry(function ($unix, \DateTime $object) {
+        return \date_timestamp_set(clone $object, $unix);
+    })(...func_get_args());
+}
+
+function date_timezone_get()
+{
+    return curry('\date_timezone_get')(...func_get_args());
+}
+
+function date_timezone_set()
+{
+    return curry(function (\DateTimeZone $time, \DateTime $object) {
+        return \date_timezone_set(clone $object, $time);
+    })(...func_get_args());
+}
+
+function date()
+{
+    return curry('\date')(...func_get_args());
+}
+
+function date2()
+{
+    return curry(function ($format, $timestamp) {
+        return \date($format, $timestamp);
+    })(...func_get_args());
+}
+
+function getdate1()
+{
+    return curry(function ($timestamp) {
+        return \getdate($timestamp);
+    })(...func_get_args());
+}
+
+function gettimeofday1()
+{
+    return curry(function ($returnFloat) {
+        return \gettimeofday($returnFloat);
+    })(...func_get_args());
+}
+
+function gmdate()
+{
+    return curry('\gmdate')(...func_get_args());
+}
+
+function gmdate2()
+{
+    return curry(function ($format, $timestamp) {
+        return \gmdate($format, $timestamp);
+    })(...func_get_args());
+}
+
+function gmstrftime()
+{
+    return curry('\gmstrftime')(...func_get_args());
+}
+
+function gmstrftime2()
+{
+    return curry(function ($format, $timestamp) {
+        return \gmstrftime($format, $timestamp);
+    })(...func_get_args());
+}
+
+function idate()
+{
+    return curry('\idate')(...func_get_args());
+}
+
+function idate2()
+{
+    return curry(function ($format, $timestamp) {
+        return \idate($format, $timestamp);
+    })(...func_get_args());
+}
+
+function localtime1()
+{
+    return curry(function ($time) {
+        return \localtime($time);
+    })(...func_get_args());
+}
+
+function localtime2()
+{
+    return curry(function ($isAssociative, $time) {
+        return \localtime($time, $isAssociative);
+    })(...func_get_args());
+}
+
+function microtime1()
+{
+    return curry(function ($getAsFloat) {
+        return \microtime($getAsFloat);
+    })(...func_get_args());
+}
+
+function strftime()
+{
+    return curry('\strftime')(...func_get_args());
+}
+
+function strftime2()
+{
+    return curry(function ($format, $timestamp) {
+        return \strftime($format, $timestamp);
+    })(...func_get_args());
+}
+
+function strptime()
+{
+    return curry(function ($format, $date) {
+        return \strptime($date, $format);
+    })(...func_get_args());
+}
+
+function strtotime()
+{
+    return curry('\strtotime')(...func_get_args());
+}
+
+function strtotime2()
+{
+    return curry(function ($now, $time) {
+        return \strtotime($time, $now);
+    })(...func_get_args());
+}
+
+function timezone_identifiers_list1()
+{
+    return curry(function ($what) {
+        return \timezone_identifiers_list($what);
+    })(...func_get_args());
+}
+
+function timezone_identifiers_list2()
+{
+    return curry(function ($country, $what) {
+        return \timezone_identifiers_list($what, $country);
+    })(...func_get_args());
+}
+
+function timezone_location_get()
+{
+    return curry('\timezone_location_get')(...func_get_args());
+}
+
+function timezone_name_from_abbr()
+{
+    return curry('\timezone_name_from_abbr')(...func_get_args());
+}
+
+function timezone_name_from_abbr2()
+{
+    return curry(function ($gmtOffset, $abbr) {
+        return \timezone_name_from_abbr($abbr, $gmtOffset);
+    })(...func_get_args());
+}
+
+function timezone_name_from_abbr3()
+{
+    return curry(function ($isdst, $gmtOffset, $abbr) {
+        return \timezone_name_from_abbr($abbr, $gmtOffset, $isdst);
+    })(...func_get_args());
+}
+
+function timezone_name_get()
+{
+    return curry('\timezone_name_get')(...func_get_args());
+}
+
+function timezone_offset_get()
+{
+    return curry('\timezone_offset_get')(...func_get_args());
+}
+
+function timezone_open()
+{
+    return curry('\timezone_open')(...func_get_args());
+}
+
+function timezone_transitions_get()
+{
+    return curry('\timezone_transitions_get')(...func_get_args());
+}
+
+function timezone_transitions_get2()
+{
+    return curry(function ($timestampBegin, \DateTimeZone $object) {
+        return \timezone_transitions_get($object, $timestampBegin);
+    })(...func_get_args());
+}
+
+function timezone_transitions_get3()
+{
+    return curry(function ($timestampBegin, $timestampEnd, \DateTimeZone $object) {
+        return \timezone_transitions_get($object, $timestampBegin, $timestampEnd);
+    })(...func_get_args());
+}

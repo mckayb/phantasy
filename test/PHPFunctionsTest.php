@@ -31,8 +31,7 @@ use function Phantasy\Core\PHP\{
     ltrim2,
     md5_file,
     md5_file2,
-    md5,
-    md52,
+    md5, md52,
     metaphone,
     metaphone2,
     money_format,
@@ -219,7 +218,72 @@ use function Phantasy\Core\PHP\{
     array_splice,
     array_splice3,
     array_splice4,
-    shuffle
+    shuffle,
+    checkdate,
+    date_create_from_format,
+    date_create_from_format3,
+    date_create_immutable_from_format,
+    date_create_immutable_from_format3,
+    date_create_immutable1,
+    date_create_immutable2,
+    date_create1,
+    date_create2,
+    date_add,
+    date_date_set,
+    date_default_timezone_set,
+    date_diff,
+    date_diff3,
+    date_format,
+    date_interval_create_from_date_string,
+    date_interval_format,
+    date_isodate_set,
+    date_isodate_set4,
+    date_modify,
+    date_offset_get,
+    date_parse_from_format,
+    date_parse,
+    date_sub,
+    date_sun_info,
+    date_sunrise,
+    date_sunrise2,
+    date_sunset,
+    date_sunset2,
+    date_time_set,
+    date_time_set4,
+    date_timestamp_get,
+    date_timestamp_set,
+    date_timezone_get,
+    date_timezone_set,
+    date,
+    date2,
+    getdate1,
+    gettimeofday1,
+    gmdate,
+    gmdate2,
+    gmstrftime,
+    gmstrftime2,
+    idate,
+    idate2,
+    localtime1,
+    localtime2,
+    microtime1,
+    strftime,
+    strftime2,
+    strptime,
+    strtotime,
+    strtotime2,
+    timezone_identifiers_list1,
+    timezone_identifiers_list2,
+    timezone_location_get,
+    timezone_name_from_abbr,
+    timezone_name_from_abbr2,
+    timezone_name_from_abbr3,
+    timezone_name_get,
+    timezone_offset_get,
+    timezone_open,
+    timezone_transitions_get,
+    timezone_transitions_get2,
+    timezone_transitions_get3
 };
 
 class PHPFunctionsTest extends TestCase
@@ -2686,5 +2750,964 @@ class PHPFunctionsTest extends TestCase
         $splice = array_splice4(1, -1);
         $spliceWithReplacements = $splice(['black', 'maroon']);
         $this->assertEquals($spliceWithReplacements($arr), ['red', 'black', 'maroon', 'yellow']);
+    }
+
+    public function testCheckDate()
+    {
+        $this->assertEquals(checkdate(12, 21, 2000), \checkdate(12, 21, 2000));
+        $checkdate = checkdate();
+        $checkDayInDecember = $checkdate(12);
+        $check21stOfDecember = $checkDayInDecember(21);
+        $this->assertEquals($check21stOfDecember(2000), \checkdate(12, 21, 2000));
+    }
+
+    public function testDateCreate1()
+    {
+        $this->assertEquals(date_create1('2000-01-01'), \date_create('2000-01-01'));
+
+        $dateCreate = date_create1();
+        $this->assertEquals($dateCreate('2000-01-01'), \date_create('2000-01-01'));
+    }
+
+    public function testDateCreate2()
+    {
+        $this->assertEquals(
+            date_create2(new DateTimeZone('Pacific/Nauru'), '2017-01-01'),
+            \date_create('2017-01-01', new DateTimeZone('Pacific/Nauru'))
+        );
+
+        $createPacificNauruDate = date_create2(new DateTimeZone('Pacific/Nauru'));
+        $this->assertEquals($createPacificNauruDate('2017-01-01'), \date_create('2017-01-01', new DateTimeZone('Pacific/Nauru')));
+    }
+
+    public function testDateAdd()
+    {
+        $interval = new DateInterval('P10D');
+        $date = \date_create('2000-01-01');
+        $this->assertEquals(
+            date_add($interval, $date),
+            \date_add($date, $interval)
+        );
+
+        $addP10D = date_add($interval);
+        $this->assertEquals(
+            $addP10D($date),
+            \date_add($date, $interval)
+        );
+    }
+
+    public function testDateCreateFromFormat()
+    {
+        $this->assertEquals(
+            date_create_from_format('j-M-Y', '15-Feb-2009'),
+            \date_create_from_format('j-M-Y', '15-Feb-2009')
+        );
+
+        $createFromjMY = date_create_from_format('j-M-Y');
+        $this->assertEquals(
+            $createFromjMY('15-Feb-2009'),
+            \date_create_from_format('j-M-Y', '15-Feb-2009')
+        );
+    }
+
+    public function testDateCreateFromFormat3()
+    {
+        $timezone = new DateTimeZone('Pacific/Nauru');
+        $format = 'j-M-Y';
+        $time = '15-Feb-2009';
+        $this->assertEquals(
+            date_create_from_format3($timezone, $format, $time),
+            \date_create_from_format($format, $time, $timezone)
+        );
+
+        $nauruDateFromFormat = date_create_from_format3($timezone);
+        $jmyNauru = $nauruDateFromFormat($format);
+        $this->assertEquals(
+            $jmyNauru($time),
+            \date_create_from_format($format, $time, $timezone)
+        );
+    }
+
+    public function testDateCreateImmutableFromFormat()
+    {
+        $format = 'j-M-Y';
+        $time = '15-Feb-2009';
+        $this->assertEquals(
+            date_create_immutable_from_format($format, $time),
+            \date_create_immutable_from_format($format, $time)
+        );
+
+        $jmyDate = date_create_immutable_from_format($format);
+        $this->assertEquals(
+            $jmyDate($time),
+            \date_create_immutable_from_format($format, $time)
+        );
+    }
+
+    public function testDateCreateImmutableFromFormat3()
+    {
+        $timezone = new DateTimeZone('Pacific/Nauru');
+        $format = 'j-M-Y';
+        $time = '15-Feb-2009';
+        $this->assertEquals(
+            date_create_immutable_from_format3($timezone, $format, $time),
+            \date_create_immutable_from_format($format, $time, $timezone)
+        );
+
+        $nauruDateFromFormat = date_create_immutable_from_format3($timezone);
+        $jmyNauru = $nauruDateFromFormat($format);
+        $this->assertEquals(
+            $jmyNauru($time),
+            \date_create_immutable_from_format($format, $time, $timezone)
+        );
+    }
+
+    public function testDateCreateImmutable1()
+    {
+        $this->assertEquals(date_create_immutable1('2000-01-01'), \date_create_immutable('2000-01-01'));
+
+        $dateCreate = date_create_immutable1();
+        $this->assertEquals($dateCreate('2000-01-01'), \date_create_immutable('2000-01-01'));
+    }
+
+    public function testDateCreateImmutable2()
+    {
+        $this->assertEquals(
+            date_create_immutable2(new DateTimeZone('Pacific/Nauru'), '2017-01-01'),
+            \date_create_immutable('2017-01-01', new DateTimeZone('Pacific/Nauru'))
+        );
+
+        $createPacificNauruDate = date_create_immutable2(new DateTimeZone('Pacific/Nauru'));
+        $this->assertEquals($createPacificNauruDate('2017-01-01'), \date_create_immutable('2017-01-01', new DateTimeZone('Pacific/Nauru')));
+    }
+
+    public function testDateDateSet()
+    {
+        $date = date_create();
+        $this->assertEquals(
+            date_date_set(2001, 2, 3, $date),
+            \date_date_set($date, 2001, 2, 3)
+        );
+
+        $date2 = date_create();
+        $setToFeb32001 = date_date_set(2001, 2, 3);
+        $this->assertEquals(
+            $setToFeb32001($date2),
+            \date_date_set($date2, 2001, 2, 3)
+        );
+    }
+
+    public function testDateDefaultTimezoneSet()
+    {
+        $this->assertEquals(
+            date_default_timezone_set('America/Denver'),
+            \date_default_timezone_set('America/Denver')
+        );
+
+        $setTimezone = date_default_timezone_set();
+        $this->assertEquals(
+            $setTimezone('America/Denver'),
+            \date_default_timezone_set('America/Denver')
+        );
+    }
+
+    public function testDateDiff()
+    {
+        $a = new DateTime('2009-10-11');
+        $b = new DateTime('2009-10-13');
+        $this->assertEquals(date_diff($a, $b), \date_diff($a, $b));
+
+        $diffA = date_diff($a);
+        $this->assertEquals($diffA($b), \date_diff($a, $b));
+    }
+
+    public function testDateDiff3()
+    {
+        $a = new DateTime('2009-10-13');
+        $b = new DateTime('2009-10-11');
+        $this->assertEquals(
+            date_diff3(true, $a, $b),
+            \date_diff($a, $b, true)
+        );
+
+        $diffAbsolute = date_diff3(true);
+        $this->assertEquals(
+            $diffAbsolute($a, $b),
+            \date_diff($a, $b, true)
+        );
+    }
+
+    public function testDateFormat()
+    {
+        $a = date_create1('2000-01-01');
+        $this->assertEquals(
+            date_format('Y-m-d H:i:s', $a),
+            \date_format($a, 'Y-m-d H:i:s')
+        );
+
+        $formatYmdHis = date_format('Y-m-d H:i:s');
+    }
+
+    public function testDateIntervalCreateFromDateString()
+    {
+        $this->assertEquals(
+            date_interval_create_from_date_string('1 day'),
+            \date_interval_create_from_date_string('1 day')
+        );
+
+        $intervalFromDateStr = date_interval_create_from_date_string();
+        $this->assertEquals(
+            $intervalFromDateStr('1 day'),
+            \date_interval_create_from_date_string('1 day')
+        );
+    }
+
+    public function testDateIntervalFormat()
+    {
+        $a = new DateTime('2010-01-01');
+        $b = new DateTime('2010-02-01');
+        $interval = date_diff($a, $b);
+        $this->assertEquals(
+            date_interval_format('%a total days', $interval),
+            \date_interval_format($interval, '%a total days')
+        );
+
+        $formatTotalDays = date_interval_format('%a total days');
+        $this->assertEquals(
+            $formatTotalDays($interval),
+            \date_interval_format($interval, '%a total days')
+        );
+    }
+
+    public function testDateIsodateSet()
+    {
+        $a = new DateTime('2010-01-01');
+        $this->assertEquals(
+            date_isodate_set(2012, 1, $a),
+            \date_isodate_set($a, 2012, 1)
+        );
+
+        $setToJan12012 = date_isodate_set(2012, 1);
+        $this->assertEquals(
+            $setToJan12012($a),
+            \date_isodate_set($a, 2012, 1)
+        );
+    }
+
+    public function testDateIsodateSet4()
+    {
+        $a = new DateTime('2010-01-01');
+        $this->assertEquals(
+            date_isodate_set4(2012, 1, 1, $a),
+            \date_isodate_set($a, 2012, 1, 1)
+        );
+
+        $setToJan12012 = date_isodate_set4(2012, 1, 1);
+        $this->assertEquals(
+            $setToJan12012($a),
+            \date_isodate_set($a, 2012, 1, 1)
+        );
+    }
+
+    public function testDateModify()
+    {
+        $a = date_create1('2006-12-12');
+        $this->assertEquals(
+            date_modify('+1 day', $a),
+            \date_modify($a, '+1 day')
+        );
+
+        $addADay = date_modify('+1 day');
+        $this->assertEquals(
+            $addADay($a),
+            \date_modify($a, '+1 day')
+        );
+    }
+
+    public function testDateOffsetGet()
+    {
+        $a = date_create2(new DateTimeZone('America/New_York'), '2010-12-21');
+        $this->assertEquals(
+            date_offset_get($a),
+            \date_offset_get($a)
+        );
+
+        $getOffset = date_offset_get();
+        $this->assertEquals(
+            $getOffset($a),
+            \date_offset_get($a)
+        );
+    }
+
+    public function testDateParseFromFormat()
+    {
+        $date = '6.1.2009 13:00+01:00';
+        $this->assertEquals(
+            date_parse_from_format('j.n.Y H:iP', $date),
+            \date_parse_from_format('j.n.Y H:iP', $date)
+        );
+
+        $parsejnYHiP = date_parse_from_format('j.n.Y H:iP');
+        $this->assertEquals(
+            $parsejnYHiP($date),
+            \date_parse_from_format('j.n.Y H:iP', $date)
+        );
+    }
+
+    public function testDateParse()
+    {
+        $str = "2006-12-12 10:00:00.5";
+        $this->assertEquals(
+            date_parse($str),
+            \date_parse($str)
+        );
+
+        $dateParse = date_parse();
+        $this->assertEquals(
+            $dateParse($str),
+            \date_parse($str)
+        );
+    }
+
+    public function testDateSub()
+    {
+        $date = date_create1('2000-01-20');
+        $interval = date_interval_create_from_date_string('10 days');
+        $this->assertEquals(
+            date_sub($interval, $date),
+            \date_sub($date, $interval)
+        );
+
+        $subtract10Days = date_sub($interval);
+
+        $this->assertEquals(
+            $subtract10Days($date),
+            \date_sub($date, $interval)
+        );
+    }
+
+    public function testDateSunInfo()
+    {
+        $lat = 31.7667;
+        $long = 35.2333;
+        $time  = strtotime('2006-12-12');
+
+        $this->assertEquals(
+            date_sun_info($lat, $long, $time),
+            \date_sun_info($time, $lat, $long)
+        );
+
+        $sunForFixedLatAndLong = date_sun_info($lat, $long);
+        $this->assertEquals(
+            $sunForFixedLatAndLong($time),
+            \date_sun_info($time, $lat, $long)
+        );
+    }
+
+    public function testDateSunrise()
+    {
+        $t = time();
+        $this->assertEquals(
+            date_sunrise($t),
+            \date_sunrise($t)
+        );
+
+        $sunrise = date_sunrise();
+        $this->assertEquals(
+            $sunrise($t),
+            \date_sunrise($t)
+        );
+    }
+
+    public function testDateSunrise2()
+    {
+        $t = time();
+        $this->assertEquals(
+            date_sunrise2(SUNFUNCS_RET_STRING, $t),
+            \date_sunrise($t, SUNFUNCS_RET_STRING)
+        );
+
+        $stringSunrise = date_sunrise2(SUNFUNCS_RET_STRING);
+        $this->assertEquals(
+            $stringSunrise($t),
+            \date_sunrise($t, SUNFUNCS_RET_STRING)
+        );
+    }
+
+    public function testDateSunset()
+    {
+        $t = time();
+        $this->assertEquals(
+            date_sunset($t),
+            \date_sunset($t)
+        );
+
+        $sunset = date_sunset();
+        $this->assertEquals(
+            $sunset($t),
+            \date_sunset($t)
+        );
+    }
+
+    public function testDateSunset2()
+    {
+        $t = time();
+        $this->assertEquals(
+            date_sunset2(SUNFUNCS_RET_STRING, $t),
+            \date_sunset($t, SUNFUNCS_RET_STRING)
+        );
+
+        $sunsetStr = date_sunset2(SUNFUNCS_RET_STRING);
+        $this->assertEquals(
+            $sunsetStr($t),
+            \date_sunset($t, SUNFUNCS_RET_STRING)
+        );
+    }
+
+    public function testDateTimeSet()
+    {
+        $date = date_create1('2001-01-01');
+        $this->assertEquals(
+            date_time_set(14, 55, $date),
+            \date_time_set($date, 14, 55)
+        );
+
+        $setTo255 = date_time_set(14, 55);
+        $this->assertEquals(
+            $setTo255($date),
+            \date_time_set($date, 14, 55)
+        );
+    }
+
+    public function testDateTimeSet4()
+    {
+        $date = date_create1('2001-01-01');
+        $this->assertEquals(
+            date_time_set4(14, 55, 12, $date),
+            \date_time_set($date, 14, 55, 12)
+        );
+
+        $setTo25512 = date_time_set4(14, 55, 12);
+        $this->assertEquals(
+            $setTo25512($date),
+            \date_time_set($date, 14, 55, 12)
+        );
+    }
+
+    public function testDateTimestampGet()
+    {
+        $date = date_create();
+        $this->assertEquals(
+            date_timestamp_get($date),
+            \date_timestamp_get($date)
+        );
+
+        $getTimestamp = date_timestamp_get();
+        $this->assertEquals(
+            $getTimestamp($date),
+            \date_timestamp_get($date)
+        );
+    }
+
+    public function testDateTimestampSet()
+    {
+        $date = date_create();
+        $this->assertEquals(
+            date_timestamp_set(1171502725, $date),
+            \date_timestamp_set($date, 1171502725)
+        );
+
+        $f = date_timestamp_set(1171502725);
+        $this->assertEquals(
+            $f($date),
+            \date_timestamp_set($date, 1171502725)
+        );
+    }
+
+    public function testDateTimezoneGet()
+    {
+        $a = date_create2(new DateTimeZone('Europe/London'), null);
+        $this->assertEquals(
+            date_timezone_get($a),
+            \date_timezone_get($a)
+        );
+
+        $getTimezone = date_timezone_get();
+        $this->assertEquals(
+            $getTimezone($a),
+            \date_timezone_get($a)
+        );
+    }
+
+    public function testDateTimezoneSet()
+    {
+        $a = new DateTimeZone('Pacific/Chatham');
+        $b = new DateTimeZone('Pacific/Nauru');
+        $date = date_create2($a, '2000-01-01');
+        $this->assertEquals(
+            date_timezone_set($b, $date),
+            \date_timezone_set($date, $b)
+        );
+    }
+
+    public function testDate()
+    {
+        $this->assertEquals(
+            date('l'),
+            \date('l')
+        );
+
+        $date = date();
+        $this->assertEquals(
+            $date('l'),
+            \date('l')
+        );
+    }
+
+    public function testDate2()
+    {
+        $time = time();
+        $this->assertEquals(
+            date2('l', $time),
+            \date('l', $time)
+        );
+
+        $date = date2('l');
+        $this->assertEquals(
+            $date($time),
+            \date('l', $time)
+        );
+    }
+
+    public function testGetDate1()
+    {
+        $time = time();
+        $this->assertEquals(
+            getdate1($time),
+            \getdate($time)
+        );
+
+        $getDate = getdate1();
+        $this->assertEquals(
+            $getDate($time),
+            \getdate($time)
+        );
+    }
+
+    public function testGetTimeOfDay1()
+    {
+        $this->assertEquals(
+            gettimeofday1(true),
+            \gettimeofday(true),
+            'Time of day did not match!',
+            1
+        );
+
+        $getTimeOfDay = gettimeofday1();
+        $this->assertEquals(
+            $getTimeOfDay(true),
+            \gettimeofday(true),
+            'Time of day did not match!',
+            1
+        );
+    }
+
+    public function testGmDate()
+    {
+        $format = 'Y-m-d';
+        $this->assertEquals(
+            gmdate($format),
+            \gmdate($format)
+        );
+
+        $gmdate = gmdate();
+        $this->assertEquals(
+            $gmdate($format),
+            \gmdate($format)
+        );
+    }
+
+    public function testGmDate2()
+    {
+        $time = time();
+        $this->assertEquals(
+            gmdate2('l', $time),
+            \gmdate('l', $time)
+        );
+
+        $gmdate = gmdate2('l');
+        $this->assertEquals(
+            $gmdate($time),
+            \gmdate('l', $time)
+        );
+    }
+
+    public function testGmStrfTime()
+    {
+        $format = '%b %d %Y';
+        $this->assertEquals(
+            gmstrftime($format),
+            \gmstrftime($format)
+        );
+
+        $gmstrftime = gmstrftime();
+        $this->assertEquals(
+            $gmstrftime($format),
+            \gmstrftime($format)
+        );
+    }
+
+    public function testGmStrfTime2()
+    {
+        $time = time();
+        $this->assertEquals(
+            gmstrftime2('%b', $time),
+            \gmstrftime('%b', $time)
+        );
+
+        $gmstrftime = gmstrftime2('%b');
+        $this->assertEquals(
+            $gmstrftime($time),
+            \gmstrftime('%b', $time)
+        );
+    }
+
+    public function testIDate()
+    {
+        $format = 'U';
+        $this->assertEquals(
+            idate($format),
+            \idate($format)
+        );
+
+        $idate = idate();
+        $this->assertEquals(
+            $idate($format),
+            \idate($format)
+        );
+    }
+
+    public function testIDate2()
+    {
+        $time = time();
+        $this->assertEquals(
+            idate2('U', $time),
+            \idate('U', $time)
+        );
+
+        $idate = idate2('U');
+        $this->assertEquals(
+            $idate($time),
+            \idate('U', $time)
+        );
+    }
+
+    public function testLocaltime1()
+    {
+        $time = time();
+        $this->assertEquals(
+            localtime1($time),
+            \localtime($time)
+        );
+
+        $localtime = localtime1();
+        $this->assertEquals(
+            $localtime($time),
+            \localtime($time)
+        );
+    }
+
+    public function testLocaltime2()
+    {
+        $time = time();
+        $this->assertEquals(
+            localtime2(true, $time),
+            \localtime($time, true)
+        );
+
+        $localtime = localtime2(true);
+        $this->assertEquals(
+            $localtime($time),
+            \localtime($time, true)
+        );
+    }
+
+    public function testMicrotime1()
+    {
+        $this->assertEquals(
+            microtime1(true),
+            \microtime(true),
+            'Micro time not equal!',
+            1
+        );
+
+        $microtime = microtime1();
+        $this->assertEquals(
+            $microtime(true),
+            \microtime(true),
+            'Micro time not equal!',
+            1
+        );
+    }
+
+    public function testStrftime()
+    {
+        $format = '%b %d %Y';
+        $this->assertEquals(
+            strftime($format),
+            \strftime($format)
+        );
+
+        $strftime = strftime();
+        $this->assertEquals(
+            $strftime($format),
+            \strftime($format)
+        );
+    }
+
+    public function testStrftime2()
+    {
+        $time = time();
+        $this->assertEquals(
+            strftime2('l', $time),
+            \strftime('l', $time)
+        );
+
+        $strftime = strftime2('l');
+        $this->assertEquals(
+            $strftime($time),
+            \strftime('l', $time)
+        );
+    }
+
+    public function testStrptime()
+    {
+        $format = '%d/%m/%Y %H:%M:%S';
+        $strf = strftime($format);
+
+        $this->assertEquals(
+            strptime($format, $strf),
+            \strptime($strf, $format)
+        );
+
+        $strptime = strptime($format);
+        $this->assertEquals(
+            $strptime($strf),
+            \strptime($strf, $format)
+        );
+    }
+
+    public function testStrtotime()
+    {
+        $time = "last Monday";
+        $this->assertEquals(
+            strtotime($time),
+            \strtotime($time)
+        );
+
+        $strtotime = strtotime();
+        $this->assertEquals(
+            $strtotime($time),
+            \strtotime($time)
+        );
+    }
+
+    public function testStrtotime2()
+    {
+        $start = time();
+        $timeStr = "-1 days";
+        $this->assertEquals(
+            strtotime2($start, $timeStr),
+            \strtotime($timeStr, $start)
+        );
+
+        $strtotime = strtotime2($start);
+        $this->assertEquals(
+            $strtotime($timeStr),
+            \strtotime($timeStr, $start)
+        );
+    }
+
+    public function testTimezoneIdentifiersList1()
+    {
+        $this->assertEquals(
+            timezone_identifiers_list1(\DateTimeZone::ALL),
+            \timezone_identifiers_list()
+        );
+
+        $til = timezone_identifiers_list1();
+        $this->assertEquals(
+            $til(\DateTimeZone::ALL),
+            \timezone_identifiers_list(\DateTimeZone::ALL)
+        );
+    }
+
+    public function testTimezoneIdentifiersList2()
+    {
+        $this->assertEquals(
+            timezone_identifiers_list2('AF', \DateTimeZone::PER_COUNTRY),
+            \timezone_identifiers_list(\DateTimeZone::PER_COUNTRY, 'AF')
+        );
+
+        $tilAF = timezone_identifiers_list2('AF');
+        $this->assertEquals(
+            $tilAF(\DateTimeZone::PER_COUNTRY),
+            \timezone_identifiers_list(\DateTimeZone::PER_COUNTRY, 'AF')
+        );
+    }
+
+    public function testTimezoneLocationGet()
+    {
+        $tz = new DateTimeZone("Europe/Prague");
+        $this->assertEquals(
+            timezone_location_get($tz),
+            \timezone_location_get($tz)
+        );
+
+        $locGet = timezone_location_get();
+        $this->assertEquals(
+            $locGet($tz),
+            \timezone_location_get($tz)
+        );
+    }
+
+    public function testTimezoneNameFromAbbr()
+    {
+        $abbr = "CET";
+        $this->assertEquals(
+            timezone_name_from_abbr($abbr),
+            \timezone_name_from_abbr($abbr)
+        );
+
+        $nameFromAbbr = timezone_name_from_abbr();
+        $this->assertEquals(
+            $nameFromAbbr($abbr),
+            \timezone_name_from_abbr($abbr)
+        );
+    }
+
+    public function testTimezoneNameFromAbbr2()
+    {
+        $abbr = "";
+        $this->assertEquals(
+            timezone_name_from_abbr2(3600, $abbr),
+            \timezone_name_from_abbr($abbr, 3600)
+        );
+
+        $nameFromAbbr = timezone_name_from_abbr2(3600);
+        $this->assertEquals(
+            $nameFromAbbr($abbr),
+            \timezone_name_from_abbr($abbr, 3600)
+        );
+    }
+
+    public function testTimezoneNameFromAbbr3()
+    {
+        $abbr = "";
+        $this->assertEquals(
+            timezone_name_from_abbr3(0, 3600, $abbr),
+            \timezone_name_from_abbr($abbr, 3600, 0)
+        );
+
+        $nameFromAbbr = timezone_name_from_abbr3(0, 3600);
+        $this->assertEquals(
+            $nameFromAbbr($abbr),
+            \timezone_name_from_abbr($abbr, 3600, 0)
+        );
+    }
+
+    public function testTimezoneNameGet()
+    {
+        $tz = new DateTimeZone("Europe/Prague");
+        $this->assertEquals(
+            timezone_name_get($tz),
+            \timezone_name_get($tz)
+        );
+
+        $nameGet = timezone_name_get();
+        $this->assertEquals(
+            $nameGet($tz),
+            \timezone_name_get($tz)
+        );
+    }
+
+    public function testTimezoneOffsetGet()
+    {
+        $tz = new DateTimeZone("Asia/Tokyo");
+        $time = new DateTime("now", $tz);
+
+        $this->assertEquals(
+            timezone_offset_get($tz, $time),
+            \timezone_offset_get($tz, $time)
+        );
+
+        $tzOffset = timezone_offset_get($tz);
+        $this->assertEquals(
+            $tzOffset($time),
+            \timezone_offset_get($tz, $time)
+        );
+    }
+
+    public function testTimezoneOpen()
+    {
+        $tz = 'Europe/London';
+        $this->assertEquals(
+            timezone_open($tz),
+            \timezone_open($tz)
+        );
+
+        $tzOpen = timezone_open();
+        $this->assertEquals(
+            $tzOpen($tz),
+            \timezone_open($tz)
+        );
+    }
+
+    public function testTimezoneTransitionsGet()
+    {
+        $tz = new DateTimeZone('Europe/London');
+        $this->assertEquals(
+            timezone_transitions_get($tz),
+            \timezone_transitions_get($tz)
+        );
+
+        $ttg = timezone_transitions_get();
+        $this->assertEquals(
+            $ttg($tz),
+            \timezone_transitions_get($tz)
+        );
+    }
+
+    public function testTimezoneTransitionsGet2()
+    {
+        $start = \strtotime('-2 weeks');
+        $tz = new DateTimeZone('Europe/London');
+        $this->assertEquals(
+            timezone_transitions_get2($start, $tz),
+            \timezone_transitions_get($tz, $start)
+        );
+
+        $ttg = timezone_transitions_get2($start);
+        $this->assertEquals(
+            $ttg($tz),
+            \timezone_transitions_get($tz, $start)
+        );
+    }
+
+    public function testTimezoneTransitionsGet3()
+    {
+        $start = \strtotime('-2 weeks');
+        $end = \strtotime('-1 week');
+        $tz = new DateTimeZone('Europe/London');
+        $this->assertEquals(
+            timezone_transitions_get3($start, $end, $tz),
+            \timezone_transitions_get($tz, $start, $end)
+        );
+
+        $ttg = timezone_transitions_get3($start, $end);
+        $this->assertEquals(
+            $ttg($tz),
+            \timezone_transitions_get($tz, $start, $end)
+        );
     }
 }

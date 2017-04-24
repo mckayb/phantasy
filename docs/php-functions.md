@@ -61,7 +61,6 @@ $addSlashesAToZ('foo[ ]');
 
 ```
 
-
 ### addslashes
 #### Usage
 
@@ -4355,4 +4354,1586 @@ $spliceWithReplacements = $splice(['black', 'maroon']);
 $res = $spliceWithReplacements($arr);
 // $res = ['red', 'black', 'maroon', 'yellow']
 // $arr = ['red', 'green', 'blue', 'yellow']
+```
+
+## Date/Time Functions
+
+### checkdate
+#### Usage
+```php
+use function Phantasy\Core\PHP\checkdate;
+```
+#### Examples
+```php
+checkdate(12, 21, 2000);
+// true
+
+$checkFebDay = checkdate(2);
+$checkLeapDay = $checkFebDay(29);
+$checkLeapDay(2001);
+// false
+```
+
+### date_add
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_add;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    date_add,
+    date_create1
+};
+date_add(
+    new DateInterval('P10D'),
+    date_create1('2000-01-01')
+);
+/*
+object(DateTime) {
+    ["date"] => "2000-02-20 00:00:00",
+    ...
+}
+*/
+
+$addP10D = date_add(new DateInterval('P10D'));
+$addP10D(date_create1('2000-01-01'));
+/*
+object(DateTime) {
+    ["date"] => "2000-02-20 00:00:00",
+    ...
+}
+*/
+```
+
+### date_create1
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_create1;
+```
+
+#### Examples
+```php
+date_create1('2000-01-01');
+/*
+object(DateTime) {
+    ["date"] => "2000-01-01 00:00:00"
+    ...
+}
+*/
+
+$dateCreate = date_create1();
+$dateCreate('2000-01-01');
+/*
+object(DateTime) {
+    ["date"] => "2000-01-01 00:00:00"
+    ...
+}
+*/
+```
+
+### date_create2
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_create2;
+```
+#### Examples
+```php
+date_create2(new DateTimeZone('Pacific/Nauru'), '2017-01-01');
+/*
+object(DateTime) {
+    ["date"] => "2017-01-01 00:00:00",
+    ["timezone"] => "Pacific/Nauru"
+    ...
+}
+*/
+
+$createPacificNauruDate = date_create2(new DateTimeZone('Pacific/Nauru'));
+$createPacificNauruDate('2017-01-01');
+/*
+object(DateTime) {
+    ["date"] => "2017-01-01 00:00:00",
+    ["timezone"] => "Pacific/Nauru"
+    ...
+}
+*/
+```
+
+### date_create_immutable1
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_create_immutable1;
+```
+
+#### Examples
+```php
+date_create_immutable1('2000-01-01');
+/*
+object(DateTimeImmutable) {
+    ["date"] => "2000-01-01 00:00:00"
+    ...
+}
+*/
+
+$dateCreate = date_create_immutable1();
+$dateCreate('2000-01-01');
+/*
+object(DateTimeImmutable) {
+    ["date"] => "2000-01-01 00:00:00"
+    ...
+}
+*/
+```
+
+### date_create_immutable2
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_create_immutable2;
+```
+#### Examples
+```php
+date_create_immutable2(new DateTimeZone('Pacific/Nauru'), '2017-01-01');
+/*
+object(DateTimeImmutable) {
+    ["date"] => "2017-01-01 00:00:00",
+    ["timezone"] => "Pacific/Nauru"
+    ...
+}
+*/
+
+$createPacificNauruDate = date_create_immutable2(new DateTimeZone('Pacific/Nauru'));
+$createPacificNauruDate('2017-01-01');
+/*
+object(DateTimeImmutable) {
+    ["date"] => "2017-01-01 00:00:00",
+    ["timezone"] => "Pacific/Nauru"
+    ...
+}
+*/
+```
+
+### date_create_from_format
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_create_from_format;
+```
+#### Examples
+```php
+date_create_from_format('j-M-Y', '15-Feb-2009');
+/*
+object(DateTime) {
+    ["date"] => "2009-02-15 02:39:57",
+    ...
+}
+*/
+
+$createFromjMY = date_create_from_format('j-M-Y');
+$createFromjMY('15-Feb-2009');
+/*
+object(DateTime) {
+    ["date"] => "2009-02-15 02:39:57",
+    ...
+}
+*/
+```
+
+### date_create_from_format3
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_create_from_format3;
+```
+#### Examples
+```php
+date_create_from_format3(
+    new DateTimeZone('Pacific/Nauru'),
+    'j-M-Y',
+    '15-Feb-2009'
+);
+/*
+object(DateTime) {
+    ["date"] => "2009-02-15 02:39:57",
+    ["timezone" => "Pacific/Nauru",
+    ...
+}
+*/
+
+$nauruDateFromFormat = date_create_from_format3(new DateTimeZone('Pacific/Nauru'));
+$jMYNauruDate = $nauruDateFromFormat('j-M-Y');
+$jMYNauruDate('15-Feb-2009');
+/*
+object(DateTime) {
+    ["date"] => "2009-02-15 02:39:57",
+    ["timezone" => "Pacific/Nauru",
+    ...
+}
+*/
+```
+
+### date_create_immutable_from_format
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_create_immutable_from_format;
+```
+#### Examples
+```php
+date_create_immutable_from_format('j-M-Y', '15-Feb-2009');
+/*
+object(DateTimeImmutable) {
+    ["date"] => "2009-02-15 02:39:57",
+    ...
+}
+*/
+
+$createFromjMY = date_create_immutable_from_format('j-M-Y');
+$createFromjMY('15-Feb-2009');
+/*
+object(DateTimeImmutable) {
+    ["date"] => "2009-02-15 02:39:57",
+    ...
+}
+*/
+```
+
+### date_create_immutable_from_format3
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_create_immutable_from_format3;
+```
+#### Examples
+```php
+date_create_immutable_from_format3(
+    new DateTimeZone('Pacific/Nauru'),
+    'j-M-Y',
+    '15-Feb-2009'
+);
+/*
+object(DateTimeImmutable) {
+    ["date"] => "2009-02-15 02:39:57",
+    ["timezone" => "Pacific/Nauru",
+    ...
+}
+*/
+
+$nauruDateFromFormat = date_create_immutable_from_format3(new DateTimeZone('Pacific/Nauru'));
+$jMYNauruDate = $nauruDateFromFormat('j-M-Y');
+$jMYNauruDate('15-Feb-2009');
+/*
+object(DateTimeImmutable) {
+    ["date"] => "2009-02-15 02:39:57",
+    ["timezone" => "Pacific/Nauru",
+    ...
+}
+*/
+```
+
+### date_date_set
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_date_set;
+```
+#### Examples
+```php
+date_date_set(2001, 2, 3, date_create());
+/*
+object(DateTime) {
+    ["date"] => "2001-02-03 03:03:59",
+    ...
+*/
+
+$setToFeb32001 = date_date_set(2001, 2, 3);
+$setToFeb32001(date_create());
+/*
+object(DateTime) {
+    ["date"] => "2001-02-03 03:04:12",
+    ...
+*/
+```
+
+### date_default_timezone_set
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_default_timezone_set;
+```
+#### Examples
+```php
+date_default_timezone_set('America/Los_Angeles');
+// true
+
+$setTimezone = date_default_timezone_set();
+$setTimezone('America/Los_Angeles');
+// true
+```
+
+### date_diff
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_diff;
+```
+#### Examples
+```php
+$a = new DateTime('2009-10-11');
+$b = new DateTime('2009-10-13');
+
+$c = date_diff($a, $b);
+/*
+object(DateInterval) {
+...
+["d"] => 2,
+...
+}
+*/
+
+$diffA = date_diff($a);
+$d = $diffA($b);
+/*
+object(DateInterval) {
+...
+["d"] => 2,
+...
+}
+*/
+```
+
+### date_diff3
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_diff3;
+```
+#### Examples
+```php
+$time1 = new DateTime('2009-10-13');
+$time2 = new DateTime('2009-10-11');
+
+$a = date_diff3(true, $time1, $time2);
+/*
+object(DateInterval) {
+...
+["d"] => 2,
+...
+}
+*/
+
+$diffAbsolute = date_diff3(true);
+$b = $diffAbsolute($time1, $time2);
+/*
+object(DateInterval) {
+...
+["d"] => 2,
+...
+}
+*/
+```
+
+### date_format
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_format;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    date_format,
+    date_create1
+};
+
+$a = date_create1('2000-01-01');
+$b = date_format('Y-m-d H:i:s', $a);
+// 2001-01-01 00:00:00
+
+$ymdHisDate = date_format('Y-m-d H:i:s');
+$c = $ymdHisDate($a);
+// 2001-01-01 00:00:00
+```
+
+### date_interval_create_from_date_string
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_interval_create_from_date_string;
+```
+#### Examples
+```php
+$a = date_interval_create_from_date_string('1 day');
+/*
+object(DateInterval) {
+    ...
+    ["d"] => 1,
+    ...
+}
+*/
+
+$intervalFromDateStr = date_interval_create_from_date_string();
+$b = $intervalFromDateStr('1 day');
+/*
+object(DateInterval) {
+    ...
+    ["d"] => 1,
+    ...
+}
+*/
+```
+
+### date_interval_format
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_interval_format;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    date_diff,
+    date_interval_format
+};
+$a = new DateTime('2010-01-01');
+$b = new DateTime('2010-02-01');
+$interval = date_diff($a, $b);
+
+$c = date_interval_format('%a total days', $interval);
+// "31 total days"
+
+$formatTotalDays = date_interval_format('%a total days');
+$d = $formatTotalDays($interval);
+// "31 total days"
+```
+
+### date_isodate_set
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_isodate_set;
+```
+#### Examples
+```php
+$a = new DateTime('2010-01-01');
+$b = date_isodate_set(2012, 1, $a);
+/*object(DateTime) {
+    ["date"] => "2012-01-02 00:00:00"
+    ...
+}
+*/
+
+$setToJan2012 = date_isodate_set(2012, 1);
+$c = $setToJan2012($a);
+/*object(DateTime) {
+    ["date"] => "2012-01-02 00:00:00"
+    ...
+}
+*/
+```
+
+### date_isodate_set4
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_isodate_set4;
+```
+#### Examples
+```php
+$a = new DateTime('2010-01-01');
+$b = date_isodate_set4(2012, 1, 1, $a);
+/*object(DateTime) {
+    ["date"] => "2012-01-02 00:00:00"
+    ...
+}
+*/
+
+$setToJan2012 = date_isodate_set4(2012, 1, 1);
+$c = $setToJan2012($a);
+/*object(DateTime) {
+    ["date"] => "2012-01-02 00:00:00"
+    ...
+}
+*/
+```
+
+### date_modify
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_modify;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    date_modify,
+    date_create1
+};
+
+$a = date_create1('2006-12-12');
+$b = date_modify('+1 day', $a);
+
+$addADay = date_modify('+1 day');
+$c = $addADay($a);
+```
+
+### date_offset_get
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_offset_get;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    timezone_open,
+    date_create2
+    date_offset_get
+};
+
+$a = date_create2(timezone_open('America/New_York'), '2010-12-21');
+
+$offsetA = date_offset_get($a);
+// -18000
+
+$offsetGet = date_offset_get();
+$offsetB = $offsetGet($a);
+// -18000
+```
+
+### date_parse_from_format
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_parse_from_format;
+```
+#### Examples
+```php
+$date = '6.1.2009 13:00+01:00';
+
+$res = date_parse_from_format('j.n.Y H:iP', $date);
+/*
+array(15) {
+    ["year"] => 2009,
+    ["month"] => 1,
+    ["day" => 6,
+    ...
+}
+*/
+
+$parseDate = date_parse_from_format('j.n.Y H:iP');
+$res2 = $parseDate($date);
+/*
+array(15) {
+    ["year"] => 2009,
+    ["month"] => 1,
+    ["day" => 6,
+    ...
+}
+*/
+```
+
+### date_parse
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_parse;
+```
+#### Examples
+```php
+$date = "2006-12-12 10:00:00.5";
+$res = date_parse($date);
+/*
+array(12) {
+    ["year"] => 2006,
+    ["month"] => 12,
+    ["day"] => 12
+    ...
+}
+*/
+
+$parse = date_parse();
+$res2 = $parse($date);
+/*
+array(12) {
+    ["year"] => 2006,
+    ["month"] => 12,
+    ["day"] => 12
+    ...
+}
+*/
+```
+
+### date_sub
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_sub;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    date_create1,
+    date_sub,
+    date_interval_create_from_date_string
+};
+
+$date = date_create1('2000-01-20');
+$interval = date_interval_create_from_date_string('10 days');
+$res = date_sub($interval, $date);
+/*
+object(DateTime) {
+    ["date"] => "2000-01-10',
+    ...
+}
+*/
+
+$sub10Days = date_sub($interval);
+$res2 = $sub10Days($date);
+/*
+object(DateTime) {
+    ["date"] => "2000-01-10',
+    ...
+}
+*/
+```
+
+### date_sun_info
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_sun_info;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    date_sun_info,
+    strtotime
+};
+
+$latitude = 31.7667;
+$longitude = 35.2333;
+$time = strtotime('2006-12-12');
+
+$res = date_sun_info($lat, $long, $time);
+/*
+array(9) {
+    ["sunrise"] => 1165897794,
+    ["sunset"] => 1165934172,
+    ["transit"] => 1165915983,
+    ...
+}
+*/
+
+$sunForFixedLatAndLong = date_sun_info($lat, $long);
+$res2 = $sunForFixedLatAndLong($time);
+/*
+array(9) {
+    ["sunrise"] => 1165897794,
+    ["sunset"] => 1165934172,
+    ["transit"] => 1165915983,
+    ...
+}
+*/
+```
+
+### date_sunrise
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_sunrise;
+```
+#### Examples
+```php
+$res = date_sunrise(time());
+// "20:00"
+
+$sunrise = date_sunrise();
+$res2 = $sunrise(time());
+// "20:00"
+```
+
+### date_sunrise2
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_sunrise2;
+```
+#### Examples
+```php
+$time = time();
+$res = date_sunrise2(SUNFUNCS_RET_STRING, $time);
+// "20:00"
+
+$stringSunrise = date_sunrise2(SUNFUNCS_RET_STRING);
+$res2 = $stringSunrise($time);
+// "20:00"
+```
+
+### date_sunset
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_sunset;
+```
+#### Examples
+```php
+$time = time();
+$res = date_sunset($time);
+// "06:00"
+
+$sunset = date_sunset();
+$sunset($time);
+// "06:00"
+
+```
+
+### date_sunset2
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_sunset2;
+```
+#### Examples
+```php
+$time = time();
+$res = date_sunset2(SUNFUNCS_RET_STRING, $time);
+// "06:00"
+
+$stringSunset = date_sunset2(SUNFUNCS_RET_STRING);
+$res2 = $stringSunset($time);
+// "06:00"
+```
+
+### date_time_set
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_time_set;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    date_create1,
+    date_time_set
+};
+
+$date = date_create1('2001-01-01');
+$res = date_time_set(14, 55, $date);
+/*
+object(DateTime) {
+    ["date"] => "2001-01-01 14:55:00",
+    ...
+}
+*/
+
+$setTo255 = date_time_set(14, 55);
+$res2 = $setTo255($date);
+/*
+object(DateTime) {
+    ["date"] => "2001-01-01 14:55:00",
+    ...
+}
+*/
+```
+
+### date_time_set4
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_time_set4;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    date_create1,
+    date_time_set4
+};
+
+$date = date_create1('2001-01-01');
+$res = date_time_set4(14, 55, 12, $date);
+/*
+object(DateTime) {
+    ["date"] => "2001-01-01 14:55:12",
+    ...
+}
+*/
+
+$setTo25512 = date_time_set4(14, 55, 12);
+$res2 = $setTo255($date);
+/*
+object(DateTime) {
+    ["date"] => "2001-01-01 14:55:12",
+    ...
+}
+*/
+```
+
+### date_timestamp_get
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_timestamp_get;
+```
+#### Examples
+```php
+$date = date_create();
+$res = date_timestamp_get($date);
+// 1492998985
+
+$getTimestamp = date_timestamp_get();
+$res2 = $getTimestamp($date);
+// 1492998985
+```
+
+### date_timestamp_set
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_timestamp_set;
+```
+#### Examples
+```php
+$date = date_create();
+$res = date_timestamp_set(1171502725, $date);
+/*
+object(DateTime) {
+    ["date"] => "2007-02-14 18:25:25",
+    ...
+}
+*/
+
+$setTimestamp = date_timestamp_set(1171502725);
+$res2 = $setTimestamp($date);
+/*
+object(DateTime) {
+    ["date"] => "2007-02-14 18:25:25",
+    ...
+}
+*/
+```
+
+### date_timezone_get
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_timezone_get;
+```
+#### Examples
+```php
+
+```
+
+### date_timezone_set
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_timezone_set;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    date_create2,
+    date_timezone_set,
+    timezone_open
+};
+
+$date = date_create2(timezone_open('Europe/London'), null);
+
+$res = date_timezone_get($date);
+/*
+    ...,
+    ["timezone"] => "Europe/London"
+}
+*/
+
+$getTimezone = date_timezone_get();
+$res2 = $getTimezone($date);
+/*
+    ...,
+    ["timezone"] => "Europe/London"
+}
+*/
+```
+
+### date
+#### Usage
+```php
+use function Phantasy\Core\PHP\date;
+```
+#### Examples
+```php
+$res = date('l');
+// 'Sunday'
+
+$date = date();
+$res2 = $date('l');
+// 'Sunday'
+```
+
+### date2
+#### Usage
+```php
+use function Phantasy\Core\PHP\date2;
+```
+#### Examples
+```php
+$time = time();
+$res = date2('l', $time);
+// 'Sunday'
+
+$getDay = date2('l');
+$res2 = $getDay($time);
+// 'Sunday'
+```
+
+### getdate1
+#### Usage
+```php
+use function Phantasy\Core\PHP\getdate1;
+```
+#### Examples
+```php
+getdate1(time());
+/*
+    ["seconds"] => 32,
+    ["minutes"] => 4,
+    ["hours"] => 20,
+    ["mday"] => 23,
+    ["wday"] => 0,
+    ...
+*/
+
+$getDate = getdate1();
+$getDate(time());
+/*
+    ["seconds"] => 32,
+    ["minutes"] => 4,
+    ["hours"] => 20,
+    ["mday"] => 23,
+    ["wday"] => 0,
+    ...
+*/
+```
+
+### gettimeofday1
+#### Usage
+```php
+use function Phantasy\Core\PHP\gettimeofday1;
+```
+#### Examples
+```php
+$res = gettimeofday1(true);
+// float(1492999565.9816)
+
+$getTime = gettimeofday1();
+$res2 = $getTime(true);
+// float(1492999565.9816)
+```
+
+### gmdate
+#### Usage
+```php
+use function Phantasy\Core\PHP\gmdate;
+```
+#### Examples
+```php
+$format = 'Y-m-d';
+$res = gmdate($format);
+// '2017-04-24'
+
+$gmdate = gmdate();
+$res2 = $gmdate($format);
+// '2017-04-24'
+```
+
+### gmdate2
+#### Usage
+```php
+use function Phantasy\Core\PHP\gmdate2;
+```
+#### Examples
+```php
+$res = gmdate2('l', time());
+// 'Monday'
+
+$gmDay = gmdate2('l');
+$res2 = $gmDay(time());
+// 'Monday'
+```
+
+### gmstrftime
+#### Usage
+```php
+use function Phantasy\Core\PHP\gmstrftime;
+```
+#### Examples
+```php
+$format = '%b %d %Y';
+
+$res = gmstrftime($format);
+// "Apr 12 2017"
+
+$gmstrftime = gmstrftime();
+$res2 = $gmstrftime($format);
+// "Apr 12 2017"
+```
+
+### gmstrftime2
+#### Usage
+```php
+use function Phantasy\Core\PHP\gmstrftime2;
+```
+#### Examples
+```php
+$format = '%b %d %Y';
+$res = gmstrftime2($format, time());
+// "Apr 12 2017"
+
+$gmstrftime = gmstrftime2($format);
+$res2 = $gmstrftime(time());
+// "Apr 12 2017"
+```
+
+### idate
+#### Usage
+```php
+use function Phantasy\Core\PHP\idate;
+```
+#### Examples
+```php
+$res = idate('U');
+// 1493000021
+
+$idate = idate();
+$res2 = $idate('U');
+// 1493000021
+```
+
+### idate2
+#### Usage
+```php
+use function Phantasy\Core\PHP\idate2;
+```
+#### Examples
+```php
+$res = idate2('U', time());
+// 1493000021
+
+$unixIDate = idate2('U');
+$res2 = $unixIDate(time());
+// 1493000021
+```
+
+### localtime1
+#### Usage
+```php
+use function Phantasy\Core\PHP\localtime1;
+```
+#### Examples
+```php
+$res = localtime1(time());
+/*
+array(9) {
+    [0] => 1,
+    [1] => 15,
+    [2] => 20,
+    [3] => 23,
+    [4] => 3,
+    ...
+}
+*/
+```
+
+### localtime2
+#### Usage
+```php
+use function Phantasy\Core\PHP\localtime2;
+```
+#### Examples
+```php
+$res = localtime2(true, time());
+/*
+array(9) {
+    ["tm_sec"] => 18,
+    ["tm_min"] => 16,
+    ["tm_hour"] => 20,
+    ["tm_mday"] => 23,
+    ["tm_mon"] => 3,
+    ...
+}
+*/
+
+$localtimeAssoc = localtime2(true);
+$res2 = $localtimeAssoc(time());
+/*
+array(9) {
+    ["tm_sec"] => 18,
+    ["tm_min"] => 16,
+    ["tm_hour"] => 20,
+    ["tm_mday"] => 23,
+    ["tm_mon"] => 3,
+    ...
+}
+*/
+```
+
+### microtime1
+#### Usage
+```php
+use function Phantasy\Core\PHP\microtime1;
+```
+#### Examples
+```php
+$res = microtime1(true);
+// float(1493000249.088)
+
+$microtime = microtime1();
+$res2 = $microtime(true);
+// float(1493000249.088)
+```
+
+### strftime
+#### Usage
+```php
+use function Phantasy\Core\PHP\strftime;
+```
+#### Examples
+```php
+$res = strftime('%b %d %Y');
+// "Apr 28 2017"
+
+$strftime = strftime();
+$res2 = $strftime('%b %d %Y');
+// "Apr 28 2017"
+```
+
+### strftime2
+#### Usage
+```php
+use function Phantasy\Core\PHP\strftime2;
+```
+#### Examples
+```php
+$res = strftime2('l', time());
+// 'Sunday'
+
+$strftimeDay = strftime2('l');
+$res2 = $strftimeDay(time());
+// 'Sunday'
+```
+
+### strptime
+#### Usage
+```php
+use function Phantasy\Core\PHP\strptime;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    strftime,
+    strptime
+};
+
+$format = '%d/%m/%Y %H:%M:%S';
+$strf = strftime($format);
+
+$res = strptime($format, $strf);
+/*
+array(9) {
+    ["tm_sec"] => 13,
+    ["tm_min"] => 21,
+    ["tm_hour"] => 20,
+    ["tm_mday"] => 23,
+    ...
+}
+*/
+
+$strptimeFormat = strptime($format);
+$res2 = $strptimeFormat($strf);
+/*
+array(9) {
+    ["tm_sec"] => 13,
+    ["tm_min"] => 21,
+    ["tm_hour"] => 20,
+    ["tm_mday"] => 23,
+    ...
+}
+*/
+```
+
+### strtotime
+#### Usage
+```php
+use function Phantasy\Core\PHP\strtotime;
+```
+#### Examples
+```php
+$res = strtotime('+1 day');
+// 1492408800
+
+$strtotime = strtotime();
+$res2 = $strtotime('+1 day');
+// 1492408800
+```
+
+### strtotime2
+#### Usage
+```php
+use function Phantasy\Core\PHP\strtotime2;
+```
+#### Examples
+```php
+$res = strtotime2(time(), '+1 day');
+// 1492408800
+
+$strtotime = strtotime2(time());
+$res2 = $strtotime('-1 day');
+// // 1492408800
+```
+
+### timezone_identifiers_list1
+#### Usage
+```php
+use function Phantasy\Core\PHP\date_interval_format;
+```
+#### Examples
+```php
+$res = timezone_identifiers_list1(DateTimeZone::ALL);
+/*
+array(425) {
+    0 => 'Africa/Abidjan',
+    1 => 'Africa/Accra',
+    2 => 'Africa/Addis_Ababa',
+    ...
+}
+*/
+
+$til = timezone_identifiers_list1();
+$res2 = $til(DateTimeZone::ALL);
+/*
+array(425) {
+    0 => 'Africa/Abidjan',
+    1 => 'Africa/Accra',
+    2 => 'Africa/Addis_Ababa',
+    ...
+}
+*/
+```
+
+### timezone_identifiers_list2
+#### Usage
+```php
+use function Phantasy\Core\PHP\timezone_identifiers_list2;
+```
+#### Examples
+```php
+$res = timezone_identifiers_list2('AF', \DateTimeZone::PER_COUNTRY);
+/*
+array(1) {
+    0 => "Asia/Kabul"
+}
+*/
+
+$tilAf = timezone_identifiers_list2('AF');
+$res2 = $tilAf(DateTimeZone::PER_COUNTRY);
+/*
+array(1) {
+    0 => "Asia/Kabul"
+}
+*/
+```
+
+### timezone_location_get
+#### Usage
+```php
+use function Phantasy\Core\PHP\timezone_location_get;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    timezone_open,
+    timezone_location_get
+};
+
+$res = timezone_location_get(timezone_open('Europe/Prague'));
+/*
+array(4) {
+    ["country_code"] => "CZ",
+    ["latitude"] => float(50.08333),
+    ...
+}
+*/
+
+$locGet = timezone_location_get();
+$res2 = $locGet(timezone_open('Europe/Prague'));
+/*
+array(4) {
+    ["country_code"] => "CZ",
+    ["latitude"] => float(50.08333),
+    ...
+}
+*/
+```
+
+### timezone_name_from_abbr
+#### Usage
+```php
+use function Phantasy\Core\PHP\timezone_name_from_abbr;
+```
+#### Examples
+```php
+$res = timezone_name_from_abbr('CET');
+// 'Europe/Berlin'
+
+$nameFromAbbr = timezone_name_from_abbr();
+$res2 = $nameFromAbbr('CET');
+// 'Europe/Berlin'
+```
+
+### timezone_name_from_abbr2
+#### Usage
+```php
+use function Phantasy\Core\PHP\timezone_name_from_abbr2;
+```
+#### Examples
+```php
+$res = timezone_name_from_abbr2(3600, 'CET');
+// 'Europe/Berlin'
+
+$nameFromAbbr = timezone_name_from_abbr2(3600);
+$res2 = $nameFromAbbr('CET');
+// 'Europe/Berlin'
+```
+
+### timezone_name_from_abbr3
+#### Usage
+```php
+use function Phantasy\Core\PHP\timezone_name_from_abbr3;
+```
+#### Examples
+```php
+$res = timezone_name_from_abbr3(0, 3600, '');
+// 'Europe/Paris'
+
+$nameFromAbbr = timezone_name_from_abbr3(0, 3600);
+$res2 = $nameFromAbbr('');
+// 'Europe/Paris'
+```
+
+### timezone_name_get
+#### Usage
+```php
+use function Phantasy\Core\PHP\timezone_name_get;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    timezone_name_get,
+    timezone_open
+};
+
+$tz = timezone_open('Europe/Prague');
+$res = timezone_name_get($tz);
+// 'Europe/Prague'
+
+$tzName = timezone_name_get();
+$res2 = $tzName($tz);
+// 'Europe/Prague'
+```
+
+### timezone_offset_get
+#### Usage
+```php
+use function Phantasy\Core\PHP\timezone_offset_get;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    date_create1,
+    timezone_open
+};
+
+$tz = timezone_open('Asia/Tokyo');
+$time = date_create1('now');
+
+$res = timezone_offset_get($tz, $time);
+// 32400
+
+$offset = timezone_offset_get($tz);
+$res2 = $offset($time);
+// 32400
+```
+
+### timezone_open
+#### Usage
+```php
+use function Phantasy\Core\PHP\timezone_open;
+```
+#### Examples
+```php
+$tz = timezone_open('Asia/Tokyo');
+/*
+object(DateTimeZone) {
+    ...,
+    ["timezone"] => "Asia/Tokyo"
+}
+*/
+
+$tzOpen = timezone_open();
+$tz = $tzOpen('Asia/Tokyo');
+/*
+object(DateTimeZone) {
+    ...,
+    ["timezone"] => "Asia/Tokyo"
+}
+*/
+```
+
+### timezone_transitions_get
+#### Usage
+```php
+use function Phantasy\Core\PHP\timezone_transitions_get;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    timezone_transitions_get,
+    timezone_open
+};
+
+$tz = timezone_open('Europe/London');
+$res = timezone_transitions_get($tz);
+/*
+array(243) {
+    ...,
+    242 => array(5) {
+        'ts' => 2121901200,
+        'time' => '2037-03-29T01:00:00',
+        'offset' => 3600,
+        'isdst' => true,
+        'abbr' => 'BST'
+    },
+    243 => array(5) {
+        'ts' => 2140045200,
+        'time' => '2037-10-25T01:00:00',
+        'offset' => 0,
+        'isdst' => false,
+        'abbr' => 'GMT'
+    }
+}
+*/
+
+$ttg = timezone_transitions_get();
+$res2 = $ttg($tz);
+/*
+array(243) {
+    ...,
+    242 => array(5) {
+        'ts' => 2121901200,
+        'time' => '2037-03-29T01:00:00',
+        'offset' => 3600,
+        'isdst' => true,
+        'abbr' => 'BST'
+    },
+    243 => array(5) {
+        'ts' => 2140045200,
+        'time' => '2037-10-25T01:00:00',
+        'offset' => 0,
+        'isdst' => false,
+        'abbr' => 'GMT'
+    }
+}
+*/
+```
+
+### timezone_transitions_get2
+#### Usage
+```php
+use function Phantasy\Core\PHP\timezone_transitions_get2;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    timezone_open,
+    strtotime,
+    timezone_transitions_get2
+};
+
+$start = strtotime('-2 weeks');
+$tz = timezone_open('Europe/London');
+
+$res = timezone_transitions_get2($start, $tz);
+/*
+array(42) {
+    ...,
+    40 => array(5) {
+        ["ts"] => 2121901200,
+        ["time"] => "2037-03-29T01:00:00",
+        ["offset"] => 3600,
+        ["isdst"] => true,
+        ["abbr"] => "BST"
+    },
+    41 => array(5) {
+        ["ts"] => 2140045200,
+        ["time"] => "2037-10-25T01:00:00",
+        ["offset"] => 0,
+        ["isdst"] => false,
+        ["abbr"] => "GMT"
+    }
+}
+*/
+
+$ttg = timezone_transitions_get2($start);
+$res2 = $ttg($tz);
+/*
+array(42) {
+    ...,
+    40 => array(5) {
+        ["ts"] => 2121901200,
+        ["time"] => "2037-03-29T01:00:00",
+        ["offset"] => 3600,
+        ["isdst"] => true,
+        ["abbr"] => "BST"
+    },
+    41 => array(5) {
+        ["ts"] => 2140045200,
+        ["time"] => "2037-10-25T01:00:00",
+        ["offset"] => 0,
+        ["isdst"] => false,
+        ["abbr"] => "GMT"
+    }
+}
+*/
+```
+
+### timezone_transitions_get3
+#### Usage
+```php
+use function Phantasy\Core\PHP\timezone_transitions_get_3;
+```
+#### Examples
+```php
+use function Phantasy\Core\PHP\{
+    timezone_open,
+    strtotime,
+    timezone_transitions_get3
+};
+
+$start = strtotime('-2 weeks');
+$end = strtotime('-1 week');
+$tz = timezone_open('Europe/London');
+
+$res = timezone_transitions_get3($start, $end, $tz);
+/*
+array(42) {
+    ...,
+    40 => array(5) {
+        ["ts"] => 2121901200,
+        ["time"] => "2037-03-29T01:00:00",
+        ["offset"] => 3600,
+        ["isdst"] => true,
+        ["abbr"] => "BST"
+    },
+    41 => array(5) {
+        ["ts"] => 2140045200,
+        ["time"] => "2037-10-25T01:00:00",
+        ["offset"] => 0,
+        ["isdst"] => false,
+        ["abbr"] => "GMT"
+    }
+}
+*/
+
+$ttg = timezone_transitions_get3($start, $end);
+$res2 = $ttg($tz);
+/*
+array(42) {
+    ...,
+    40 => array(5) {
+        ["ts"] => 2121901200,
+        ["time"] => "2037-03-29T01:00:00",
+        ["offset"] => 3600,
+        ["isdst"] => true,
+        ["abbr"] => "BST"
+    },
+    41 => array(5) {
+        ["ts"] => 2140045200,
+        ["time"] => "2037-10-25T01:00:00",
+        ["offset"] => 0,
+        ["isdst"] => false,
+        ["abbr"] => "GMT"
+    }
+}
+*/
 ```
