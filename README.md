@@ -7,7 +7,7 @@ Functional Programming Helpers and Data Types for PHP.
 `composer require mckayb/phantasy`
 
 ### Usage
-```
+```php
 use Phantasy\DataTypes\Maybe\Maybe;
 use function Phantasy\Core\prop;
 
