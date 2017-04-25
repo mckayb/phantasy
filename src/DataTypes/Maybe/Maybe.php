@@ -2,24 +2,32 @@
 
 namespace Phantasy\DataTypes\Maybe;
 
+use function Phantasy\Core\curry;
+
 class Maybe
 {
-    public static function of($val)
+    public static function of()
     {
-        return new Just($val);
+        return curry(function ($val) {
+            return new Just($val);
+        })(...func_get_args());
     }
 
-    public static function fromNullable($val)
+    public static function fromNullable()
     {
-        return is_null($val) ? new Nothing() : new Just($val);
+        return curry(function ($val) {
+            return is_null($val) ? new Nothing() : new Just($val);
+        })(...func_get_args());
     }
 
-    public static function tryCatch($f)
+    public static function tryCatch()
     {
-        try {
-            return new Just($f());
-        } catch (\Exception $e) {
-            return new Nothing();
-        }
+        return curry(function ($f) {
+            try {
+                return new Just($f());
+            } catch (\Exception $e) {
+                return new Nothing();
+            }
+        })(...func_get_args());
     }
 }

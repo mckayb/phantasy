@@ -14,13 +14,13 @@ class EitherTest extends TestCase
 
     public function testEitherFromNullable()
     {
-        $just = Either::fromNullable("foo");
-        $nothing = Either::fromNullable(null);
+        $left = Either::fromNullable(null, null);
+        $right = Either::fromNullable(null, "foo");
 
-        $this->assertInstanceOf(Right::class, $just);
-        $this->assertInstanceOf(Left::class, $nothing);
-        $this->assertEquals(new Right("foo"), $just);
-        $this->assertEquals(Either::of("foo"), $just);
+        $this->assertInstanceOf(Right::class, $right);
+        $this->assertInstanceOf(Left::class, $left);
+        $this->assertEquals(new Right("foo"), $right);
+        $this->assertEquals(Either::of("foo"), $right);
     }
 
     public function testEitherTryCatchRight()
@@ -313,7 +313,7 @@ class EitherTest extends TestCase
 
     public function testLeftMap()
     {
-        $a = Either::fromNullable(null);
+        $a = Either::fromNullable(null, null);
 
         $b = $a->map(
             function ($x) {
@@ -327,7 +327,7 @@ class EitherTest extends TestCase
 
     public function testLeftAp()
     {
-        $a = Either::fromNullable(null);
+        $a = Either::fromNullable(null, null);
         $e = Either::of(
             function ($x) {
                 return $x + 1;
@@ -342,7 +342,7 @@ class EitherTest extends TestCase
 
     public function testLeftChain()
     {
-        $a = Either::fromNullable(null)
+        $a = Either::fromNullable(null, null)
         ->chain(
             function ($x) {
                 return Either::of($x + 1);
@@ -355,7 +355,7 @@ class EitherTest extends TestCase
 
     public function testLeftBind()
     {
-        $a = Either::fromNullable(null)
+        $a = Either::fromNullable(null, null)
         ->bind(
             function ($x) {
                 return Either::of($x + 1);
@@ -368,7 +368,7 @@ class EitherTest extends TestCase
 
     public function testLeftFlatMap()
     {
-        $a = Either::fromNullable(null)
+        $a = Either::fromNullable(null, null)
         ->flatMap(
             function ($x) {
                 return Either::of($x + 1);
@@ -381,7 +381,7 @@ class EitherTest extends TestCase
 
     public function testLeftFoldOnlyUsesFirstFunction()
     {
-        $a = Either::fromNullable(null)
+        $a = Either::fromNullable(null, null)
         ->fold(
             function ($x) {
                 return "Error";
@@ -396,7 +396,7 @@ class EitherTest extends TestCase
 
     public function testLeftCataOnlyUsesFirstFunction()
     {
-        $a = Either::fromNullable(null)
+        $a = Either::fromNullable(null, null)
         ->cata(
             function ($x) {
                 return "Error";
@@ -425,7 +425,7 @@ class EitherTest extends TestCase
 
     public function testLeftToMaybe()
     {
-        $a = Either::fromNullable(null)
+        $a = Either::fromNullable(null, null)
         ->toMaybe();
 
         $this->assertInstanceOf(Nothing::class, $a);

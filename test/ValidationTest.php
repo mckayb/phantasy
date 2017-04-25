@@ -20,13 +20,13 @@ class ValidationTest extends TestCase
 
     public function testValidationFromNullableFailure()
     {
-        $a = Validation::fromNullable(null);
+        $a = Validation::fromNullable(null, null);
         $this->assertEquals(new Failure(null), $a);
     }
 
     public function testValidationFromNullableSuccess()
     {
-        $this->assertEquals(new Success('foo'), Validation::of('foo'));
+        $this->assertEquals(new Success('foo'), Validation::fromNullable(null, 'foo'));
     }
 
     public function testValidationTryCatchSuccess()

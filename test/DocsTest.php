@@ -12,7 +12,7 @@ class DocsTest extends TestCase
 {
     public function testCallableIdentity()
     {
-        $this->assertEquals('foobar', Either::fromNullable('foo')
+        $this->assertEquals('foobar', Either::fromNullable(null, 'foo')
             ->map(function ($x) {
                 return $x . 'bar';
             })
@@ -30,7 +30,7 @@ class DocsTest extends TestCase
             return $x;
         });
 
-        $this->assertEquals('foobar', Either::fromNullable('foo')
+        $this->assertEquals('foobar', Either::fromNullable(null, 'foo')
             ->map(function ($x) {
                 return $x . 'bar';
             })
@@ -108,7 +108,7 @@ class DocsTest extends TestCase
         };
 
         $parseJSON = function ($json) {
-            return Either::fromNullable(json_decode($json, true));
+            return Either::fromNullable('', json_decode($json, true));
         };
 
         $handleError = function ($e) {

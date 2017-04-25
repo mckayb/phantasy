@@ -2,24 +2,31 @@
 
 namespace Phantasy\DataTypes\Either;
 
-class Either
-{
-    public static function of($val)
+use function Phantasy\Core\curry;
+
+class Either {
+    public static function of()
     {
-        return new Right($val);
+        return curry(function ($val) {
+            return new Right($val);
+        })(...func_get_args());
     }
 
-    public static function fromNullable($val, $msg = null)
+    public static function fromNullable()
     {
-        return is_null($val) ? new Left($msg) : new Right($val);
+        return curry(function ($failVal, $val) {
+            return is_null($val) ? new Left($failVal) : new Right($val);
+        })(...func_get_args());
     }
 
-    public static function tryCatch($f)
+    public static function tryCatch()
     {
-        try {
-            return new Right($f());
-        } catch (\Exception $e) {
-            return new Left($e);
-        }
+        return curry(function ($f) {
+            try {
+                return new Right($f());
+            } catch (\Exception $e) {
+                return new Left($e);
+            }
+        })(...func_get_args());
     }
 }

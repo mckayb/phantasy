@@ -2,24 +2,32 @@
 
 namespace Phantasy\DataTypes\Validation;
 
+use function Phantasy\Core\curry;
+
 class Validation
 {
-    public static function of($x)
+    public static function of()
     {
-        return new Success($x);
+        return curry(function ($x) {
+            return new Success($x);
+        })(...func_get_args());
     }
 
-    public static function fromNullable($x, $msg = null)
+    public static function fromNullable()
     {
-        return is_null($x) ? new Failure($msg) : new Success($msg);
+        return curry(function ($failVal, $val) {
+            return is_null($val) ? new Failure($failVal) : new Success($val);
+        })(...func_get_args());
     }
 
-    public static function tryCatch($f)
+    public static function tryCatch()
     {
-        try {
-            return new Success($f());
-        } catch (\Exception $e) {
-            return new Failure($e);
-        }
+        return curry(function ($f) {
+            try {
+                return new Success($f());
+            } catch (\Exception $e) {
+                return new Failure($e);
+            }
+        })(...func_get_args());
     }
 }
