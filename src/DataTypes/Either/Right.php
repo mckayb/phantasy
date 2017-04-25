@@ -3,6 +3,7 @@
 namespace Phantasy\DataTypes\Either;
 
 use Phantasy\DataTypes\Maybe\Just;
+use Phantasy\DataTypes\Validation\Success;
 
 class Right
 {
@@ -68,5 +69,10 @@ class Right
     public function toMaybe()
     {
         return new Just($this->value);
+    }
+
+    public function toValidation()
+    {
+        return new Success($this->value);
     }
 }

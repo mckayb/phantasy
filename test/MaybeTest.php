@@ -3,6 +3,7 @@
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Either\{Either, Left, Right};
+use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 
 class MaybeTest extends TestCase
 {
@@ -482,5 +483,22 @@ class MaybeTest extends TestCase
         $this->assertInstanceOf(Right::class, $either);
         $this->assertEquals(Either::of(85), $either);
         $this->assertEquals(new Right(85), $either);
+    }
+
+    public function testJustToValidation()
+    {
+        $a = Maybe::of(85);
+        $vali = $a->toValidation(80);
+        $this->assertInstanceOf(Success::class, $vali);
+        $this->assertEquals(Validation::of(85), $vali);
+        $this->assertEquals(new Success(85), $vali);
+    }
+
+    public function testNothingToValidation()
+    {
+        $a = Maybe::fromNullable(null);
+        $vali = $a->toValidation('foobar');
+        $this->assertInstanceOf(Failure::class, $vali);
+        $this->assertEquals(new Failure('foobar'), $vali);
     }
 }

@@ -3,6 +3,7 @@
 namespace Phantasy\DataTypes\Either;
 
 use Phantasy\DataTypes\Maybe\Nothing;
+use Phantasy\DataTypes\Validation\Failure;
 
 class Left
 {
@@ -63,5 +64,10 @@ class Left
     public function toMaybe()
     {
         return new Nothing();
+    }
+
+    public function toValidation()
+    {
+        return new Failure($this->value);
     }
 }
