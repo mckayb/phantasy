@@ -124,6 +124,19 @@ Maybe::fromNullable(null)->toEither(0);
 // Left(0)
 ```
 
+#### toValidation ($val)
+Used to transform a `Maybe` into a `Validation` context.
+If the instance is a `Just`, then it returns a `Success` containing that instance value.
+```php
+Maybe::of(1)->toValidation(0);
+// Success(1)
+```
+If the instance is a `Nothing`, then it returns a `Failure` containing the parameter `$val`.
+```php
+Maybe::fromNullable(null)->toValidation('No val set!');
+// Failure('No val set!')
+```
+
 ## Either
 ### Usage
 ```php
@@ -277,6 +290,18 @@ If the instance is a `Left`, it returns `Nothing`.
 ```php
 Either::fromNullable(0, null)->toMaybe();
 // Nothing()
+```
+#### toValidation ($val)
+Used to transform a `Either` into a `Validation` context.
+If the instance is a `Right`, then it returns a `Success` containing that instance value.
+```php
+Either::of(1)->toValidation(0);
+// Success(1)
+```
+If the instance is a `Left`, then it returns a `Failure` containing the parameter `$val`.
+```php
+Either::fromNullable('No val set!', null)->toValidation();
+// Failure('No val set!')
 ```
 
 ## Validation
