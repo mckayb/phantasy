@@ -6,6 +6,11 @@ use Phantasy\DataTypes\Either\Left;
 
 class Nothing
 {
+    public function __toString()
+    {
+        return "Nothing()";
+    }
+
     public function map($f)
     {
         return $this;

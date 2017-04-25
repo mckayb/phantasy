@@ -50,16 +50,17 @@ function compose(...$fns)
                 return $f($g($x));
             };
         },
-        'Phantasy\Core\identity'
+        identity()
     );
 }
 
-// @codingStandardsIgnoreStart
-const identity = 'Phantasy\Core\identity';
-// @codingStandardsIgnoreEnd
-function identity($x)
+function identity()
 {
-    return $x;
+    $id = curry(function ($x) {
+        return $x;
+    });
+
+    return $id(...func_get_args());
 }
 
 function prop()
@@ -78,10 +79,14 @@ function prop()
     return $prop(...func_get_args());
 }
 
-function trace($x)
+function trace()
 {
-    var_dump($x);
-    return $x;
+    $trace = curry(function ($x) {
+        var_dump($x);
+        return $x;
+    });
+
+    return $trace(...func_get_args());
 }
 
 function map()
@@ -92,8 +97,8 @@ function map()
                 return $x->map($f);
             } else {
                 $res = [];
-                foreach ($x as $y) {
-                    $res[] = $f($y);
+                foreach ($x as $k => $y) {
+                    $res[$k] = $f($y);
                 }
                 return $res;
             }
@@ -174,6 +179,11 @@ function semigroupConcat()
     });
 
     return $semigroupConcat(...func_get_args());
+}
+
+function concat()
+{
+    return semigroupConcat(...func_get_args());
 }
 
 function liftA()
@@ -273,7 +283,10 @@ function Type()
 
             public function __toString()
             {
-                return $this->tag .'(' . implode(', ', $this->fieldValues) . ')';
+                $vals = map(function ($x) {
+                    return var_export($x, true);
+                }, $this->fieldValues);
+                return $this->tag .'(' . implode(', ', $vals) . ')';
             }
         };
     });
@@ -317,9 +330,12 @@ function SumType()
 
                             public function __toString()
                             {
+                                $vals = map(function ($x) {
+                                    return var_export($x, true);
+                                }, $this->fieldValues);
                                 return $this->parentCtx->name
                                     . '.' . $this->tag
-                                    .'(' . implode(', ', $this->fieldValues) . ')';
+                                    .'(' . implode(', ', $vals) . ')';
                             }
 
                             public function cata($cases)

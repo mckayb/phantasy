@@ -13,6 +13,11 @@ class Just
         $this->value = $val;
     }
 
+    public function __toString()
+    {
+        return "Just(" . var_export($this->value, true) . ")";
+    }
+
     public function map($f)
     {
         return Maybe::of($f($this->value));

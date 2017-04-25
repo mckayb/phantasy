@@ -20,6 +20,7 @@ use function Phantasy\Core\{
   liftA4,
   liftA5,
   semigroupConcat,
+  concat,
   Type,
   SumType
 };
@@ -32,6 +33,15 @@ class FunctionsTest extends TestCase
         $this->assertEquals(false, identity(false));
         $this->assertEquals(true, identity(true));
         $this->assertEquals("Foo bar", identity("Foo bar"));
+    }
+
+    public function testIdentityCurried()
+    {
+        $identity = identity();
+        $this->assertEquals(1, $identity(1));
+        $this->assertEquals(false, $identity(false));
+        $this->assertEquals(true, $identity(true));
+        $this->assertEquals([1, 2], $identity([1, 2]));
     }
 
     public function testCompose()
@@ -102,6 +112,43 @@ class FunctionsTest extends TestCase
         $this->assertEquals($add2NumsTo2(1, 2), 5);
         $this->assertEquals($add3NumsTo1(1, 2, 3), 7);
         $this->assertEquals($add4Nums(1, 2, 3, 4), 10);
+    }
+
+    public function testConcatArrays()
+    {
+        $a = concat([1, 2], [3, 4]);
+        $this->assertEquals([1, 2, 3, 4], $a);
+    }
+
+    public function testConcatStrings()
+    {
+        $a = concat('foo', 'bar');
+        $this->assertEquals('foobar', $a);
+    }
+
+    public function testConcatObjects()
+    {
+        $f = function ($x) {
+            return new class($x) {
+                public $val = '';
+                public function __construct($val)
+                {
+                    $this->val = $val;
+                }
+
+                public function concat($x)
+                {
+                    $this->val .= $x->val;
+                    return $this;
+                }
+            };
+        };
+        $a = $f('foo');
+        $b = $f('bar');
+
+        $m = concat($a, $b);
+
+        $this->assertEquals($f('foobar'), $m);
     }
 
     public function testSemigroupConcatArrays()
@@ -413,6 +460,10 @@ class FunctionsTest extends TestCase
             return $x + 1;
         };
         $this->assertEquals(liftA($add1, Maybe::of(2)), Maybe::of(3));
+        $this->assertEquals(
+            liftA($add1, Maybe::fromNullable(null)),
+            Maybe::fromNullable(null)
+        );
     }
 
     public function testLiftA2()
@@ -422,6 +473,21 @@ class FunctionsTest extends TestCase
         };
         $liftedAdd = liftA2(curry($add));
         $this->assertEquals($liftedAdd(Maybe::of(2), Maybe::of(3)), Maybe::of(5));
+
+        $this->assertEquals(
+            $liftedAdd(Maybe::of(2), Maybe::fromNullable(null)),
+            Maybe::fromNullable(null)
+        );
+
+        $this->assertEquals(
+            $liftedAdd(Maybe::fromNullable(null), Maybe::fromNullable(2)),
+            Maybe::fromNullable(null)
+        );
+
+        $this->assertEquals(
+            $liftedAdd(Maybe::fromNullable(null), Maybe::fromNullable(null)),
+            Maybe::fromNullable(null)
+        );
     }
 
     public function testLiftA3()
@@ -433,6 +499,11 @@ class FunctionsTest extends TestCase
         $this->assertEquals(
             $liftedAdd(Maybe::of(1), Maybe::of(2), Maybe::of(3)),
             Maybe::of(6)
+        );
+
+        $this->assertEquals(
+            $liftedAdd(Maybe::fromNullable(null), Maybe::of(1), Maybe::fromNullable(null)),
+            Maybe::fromNullable(null)
         );
     }
 
@@ -510,7 +581,7 @@ class FunctionsTest extends TestCase
         echo $a;
         $d = ob_get_contents();
         ob_end_clean();
-        $this->assertEquals($d, 'Foo.A(foo, bar)');
+        $this->assertEquals($d, "Foo.A('foo', 'bar')");
 
         $foo->map = function ($f) {
             return $this->cata([
@@ -666,6 +737,18 @@ class FunctionsTest extends TestCase
         ini_set('xdebug.overload_var_dump', 0);
         ob_start();
         $a = trace('Hello!');
+        $b = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals(trim($b), 'string(6) "Hello!"');
+        $this->assertEquals($a, 'Hello!');
+    }
+
+    public function testTraceCurried()
+    {
+        $trace = trace();
+        ini_set('xdebug.overload_var_dump', 0);
+        ob_start();
+        $a = $trace('Hello!');
         $b = ob_get_contents();
         ob_end_clean();
         $this->assertEquals(trim($b), 'string(6) "Hello!"');

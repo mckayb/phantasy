@@ -2,7 +2,9 @@
 
 ## Maybe
 ### Usage
-`use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};`
+```php
+use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
+```
 ### Description
 `Maybe` (called `Option` in some FP languages) is a type that consists of two subclasses: `Just` or `Nothing`.
 It is the simplest way to create null-safe code and can be used in computing with variables that can possibly be null, or in returning values that may or may not exist.
@@ -124,7 +126,9 @@ Maybe::fromNullable(null)->toEither(0);
 
 ## Either
 ### Usage
-`use Phantasy\DataTypes\Either\{Either, Left, Right};`
+```php
+use Phantasy\DataTypes\Either\{Either, Left, Right};
+```
 ### Description
 `Either` is a type that consists of two subclasses: `Left` or `Right`.
 It is most often used on computations that may fail, but where you want information about how it failed.
@@ -277,7 +281,9 @@ Either::fromNullable(null)->toMaybe();
 
 ## Validation
 ### Usage
-`use Phantasy\DataTypes\Validation\{Validation, Success, Failure};`
+```php
+use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
+````
 ### Description
 `Validation` is a type that consists of two subclasses: `Success` or `Failure`.
 It is used when a certain computation can fail in multiple ways, and you need to be able to keep track of all of the things that failed. It differs from Either in the fact that you can compose Validation Failures into a single Validation Failure.

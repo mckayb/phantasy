@@ -7,7 +7,6 @@ use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 use function Phantasy\Core\{map, prop, identity, curry, compose, liftA, SumType};
-use const Phantasy\Core\identity;
 
 class DocsTest extends TestCase
 {
@@ -17,7 +16,7 @@ class DocsTest extends TestCase
             ->map(function ($x) {
                 return $x . 'bar';
             })
-            ->fold(identity, identity));
+            ->fold(identity(), identity()));
         $this->assertEquals(1, identity(1));
     }
 
@@ -35,7 +34,7 @@ class DocsTest extends TestCase
             ->map(function ($x) {
                 return $x . 'bar';
             })
-            ->fold(identity, identity));
+            ->fold(identity(), identity()));
     }
 
     public function testCurryExamples()

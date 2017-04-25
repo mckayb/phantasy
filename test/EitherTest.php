@@ -253,6 +253,64 @@ class EitherTest extends TestCase
         $this->assertEquals(new Just($f), $m);
     }
 
+    public function testRightToString()
+    {
+        $a = Either::of([1, 2]);
+        $b = Either::of('foo');
+        $c = Either::of(12);
+
+        $expectedA = "Right(array (\n  0 => 1,\n  1 => 2,\n))";
+        $expectedB = "Right('foo')";
+        $expectedC = "Right(12)";
+        ob_start();
+        echo $a;
+        $actualA = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        echo $b;
+        $actualB = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        echo $c;
+        $actualC = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEquals($expectedA, $actualA);
+        $this->assertEquals($expectedB, $actualB);
+        $this->assertEquals($expectedC, $actualC);
+    }
+
+    public function testLeftToString()
+    {
+        $a = new Left([1, 2]);
+        $b = new Left('foo');
+        $c = new Left(12);
+
+        $expectedA = "Left(array (\n  0 => 1,\n  1 => 2,\n))";
+        $expectedB = "Left('foo')";
+        $expectedC = "Left(12)";
+        ob_start();
+        echo $a;
+        $actualA = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        echo $b;
+        $actualB = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        echo $c;
+        $actualC = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEquals($expectedA, $actualA);
+        $this->assertEquals($expectedB, $actualB);
+        $this->assertEquals($expectedC, $actualC);
+    }
+
     public function testLeftMap()
     {
         $a = Either::fromNullable(null);

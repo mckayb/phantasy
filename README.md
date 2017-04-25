@@ -17,7 +17,7 @@ $name = Maybe::of($user)
 	->getOrElse(null);
 // "Foo"
 ```
-For more information, read the docs!
+For more information, read the [docs!](https://github.com/mckayb/phantasy/tree/master/docs)
 
 ## What's Included
   * Currying, Higher-Order Functions, etc

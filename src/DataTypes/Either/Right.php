@@ -13,6 +13,11 @@ class Right
         $this->value = $val;
     }
 
+    public function __toString()
+    {
+        return "Right(" . var_export($this->value, true) . ")";
+    }
+
     public function map($f)
     {
         return Either::of($f($this->value));

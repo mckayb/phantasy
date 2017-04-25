@@ -319,6 +319,46 @@ class MaybeTest extends TestCase
         $this->assertEquals(3, $a);
     }
 
+    public function testJustToString()
+    {
+        $a = Maybe::of([1, 2]);
+        $b = Maybe::of('foo');
+        $c = Maybe::of(12);
+
+        $expectedA = "Just(array (\n  0 => 1,\n  1 => 2,\n))";
+        $expectedB = "Just('foo')";
+        $expectedC = "Just(12)";
+        ob_start();
+        echo $a;
+        $actualA = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        echo $b;
+        $actualB = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        echo $c;
+        $actualC = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEquals($expectedA, $actualA);
+        $this->assertEquals($expectedB, $actualB);
+        $this->assertEquals($expectedC, $actualC);
+    }
+
+    public function testNothingToString()
+    {
+        $a = new Nothing();
+        $expectedA = "Nothing()";
+        ob_start();
+        echo $a;
+        $actualA = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals($expectedA, $actualA);
+    }
+
     public function testNothingMap()
     {
         $a = Maybe::fromNullable(null)

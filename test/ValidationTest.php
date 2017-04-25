@@ -211,6 +211,56 @@ class ValidationTest extends TestCase
         $this->assertEquals(new Just("foo"), $a);
     }
 
+    public function testSuccessToString()
+    {
+        $a = Validation::of([1, 2]);
+        $b = Validation::of('foo');
+        $c = Validation::of(12);
+
+        $expectedA = "Success(array (\n  0 => 1,\n  1 => 2,\n))";
+        $expectedB = "Success('foo')";
+        $expectedC = "Success(12)";
+        ob_start();
+        echo $a;
+        $actualA = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        echo $b;
+        $actualB = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        echo $c;
+        $actualC = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEquals($expectedA, $actualA);
+        $this->assertEquals($expectedB, $actualB);
+        $this->assertEquals($expectedC, $actualC);
+    }
+
+    public function testFailureToString()
+    {
+        $a = new Failure([1, 2]);
+        $b = new Failure('foo');
+
+        $expectedA = "Failure(array (\n  0 => 1,\n  1 => 2,\n))";
+        $expectedB = "Failure('foo')";
+        ob_start();
+        echo $a;
+        $actualA = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        echo $b;
+        $actualB = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEquals($expectedA, $actualA);
+        $this->assertEquals($expectedB, $actualB);
+    }
+
     public function testFailureMap()
     {
         $a = new Failure("foo");

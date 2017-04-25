@@ -15,6 +15,11 @@ class Failure
         $this->value = $val;
     }
 
+    public function __toString()
+    {
+        return "Failure(" . var_export($this->value, true) . ")";
+    }
+
     public function map($f)
     {
         return $this;

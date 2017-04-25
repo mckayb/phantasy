@@ -14,6 +14,11 @@ class Success
         $this->value = $val;
     }
 
+    public function __toString()
+    {
+        return "Success(" . var_export($this->value, true) . ")";
+    }
+
     public function map($f)
     {
         return new Success($f($this->value));

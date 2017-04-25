@@ -13,6 +13,11 @@ class Left
         $this->value = $val;
     }
 
+    public function __toString()
+    {
+        return "Left(" . var_export($this->value, true) . ")";
+    }
+
     public function map($f)
     {
         return $this;

@@ -3,11 +3,7 @@
 ## identity
 ### Usage
 ```php
-// If you want to call the function directly.
 use function Phantasy\Core\identity;
-
-// If you want to pass the function as a callable.
-use const Phantasy\Core\identity;
 ```
 
 ### Description
@@ -18,7 +14,6 @@ to lift a value into a function, or when you just want to return the value witho
 ```php
 use Phantasy\DataTypes\Either\Either;
 use function Phantasy\Core\identity;
-use const Phantasy\Core\identity as id;
 
 identity(1);
 // 1
@@ -33,13 +28,15 @@ Either::fromNullable('foo')
   ->map(function($x) {
     return $x . 'bar';
   })
-  ->fold(id, id);
+  ->fold(identity(), identity());
 // foobar
 ```
 
 ## curry
 ### Usage
-`use function Phantasy\Core\curry;`
+```php
+use function Phantasy\Core\curry;
+```
 
 ### Description
 Currying is when you call a function with a number of arguments less than the number of required arguments.
@@ -72,7 +69,9 @@ $explodeBySpace('foo bar');
 
 ## curryN
 ### Usage
-`use function Phantasy\Core\curryN;`
+```php
+use function Phantasy\Core\curryN;
+```
 
 ### Descripion
 Used when you want to curry a function, but it has variadic arguments,
@@ -81,7 +80,7 @@ currying.
 
 ### Examples
 ```php
-use function Phantasy\Core\CurryN;
+use function Phantasy\Core\curryN;
 
 $addNums = function(...$args) {
     return array_reduce($args, function($sum, $n) {
@@ -98,7 +97,9 @@ $result = $add1MoreNum(4);
 
 ## compose
 ### Usage
-`use function Phantasy\Core\compose`;
+```php
+use function Phantasy\Core\compose;
+```
 
 ### Description
 Composition lets you chain results of multiple functions into a single function.
@@ -113,6 +114,7 @@ $data = [
   [ "title" => "Foo Baz" ]
 ];
 // You can curry PHP's functions.
+// Or just use the ones already curried for you in Phantasy\Core\PHP.
 $explode = curry('explode');
 $implode = curry('implode');
 $snakeCase = compose(
@@ -128,7 +130,9 @@ $getSnakeTitles($data);
 
 ## prop
 ### Usage
-`use function Phantasy\Core\prop;`
+```php
+use function Phantasy\Core\prop;
+```
 
 ### Description
 A helper function for extracting named values out of an array or object.
@@ -162,7 +166,9 @@ $getNames($data); // ["Foo", "Bar"]
 
 ## map (aliases: fmap)
 ### Usage
-`use function Phantasy\Core\map;`
+```php
+use function Phantasy\Core\map;
+```
 ### Description
 A simple wrapper around the map method. If the data passed in has a map method, it just calls that. Otherwise, it just iterates over the data and returns an array.
 ### Examples
@@ -206,7 +212,9 @@ map($add, $box);
 
 ## ap
 ### Usage
-`use function Phantasy\Core\ap;`
+```php
+use function Phantasy\Core\ap;
+```
 ### Description
 A simple wrapper around the ap method found in an Apply.
 Used when you have an Applicative with a function, and an Applicative with a value, and you want to apply the function to the value.
@@ -225,7 +233,9 @@ ap($mAdd, $m1);
 
 ## filter
 ### Usage
-`use function Phantasy\Core\filter;`
+```php
+use function Phantasy\Core\filter;
+```
 ### Description
 A simple wrapper around the filter method. If the data passed in has a filter method, it just calls that. Otherwise, it just iterates over the data and returns an array.
 ### Examples
@@ -271,7 +281,9 @@ filter($isEven, $box);
 
 ## reduce
 ### Usage
-`use function Phantasy\Core\reduce;`
+```php
+use function Phantasy\Core\reduce;
+```
 ### Description
 A simple wrapper around the filter method. If the data passed in has a reduce method, it just calls that. Otherwise, it just iterates over the data and returns an array.
 ### Examples
@@ -323,7 +335,9 @@ reduce($oddSum, 0, $box);
 
 ## liftA
 ### Usage
-`use function Phantasy\Core\liftA;`
+```php
+use function Phantasy\Core\liftA;
+```
 ### Description
 Used to lift a function with one argument across an Applicative Functor.
 In other words, you can use this to call a function with one argument, but use Applicatives as parameters!
@@ -337,7 +351,9 @@ liftA('strtolower', Maybe::of('Foo Bar'));
 
 ## liftA2
 ### Usage
-`use function Phantasy\Core\liftA2;`
+```php
+use function Phantasy\Core\liftA2;
+```
 ### Description
 Used to lift a function with two arguments across Applicative Functors.
 In other words, you can use this to call a function with two arguments, but use Applicatives as parameters!
@@ -351,11 +367,16 @@ $add = function($a, $b) {
 };
 liftA2(curry($add), Either::of(2), Either::of(5));
 // Right(7)
+
+liftA2(curry($add), Either::of(2), Either::fromNullable(null));
+// Left(null)
 ```
 
 ## liftA3
 ### Usage
-`use function Phantasy\Core\liftA3;`
+```php
+use function Phantasy\Core\liftA3;
+```
 ### Description
 Used to lift a function with three arguments across Applicative Functors.
 In other words, you can use this to call a function with three arguments, but use Applicatives as parameters!
@@ -381,11 +402,21 @@ liftA3(
     Validation::of($host)
 );
 // Success($connection)
+
+liftA3(
+    curry('connectToDatabase'),
+    Validation::of($username),
+    Validation::fromNullable(null),
+    Validation::of($host)
+);
+// Failure(null)
 ```
 
 ## liftA4
 ### Usage
-`use function Phantasy\Core\liftA4;`
+```
+use function Phantasy\Core\liftA4;
+```
 ### Description
 Used to lift a function with four arguments across Applicative Functors.
 In other words, you can use this to call a function with four arguments, but use Applicatives as parameters!
@@ -414,12 +445,23 @@ liftA4(
     Validation::of($database_name)
 );
 // Success($connection)
+
+liftA4(
+    curry('connectToDatabase'),
+    Validation::of($username),
+    Validation::fromNullable(null),
+    Validation::of($host)
+    Validation::fromNullable(null)
+);
+// Failure(null)
 ```
 
 
 ## liftA5
 ### Usage
-`use function Phantasy\Core\liftA5;`
+```php
+use function Phantasy\Core\liftA5;
+```
 ### Description
 Used to lift a function with five arguments across Applicative Functors.
 In other words, you can use this to call a function with five arguments, but use Applicatives as parameters!
@@ -450,11 +492,22 @@ $add5Applicatives(
     Maybe::of(5)
 );
 // Just(15)
+
+$add5Applicatives(
+    Maybe::of(1),
+    Maybe::of(2),
+    Maybe::fromNullable(null),
+    Maybe::of(4),
+    Maybe::fromNullable(null)
+);
+// Nothing()
 ```
 
 ## trace
 ### Usage
-`use function Phantasy\Core\trace;`
+```php
+use function Phantasy\Core\trace;
+```
 ### Description
 Used in debugging in the middle of arrow chaining, when you want
 to view the actual value inside one of your types at a certain point.
@@ -462,15 +515,16 @@ to view the actual value inside one of your types at a certain point.
 ```php
 use Phantasy\DataTypes\Maybe\Maybe;
 use function Phantasy\Core\{curry, map, trace};
+use function Phantasy\Core\PHP\{explode, ucfirst, implode};
 
 function titleCase($str) {
     return Maybe::fromNullable($str)
-        ->map('trace')
-        ->map(curry('explode')(' '))
-        ->map('trace')
-        ->map(map('ucfirst'))
-        ->map('trace')
-        ->map(curry('implode')(''))
+        ->map(trace())
+        ->map(explode(' '))
+        ->map(trace())
+        ->map(map(ucfirst()))
+        ->map(trace())
+        ->map(implode(''))
         ->fold('Invalid string');
 }
 echo titleCase('foo bar');
@@ -487,14 +541,15 @@ echo titleCase(null);
 ```php
 use Phantasy\DataTypes\Maybe\Maybe;
 use function Phantasy\Core\{curry, compose, map, trace};
+use function Phantasy\Core\PHP\{implode, explode, ucfirst};
 
 $titleCase = compose(
-    curry('implode')(' ')
-    'trace',
-    map('ucfirst'),
-    'trace',
-    curry('explode')(' '),
-    'trace'
+    implode(' ')
+    trace(),
+    map(ucfirst()),
+    trace(),
+    explode(' '),
+    trace()
 );
 echo $titleCase('foo bar');
 // Output:
@@ -505,20 +560,22 @@ echo $titleCase('foo bar');
 ```
 
 
-## semigroupConcat
+## concat (aliases: semigroupConcat)
 ### Usage
-`use function Phantasy\Core\semigroupConcat;`
+```php
+use function Phantasy\Core\concat;
+```
 ### Description
 Simply concatenates two types together, if the concatenation makes sense,
 or the objects have a concat method.
 ### Examples
 ```php
-use function Phantasy\Core\semigroupConcat;
+use function Phantasy\Core\concat;
 
-semigroupConcat([1, 2], [3, 4]);
+concat([1, 2], [3, 4]);
 // [1, 2, 3, 4]
 
-semigroupConcat('foo', 'bar');
+concat('foo', 'bar');
 // foobar
 
 // Any.php
@@ -534,17 +591,19 @@ class Any {
 }
 
 // OtherFile.php
-use function Phantasy\Core\semigroupConcat;
+use function Phantasy\Core\concat;
 
 $a = new Any(true);
 $b = new Any(false);
-semigroupConcat($a, $b);
+concat($a, $b);
 // Any(false);
 ```
 
 ## Type
 ### Usage
-`use function Phantasy\Core\Type`;
+```php
+use function Phantasy\Core\Type;
+```
 
 ### Description
 Inspired heavily by [daggy](github.com/fantasy-land/daggy), this function lets you dynamically create a tagged constructor. The best way to learn this is through examples, so let's dive right in.
@@ -600,9 +659,13 @@ $newPoint->z; // 6
 ## SumType
 
 ### Usage
+```php
+use function Phantasy\Core\SumType
+```
 
 ### Description
 Inspired heavily by [daggy](github.com/fantasy-land/daggy), this function lets you dynamically create a new sum type, also known as union types. The best way to learn this is through examples, so let's dive right in.
+
 ### Examples
 ```php
 use function Phantasy\Core\SumType;
