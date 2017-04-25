@@ -140,14 +140,14 @@ Creates a new Right(\$val);
 Either::of(1);
 // Right(1)
 ```
-#### static fromNullable ($val)
-If \$val is null, it creates a `new Left(null)`, otherwise it creates a `new Right($val)`.
+#### static fromNullable ($failVal, $val)
+If \$val is null, it creates a `new Left($failVal)`, otherwise it creates a `new Right($val)`.
 ```php
-Either::fromNullable(1);
-// Right(1)
+Either::fromNullable('left val', 'right val');
+// Right('right val')
 
-Either::fromNullable(null);
-// Left(null)
+Either::fromNullable('left val', null);
+// Left('left val')
 ```
 #### static tryCatch ($f)
 Performs a function that might throw an exception. If it succeeds,
@@ -179,10 +179,10 @@ Either::of(1)->map(function($x) {
 ```
 If the instance is a `Left`, it just returns the instance without executing the function.
 ```php
-Either::fromNullable(null)->map(function($x) {
+Either::fromNullable('Val is null!', null)->map(function($x) {
     return ($x / 100) . '%';
 });
-// Left(null)
+// Left('Val is null!')
 ```
 #### ap (Either $e)
 Used when you want to apply a function inside of an `Either` to a value inside of an `Either`.
@@ -197,12 +197,12 @@ $a->ap($b);
 ```
 If the instance is a `Left`, it ignores the parameter and just returns the instance.
 ```php
-$a = Either::fromNullable(null);
+$a = Either::fromNullable('Val is null!', null);
 $b = Either::of(function($x) {
     return strtolower($x);
 });
 $a->ap($b);
-// Left(null)
+// Left('Val is null!')
 ```
 #### chain ($f) (aliases: bind, flatMap)
 Used when you want to map over your value, but where the mapping function returns an `Either` context.
@@ -215,10 +215,10 @@ $a = Either::of(1)->chain(function($x) {
 ```
 If the instance is a `Left`, it just ignores the function and returns the current instance.
 ```php
-$a = Either::fromNullable(null)->chain(function($x) {
+$a = Either::fromNullable(0, null)->chain(function($x) {
     return $x >= 1 ? new Right($x) : new Left(1);
 });
-// Left(null)
+// Left(0)
 ```
 #### fold (\$f, \$g) (aliases: cata)
 Used to extract values out of an `Either` context.
@@ -236,7 +236,7 @@ $a = Either::of('foo')->fold(
 ```
 If the instance is a `Left`, it returns the result of the left function `$f`.
 ```php
-$a = Either::fromNullable('null')->fold(
+$a = Either::fromNullable(null, null)->fold(
     function($e) {
         return 'Error';
     },
@@ -275,7 +275,7 @@ Either::of(1)->toMaybe();
 ```
 If the instance is a `Left`, it returns `Nothing`.
 ```php
-Either::fromNullable(null)->toMaybe();
+Either::fromNullable(0, null)->toMaybe();
 // Nothing()
 ```
 
@@ -296,13 +296,13 @@ Useful for lifting values into the `Validation` context.
 Validation::of(2);
 // Success(2)
 ```
-#### static fromNullable ($val)
-Checks the value that is passed in. If it's null, it returns a `new Failure()`,
-otherwise it returns a `new Success($val)`.
+#### static fromNullable ($failVal, $val)
+Checks the value that is passed in. If it's null, it returns a `Failure($failVal)`,
+otherwise it returns a `Success($val)`.
 ```php
 $a = null;
 $b = 12;
-Validation::fromNullable($a); // Failure()
+Validation::fromNullable(0, $a); // Failure(0)
 Validation::fromNullable($b); // Success(12)
 ```
 #### static tryCatch ($f)
@@ -351,12 +351,12 @@ $c = $a->ap($b);
 ```
 If the instance is a `Failure` it just returns the instance.
 ```php
-$a = Validation::fromNullable(null);
+$a = Validation::fromNullable('No val set!', null);
 $b = Validation::of(function($x) {
     return $x + 1;
 });
 $a->ap($b);
-// Failure(null);
+// Failure('No val set!');
 ```
 #### fold (\$f, \$g) (aliases: cata)
 Used to extract values from a `Validation` context.
@@ -425,10 +425,10 @@ $c = $a->concat($b);
 If the instance is a `Failure`, then it depends on the parameter.
 If the parameter is a `Success`, it just returns the instance.
 ```php
-$a = Validation::fromNullable(null);
+$a = Validation::fromNullable('No val is set!', null);
 $b = Validation::of(12);
 $c = $a->concat($b);
-// Failure(null)
+// Failure('No val is set!')
 ```
 If the parameter is a `Failure`, then it returns a Failure with a value of the concatenation of the instance value and the parameter value (assuming the concatenation makes sense).
 ```php

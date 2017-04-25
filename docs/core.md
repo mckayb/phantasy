@@ -24,7 +24,7 @@ identity('foo');
 identity(function($x) { return $x; });
 // function($x) { return $x; });
 
-Either::fromNullable('foo')
+Either::fromNullable('baz', 'foo')
   ->map(function($x) {
     return $x . 'bar';
   })
@@ -368,7 +368,7 @@ $add = function($a, $b) {
 liftA2(curry($add), Either::of(2), Either::of(5));
 // Right(7)
 
-liftA2(curry($add), Either::of(2), Either::fromNullable(null));
+liftA2(curry($add), Either::of(2), Either::fromNullable(null, null));
 // Left(null)
 ```
 
@@ -406,7 +406,7 @@ liftA3(
 liftA3(
     curry('connectToDatabase'),
     Validation::of($username),
-    Validation::fromNullable(null),
+    Validation::fromNullable(null, null),
     Validation::of($host)
 );
 // Failure(null)
@@ -449,9 +449,9 @@ liftA4(
 liftA4(
     curry('connectToDatabase'),
     Validation::of($username),
-    Validation::fromNullable(null),
+    Validation::fromNullable(null, null),
     Validation::of($host)
-    Validation::fromNullable(null)
+    Validation::fromNullable(null, null)
 );
 // Failure(null)
 ```

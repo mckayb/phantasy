@@ -4,7 +4,8 @@ namespace Phantasy\DataTypes\Either;
 
 use function Phantasy\Core\curry;
 
-class Either {
+class Either
+{
     public static function of()
     {
         return curry(function ($val) {
