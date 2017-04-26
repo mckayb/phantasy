@@ -660,7 +660,7 @@ $newPoint->z; // 6
 
 ### Usage
 ```php
-use function Phantasy\Core\SumType
+use function Phantasy\Core\SumType;
 ```
 
 ### Description
