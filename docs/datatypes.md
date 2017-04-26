@@ -10,7 +10,7 @@ use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 It is the simplest way to create null-safe code and can be used in computing with variables that can possibly be null, or in returning values that may or may not exist.
 ### Methods
 #### static of ($val)
-Simply creates a `new Just ($val)`. Good for lifting values into the `Maybe` context, so that you can map, apply or use other nice functions over it.
+Simply creates a `Just ($val)`. Good for lifting values into the `Maybe` context, so that you can map, apply or use other nice functions over it.
 ```php
 $appendBar = function($x) {
     return $x . 'bar';
@@ -19,8 +19,8 @@ Maybe::of('foo')->map($appendBar);
 // Equivalent to new Just('foo')->map($appendBar);
 ```
 #### static fromNullable ($val)
-Checks the value that is passed in. If it's null, it returns a `new Nothing()`,
-otherwise it returns a `new Just($val)`.
+Checks the value that is passed in. If it's null, it returns a `Nothing()`,
+otherwise it returns a `Just($val)`.
 ```php
 $a = null;
 $b = 12;
@@ -29,7 +29,7 @@ Maybe::fromNullable($b); // Just(12)
 ```
 #### static tryCatch ($f)
 Performs a function that might throw an exception. If it succeeds,
-it stores the result in a `Just`, with the value of the result of the function. If it throws an exception, it returns a `new Nothing()`.
+it stores the result in a `Just`, with the value of the result of the function. If it throws an exception, it returns a `Nothing()`.
 ```php
 // Throws exceptions
 $connectToDB = function() {
@@ -148,13 +148,13 @@ It is most often used on computations that may fail, but where you want informat
 The key difference between `Either`  and `Maybe` is that `Left` can hold a value, whereas `Nothing` can't. This lets Either hold legitimate values for code branching, or contain information about failures.
 ### Methods
 #### static of ($val)
-Creates a new Right(\$val);
+Creates a `Right($val)`;
 ```php
 Either::of(1);
 // Right(1)
 ```
 #### static fromNullable ($failVal, $val)
-If \$val is null, it creates a `new Left($failVal)`, otherwise it creates a `new Right($val)`.
+If `$val` is null, it creates a `Left($failVal)`, otherwise it creates a `Right($val)`.
 ```php
 Either::fromNullable('left val', 'right val');
 // Right('right val')
@@ -164,7 +164,7 @@ Either::fromNullable('left val', null);
 ```
 #### static tryCatch ($f)
 Performs a function that might throw an exception. If it succeeds,
-it stores the result in a `new Right($f())`, otherwise, it returns a `new Left($exception)`.
+it stores the result in a `Right($f())`, otherwise, it returns a `Left($exception)`.
 ```php
 // Throws exceptions
 $connectToDB = function() {
@@ -315,7 +315,7 @@ It is used when a certain computation can fail in multiple ways, and you need to
 
 ### Methods
 #### static of ($val)
-Creates a `new Success($val)`.
+Creates a `Success($val)`.
 Useful for lifting values into the `Validation` context.
 ```php
 Validation::of(2);
@@ -332,7 +332,7 @@ Validation::fromNullable($b); // Success(12)
 ```
 #### static tryCatch ($f)
 Performs a function that might throw an exception. If it succeeds,
-it stores the result in a `Just`, with the value of the result of the function. If it throws an exception, it returns a `new Nothing()`.
+it stores the result in a `Success`, with the value of the result of the function. If it throws an exception, it returns a `Failure` with the result of the exception.
 ```php
 // Throws exceptions
 $connectToDB = function() {
@@ -343,13 +343,14 @@ $connectToDB = function() {
     );
 };
 Validation::tryCatch($connectToDB);
-// If an exception is thrown, it returns Failure()
-// If no exception was thrown, returns Success($connection)
+// If an exception is thrown, it returns Failure(Exception('E_CONN_REFUSED'))
+// or whatever exception.
+// If no exception was thrown, returns Success($connection).
 ```
 #### map ($f)
 Used to transform the value inside of our `Validation`.
 Applies the function `$f` to the value inside of our instance.
-If the instance is a `Success`, it returns a new `Success` with the result of the function.
+If the instance is a `Success`, it returns a `Success` with the result of the function.
 ```php
 Validation::of(1)->map(function($x) {
     return $x + 1;
