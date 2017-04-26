@@ -7,6 +7,7 @@ use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 use function Phantasy\Core\{map, prop, identity, curry, compose, liftA, SumType};
+use function Phantasy\Core\PHP\{explode, implode, strtolower};
 
 class DocsTest extends TestCase
 {
@@ -37,28 +38,20 @@ class DocsTest extends TestCase
             ->fold(identity(), identity()));
     }
 
-    public function testCurryExamples()
-    {
-        $explode = curry('explode');
-        $explodeBySpace = $explode(' ');
-        $this->assertEquals($explodeBySpace('foo bar'), ['foo', 'bar']);
-    }
-
     public function testComposeExample()
     {
         $data = [
             [ "title" => "Foo Bar" ],
             [ "title" => "Foo Baz" ]
         ];
-        $explode = curry('explode');
-        $implode = curry('implode');
         $snakeCase = compose(
-            $implode('_'),
-            map('strtolower'),
-            $explode(' '),
-            prop('title')
+            implode('_'),
+            map(strtolower()),
+            explode(' ')
         );
-        $getSnakeTitles = map($snakeCase);
+
+        $snakeTitle = compose($snakeCase, prop('title'));
+        $getSnakeTitles = map($snakeTitle);
         $this->assertEquals($getSnakeTitles($data), ["foo_bar", "foo_baz"]);
     }
 

@@ -60,11 +60,21 @@ $add(2, 3); // 5;
 ```
 ```php
 use function Phantasy\Core\curry;
-// You can also curry php's internal methods.
-$explode = curry('explode');
-$explodeBySpace = $explode(' ');
-$explodeBySpace('foo bar');
-// ['foo', 'bar']
+
+function myCustomFunction($a, $b) {
+    // Do something...
+}
+
+// You can also curry already defined functions, by just using
+// the string representation.
+$curried = curry('myCustomFunction');
+
+// And call with with all of the parameters.
+$curried('foo', 'bar');
+
+// Or only a portion of them.
+$fooCurried = $curried('foo');
+$fooCurried('bar');
 ```
 
 ## curryN
@@ -108,22 +118,21 @@ It helps you to manage nesting and, when combined with currying, helps you creat
 ### Examples
 ```php
 use function Phantasy\Core\{compose, prop, map, curry};
+use function Phantasy\Core\PHP\{explode, implode, strtolower};
 
 $data = [
   [ "title" => "Foo Bar" ],
   [ "title" => "Foo Baz" ]
 ];
-// You can curry PHP's functions.
-// Or just use the ones already curried for you in Phantasy\Core\PHP.
-$explode = curry('explode');
-$implode = curry('implode');
+
 $snakeCase = compose(
-  $implode('_'),
-  map('strtolower'),
-  $explode(' '),
-  prop('title')
+  implode('_'),
+  map(strtolower()),
+  explode(' ')
 );
-$getSnakeTitles = map($snakeCase);
+
+$snakeTitle = compose($snakeCase, prop('title'));
+$getSnakeTitles = map($snakeTitle);
 $getSnakeTitles($data);
 // [ "foo_bar", "foo_baz" ]
 ```
@@ -344,8 +353,9 @@ In other words, you can use this to call a function with one argument, but use A
 ### Examples
 ```php
 use function Phantasy\Core\liftA;
+use function Phantasy\Core\PHP\strtolower;
 
-liftA('strtolower', Maybe::of('Foo Bar'));
+liftA(strtolower(), Maybe::of('Foo Bar'));
 // Just('foo bar');
 ```
 
@@ -539,7 +549,6 @@ echo titleCase(null);
 ```
 
 ```php
-use Phantasy\DataTypes\Maybe\Maybe;
 use function Phantasy\Core\{curry, compose, map, trace};
 use function Phantasy\Core\PHP\{implode, explode, ucfirst};
 
@@ -558,7 +567,6 @@ echo $titleCase('foo bar');
 // ['Foo', 'Bar']
 // 'FooBar'
 ```
-
 
 ## concat (aliases: semigroupConcat)
 ### Usage
