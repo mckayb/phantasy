@@ -20,10 +20,11 @@ $name = Maybe::of($user)
 For more information, read the [docs!](https://github.com/mckayb/phantasy/tree/master/docs)
 
 ## What's Included
-  * Currying, Higher-Order Functions, etc
-  * Maybe Monad
-  * Either Monad
+  * Currying, Composition, Higher-Order Functions, etc
+  * Maybe/Either Monads
   * Validation Applicative Functor
+  * Sum Types and Product Types
+  * Curried versions of common PHP Functions
   * More coming...
 
 ## Contributing
