@@ -8,4 +8,8 @@
     <rule ref="PSR1.Classes.ClassDeclaration">
         <exclude-pattern>*/test/*</exclude-pattern>
     </rule>
+
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude-pattern>./src/Core/constructor-functions.php</exclude-pattern>
+    </rule>
 </ruleset>
