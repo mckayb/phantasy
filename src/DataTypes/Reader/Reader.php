@@ -19,7 +19,7 @@ class Reader
 
     public static function of($x)
     {
-        return new Reader(function ($s) use ($x) {
+        return new Reader(function ($_) use ($x) {
             return $x;
         });
     }
@@ -41,7 +41,7 @@ class Reader
     public function chain($r)
     {
         return new Reader(function ($s) use ($r) {
-            return $r($this->run($s))->run($s)($s);
+            return $r($this->run($s))->run($s);
         });
     }
 

@@ -69,7 +69,7 @@ class ReaderTest extends TestCase
     {
         $r = Reader::of('Hello')
             ->chain(function ($x) {
-                return Reader::of(function ($s) use ($x) {
+                return new Reader(function ($s) use ($x) {
                     return $s['ENVIRONMENT'] === 'production'
                         ? concat($x, ' Valued Customer!')
                         : concat($x, ' Devs!');
@@ -102,7 +102,7 @@ class ReaderTest extends TestCase
     {
         $r = Reader::of('Hello')
             ->bind(function ($x) {
-                return Reader::of(function ($s) use ($x) {
+                return new Reader(function ($s) use ($x) {
                     return $s['ENVIRONMENT'] === 'production'
                         ? concat($x, ' Valued Customer!')
                         : concat($x, ' Devs!');
@@ -117,7 +117,7 @@ class ReaderTest extends TestCase
     {
         $r = Reader::of('Hello')
             ->flatMap(function ($x) {
-                return Reader::of(function ($s) use ($x) {
+                return new Reader(function ($s) use ($x) {
                     return $s['ENVIRONMENT'] === 'production'
                         ? concat($x, ' Valued Customer!')
                         : concat($x, ' Devs!');
