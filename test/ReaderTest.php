@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Reader\Reader;
-use function Phantasy\Core\{concat, identity};
+use function Phantasy\Core\concat;
 
 class ReaderTest extends TestCase
 {
