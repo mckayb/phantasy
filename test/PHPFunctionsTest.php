@@ -283,7 +283,11 @@ use function Phantasy\Core\PHP\{
     timezone_open,
     timezone_transitions_get,
     timezone_transitions_get2,
-    timezone_transitions_get3
+    timezone_transitions_get3,
+    json_encode,
+    json_encode2,
+    json_decode,
+    json_decode2
 };
 
 class PHPFunctionsTest extends TestCase
@@ -3715,5 +3719,47 @@ class PHPFunctionsTest extends TestCase
             $ttg($tz),
             \timezone_transitions_get($tz, $start, $end)
         );
+    }
+
+    public function testJsonEncode()
+    {
+        $arr = ['a' => 1, 'b' => 2, 'c' => 3];
+        $this->assertEquals(json_encode($arr), \json_encode($arr));
+
+        $jsonEncode = json_encode();
+        $this->assertEquals($jsonEncode($arr), \json_encode($arr));
+    }
+
+    public function testJsonEncode2()
+    {
+        $arr = ['a' => '1', 'b' => '2', 'c' => '3'];
+        $this->assertEquals(
+            json_encode2(JSON_NUMERIC_CHECK, $arr),
+            \json_encode($arr, JSON_NUMERIC_CHECK)
+        );
+
+        $jsonEncodeNumCheck = json_encode2(JSON_NUMERIC_CHECK);
+        $this->assertEquals(
+            $jsonEncodeNumCheck($arr),
+            \json_encode($arr, JSON_NUMERIC_CHECK)
+        );
+    }
+
+    public function testJsonDecode()
+    {
+        $json = '{"a":1,"b":2,"c":3}';
+        $this->assertEquals(json_decode($json), \json_decode($json));
+
+        $jsonDecode = json_decode();
+        $this->assertEquals($jsonDecode($json), \json_decode($json));
+    }
+
+    public function testJsonDecode2()
+    {
+        $json = '{"a":1,"b":2,"c":3}';
+        $this->assertEquals(json_decode2(true, $json), \json_decode($json, true));
+
+        $jsonDecode = json_decode2(true);
+        $this->assertEquals($jsonDecode($json), \json_decode($json, true));
     }
 }

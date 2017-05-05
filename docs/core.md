@@ -83,7 +83,7 @@ $fooCurried('bar');
 use function Phantasy\Core\curryN;
 ```
 
-### Descripion
+### Description
 Used when you want to curry a function, but it has variadic arguments,
 or it has optional parameters that you want to be included in the
 currying.
@@ -604,7 +604,7 @@ use function Phantasy\Core\concat;
 $a = new Any(true);
 $b = new Any(false);
 concat($a, $b);
-// Any(false);
+// Any(true);
 ```
 
 ## Type

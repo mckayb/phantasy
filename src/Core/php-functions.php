@@ -1817,3 +1817,27 @@ function timezone_transitions_get3()
         return \timezone_transitions_get($object, $timestampBegin, $timestampEnd);
     })(...func_get_args());
 }
+
+function json_decode()
+{
+    return curry('\json_decode')(...func_get_args());
+}
+
+function json_decode2()
+{
+    return curry(function ($assoc, $json) {
+        return \json_decode($json, $assoc);
+    })(...func_get_args());
+}
+
+function json_encode()
+{
+    return curry('\json_encode')(...func_get_args());
+}
+
+function json_encode2()
+{
+    return curry(function ($options, $value) {
+        return \json_encode($value, $options);
+    })(...func_get_args());
+}

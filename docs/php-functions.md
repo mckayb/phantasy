@@ -54,7 +54,7 @@ use function Phantasy\Core\PHP\addcslashes;
 addcslashes('A..z', 'foo[ ]');
 // "\f\o\o\[ \]"
 
-// Currie
+// Curried
 $addSlashesAToZ = addcslashes('A..z');
 $addSlashesAToZ('foo[ ]');
 // "\f\o\o\[ \]"
@@ -566,7 +566,7 @@ $md5RawOutput($str);
 // "8p�'OlI��\ng("
 ```
 
-###metaphone
+### metaphone
 #### Usage
 
 ```php
@@ -584,7 +584,7 @@ $metaphone($str);
 // 'PRKRMNK'
 ```
 
-###metaphone2
+### metaphone2
 #### Usage
 
 ```php
@@ -1071,7 +1071,7 @@ use function Phantasy\Core\PHP\str_pad;
 #### Examples
 ```php
 $str = 'Alien';
-str_pad(, $str);
+str_pad(6, $str);
 // 'Alien '
 
 $padTo6 = str_pad(6);
@@ -1250,7 +1250,6 @@ use function Phantasy\Core\PHP\str_word_count;
 #### Examples
 ```php
 $str = 'This is a test.';
-
 str_word_count($str);
 // 4
 
@@ -1287,7 +1286,7 @@ use function Phantasy\Core\PHP\str_word_count3;
 
 #### Examples
 ```php
-
+$str = 'This is a test.';
 $str_word_count3(0, "\ ", $str);
 // 1
 
@@ -1307,7 +1306,6 @@ use function Phantasy\Core\PHP\strcasecmp;
 ```php
 $a = 'a';
 $b = 'b';
-
 strcasecmp($a, $b);
 // -1
 
@@ -2429,10 +2427,10 @@ use function Phantasy\Core\PHP\wordwrap4;
 #### Examples
 ```php
 $text = "A very long woooooooooooord.";
-wordwrap(true, "\n", 8, $text);
+wordwrap4(true, "\n", 8, $text);
 // "A very\nlong\nwooooooo\nooooord."
 
-$wrap8 = wordwrap(true, "\n", 8);
+$wrap8 = wordwrap4(true, "\n", 8);
 $wrap8($text);
 // "A very\nlong\nwooooooo\nooooord."
 ```
@@ -2467,10 +2465,10 @@ use function Phantasy\Core\PHP\array_change_key_case2;
 #### Examples
 ```php
 $arr = ["FirSt" => 1, "SecOnd" => 4];
-array_change_key_case(CASE_UPPER, $arr);
+array_change_key_case2(CASE_UPPER, $arr);
 // ["FIRST" => 1, "SECOND" => 4]
 
-$upperKeyCase = array_change_key_case(CASE_UPPER);
+$upperKeyCase = array_change_key_case2(CASE_UPPER);
 $upperKeyCase($arr);
 // ["FIRST" => 1, "SECOND" => 4]
 ```
@@ -3036,7 +3034,7 @@ $arr = [0 => 100, 'color' => 'red'];
 array_keys($arr);
 // [0 => 0, 1 => 'color']
 
-$arr2 = ['color' => ['blue', 'red, 'green']];
+$arr2 = ['color' => ['blue', 'red', 'green']];
 array_keys($arr2);
 // ['color']
 
@@ -3705,10 +3703,10 @@ use function Phantasy\Core\PHP\in_array3;
 #### Examples
 ```php
 $arr = ['foo', 'bar'];
-in_array(true, 'foo', $arr);
+in_array3(true, 'foo', $arr);
 // true
 
-$fooInArrStrict = in_array(true, 'foo');
+$fooInArrStrict = in_array3(true, 'foo');
 $fooInArrStrict($arr);
 // true
 ```
@@ -3859,6 +3857,11 @@ $fruits = ['d' => 'lemon', 'a' => 'orange', 'b' => 'banana', 'c' => 'apple'];
 
 $sorted = ksort($fruits);
 // $sorted = ['a' => 'orange', 'b' => 'banana', 'c' => 'apple', 'd' => 'lemon']
+// $fruits = ['d' => 'lemon', 'a' => 'orange', 'b' => 'banana', 'c' => 'apple']
+
+$ksort = ksort();
+$sorted2 = $ksort($fruits);
+// $sorted2 = ['a' => 'orange', 'b' => 'banana', 'c' => 'apple', 'd' => 'lemon']
 // $fruits = ['d' => 'lemon', 'a' => 'orange', 'b' => 'banana', 'c' => 'apple']
 ```
 
@@ -4075,7 +4078,7 @@ $sorted = sort2(SORT_NUMERIC, $arr);
 // $sorted = ['1', '2', '3', '4']
 // $arr is unchanged
 
-$sortNum = sort(SORT_NUMERIC);
+$sortNum = sort2(SORT_NUMERIC);
 $sorted = $sortNum($arr);
 // $sorted = ['1', '2', '3', '4']
 // $arr is unchanged
@@ -5936,4 +5939,81 @@ array(42) {
     }
 }
 */
+```
+
+## JSON Functions
+### json_encode
+#### Usage
+```php
+use function Phantasy\Core\PHP\json_encode;
+```
+#### Examples
+```php
+$arr = ['a' => 1, 'b' => 2, 'c' => 3];
+json_encode($arr);
+// '{"a":1,"b":2,"c":3}';
+
+$jsonEncode = json_encode();
+$jsonEncode($val);
+// '{"a":1,"b":2,"c":3}';
+```
+
+### json_encode2
+#### Usage
+```php
+use function Phantasy\Core\PHP\json_encode2;
+```
+#### Examples
+```php
+$arr = ['a' => '1', 'b' => '2', 'c' => '3'];
+json_encode2(JSON_NUMERIC_CHECK, $arr);
+// '{"a":1,"b":2,"c":3}';
+
+$jsonEncodeNumCheck = json_encode2(JSON_NUMERIC_CHECK);
+$jsonEncodeNumCheck($val);
+// '{"a":1,"b":2,"c":3}';
+```
+
+### json_decode
+#### Usage
+```php
+use function Phantasy\Core\PHP\json_decode;
+```
+#### Examples
+```php
+$json = '{"a":1,"b":2,"c":3}';
+json_decode($json);
+/*
+object(stdClass)#1 (3) {
+    ["a"] => int(1)
+    ["b"] => int(2)
+    ["c"] => int(3)
+}
+*/
+
+$jsonDecode = json_decode();
+$jsonDecode($json);
+/*
+object(stdClass)#1 (3) {
+    ["a"] => int(1)
+    ["b"] => int(2)
+    ["c"] => int(3)
+}
+*/
+```
+
+### json_decode2
+#### Usage
+```php
+use function Phantasy\Core\PHP\json_decode2;
+```
+#### Examples
+```php
+$json = '{"a":1,"b":2,"c":3}';
+json_decode2(true, $json);
+// ['a' => 3, 'b' => 2, 'c' => 3];
+
+$jsonDecodeAssoc = json_decode(true);
+$jsonDecodeAssoc($json);
+// ['a' => 3, 'b' => 2, 'c' => 3];
 ```

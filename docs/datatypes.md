@@ -16,7 +16,7 @@ $appendBar = function($x) {
     return $x . 'bar';
 };
 Maybe::of('foo')->map($appendBar);
-// Equivalent to new Just('foo')->map($appendBar);
+// Equivalent to Just('foo')->map($appendBar);
 ```
 #### static fromNullable ($val)
 Checks the value that is passed in. If it's null, it returns a `Nothing()`,
@@ -210,10 +210,11 @@ $a->ap($b);
 ```
 If the instance is a `Left`, it ignores the parameter and just returns the instance.
 ```php
+use Phantasy\DataTypes\Either\Either;
+use function Phantasy\Core\PHP\strtolower;
+
 $a = Either::fromNullable('Val is null!', null);
-$b = Either::of(function($x) {
-    return strtolower($x);
-});
+$b = Either::of(strtolower());
 $a->ap($b);
 // Left('Val is null!')
 ```
@@ -222,14 +223,14 @@ Used when you want to map over your value, but where the mapping function return
 If the instance is a `Right`, it simply returns the result of the function.
 ```php
 $a = Either::of(1)->chain(function($x) {
-    return $x >= 1 ? new Right($x) : new Left(1);
+    return $x >= 1 ? Right($x) : Left(1);
 });
 // Right(1)
 ```
 If the instance is a `Left`, it just ignores the function and returns the current instance.
 ```php
 $a = Either::fromNullable(0, null)->chain(function($x) {
-    return $x >= 1 ? new Right($x) : new Left(1);
+    return $x >= 1 ? Right($x) : Left(1);
 });
 // Left(0)
 ```
@@ -272,7 +273,7 @@ $a = Either::of('foo')->bimap(function($x) {
 ```
 If the instance is a `Left`, it calls the left function `$f`.
 ```php
-$a = (new Left('foo'))->bimap(function($x) {
+$a = Left('foo')->bimap(function($x) {
     return $x . 'baz';
 }, function($x) {
     return $x . 'bar';
@@ -291,11 +292,11 @@ If the instance is a `Left`, it returns `Nothing`.
 Either::fromNullable(0, null)->toMaybe();
 // Nothing()
 ```
-#### toValidation ($val)
+#### toValidation ()
 Used to transform a `Either` into a `Validation` context.
 If the instance is a `Right`, then it returns a `Success` containing that instance value.
 ```php
-Either::of(1)->toValidation(0);
+Either::of(1)->toValidation();
 // Success(1)
 ```
 If the instance is a `Left`, then it returns a `Failure` containing the parameter `$val`.
@@ -359,7 +360,7 @@ Validation::of(1)->map(function($x) {
 ```
 If the instance is a `Failure`, it just returns the instance.
 ```php
-(new Failure('There was a problem'))->map(function($x) {
+Failure('There was a problem')->map(function($x) {
     return $x + 1;
 });
 // Failure('There was a problem')
@@ -397,7 +398,7 @@ Validation::of(1)->fold(function($x) {
 ```
 If the instance is a `Failure`, it returns the result of the left function `$f`.
 ```php
-(new Failure(['First problem']))->fold(
+Failure(['First problem'])->fold(
     function($e) {
         return $e;
     },
@@ -423,7 +424,7 @@ Validation::of(1)->bimap(
 ```
 If the instance is a `Failure`, it calls the left function `$f`.
 ```php
-(new Failure(12))->bimap(
+Failure(12)->bimap(
     function($x) {
         return $x - 1;
     },
@@ -444,7 +445,7 @@ $c = $a->concat($b);
 ```
 ```php
 $a = Validation::of(1);
-$b = new Failure(['There was some problem.']);
+$b = Failure(['There was some problem.']);
 $c = $a->concat($b);
 // Failure(['There was some problem.'])
 ```
@@ -458,8 +459,8 @@ $c = $a->concat($b);
 ```
 If the parameter is a `Failure`, then it returns a Failure with a value of the concatenation of the instance value and the parameter value (assuming the concatenation makes sense).
 ```php
-$a = new Failure(['There was a problem.']);
-$b = new Failure(['There was another problem.']);
+$a = Failure(['There was a problem.']);
+$b = Failure(['There was another problem.']);
 $c = $a->concat($b);
 // Failure(['There was a problem.', 'There was another problem.']);
 ```
@@ -472,7 +473,7 @@ Validation::of(1)->toEither();
 ```
 If the instance is a `Failure`, it returns a `Left` with the same value.
 ```php
-(new Failure('foobar'))->toEither();
+Failure('foobar')->toEither();
 // Left('foobar')
 ```
 #### toMaybe ()
@@ -484,6 +485,76 @@ Validation::of(1)->toMaybe();
 ```
 If the instance is a `Failure`, it returns a `Nothing`.
 ```php
-(new Failure('foo'))->toMaybe();
+Failure('foo')->toMaybe();
 // Nothing()
+```
+
+## Reader
+### Usage
+```php
+use Phantasy\DataTypes\Reader\Reader;
+```
+### Description
+The Reader type is essentially just a way of composing functions where
+each of the functions have access to some external state.
+It helps to think of the Reader type as just a wrapper that holds a function with some extra
+properties.
+### Methods
+#### static of ($x)
+Creates a `Reader` with a function that just returns the parameter
+value `$x`. The difference between using `Reader::of` and just calling
+the helper function `Reader` is that `Reader::of` creates a function
+returning whatever was passed in, while `Reader` just takes the parameter
+function as it's function, without the extra level of nesting.
+```php
+Reader::of(12)->run([]);
+// 12
+```
+#### run ($s)
+Simply runs the function that the `Reader` is holding with some state
+`$s`. This is the state that will be referenced during the computation
+that the `Reader` is performing.
+#### map ($g)
+This is the simplest way of composing new functions with the function
+that is already stored inside the `Reader`. Simply composes the function
+inside the `Reader` and the parameter function `$g`.
+```php
+use Phantasy\DataTypes\Reader\Reader;
+use function Phantasy\Core\concat;
+
+Reader::of('hello')->map(function($x) {
+    return concat($x, ' World!');
+})->run([]);
+// 'Hello World!'
+```
+#### ap (Reader $g)
+Used when you want to apply a function inside of a `Reader` to a value
+inside of a `Reader`.
+```php
+Reader::of(12)->ap(Reader::of(function($x) {
+    return $x + 1;
+}))->run([]);
+// 13
+```
+#### chain ($r) (aliases: bind, flatMap)
+Used when you want to map with a function that also returns a `Reader`.
+The `Reader` inside of the chain method has access to the external state
+that was passed in.
+```php
+use Phantasy\DataTypes\Reader\Reader;
+use function Phantasy\Core\concat;
+
+$r = Reader::of('Hello')
+    ->chain(function($x) {
+        return Reader(function($s) use ($x) {
+            return $s['ENVIRONMENT'] === 'production'
+                ? concat($x, ' Customer!')
+                : concat($x, ' Dev!');
+        });
+    });
+$r->run([ 'ENVIRONMENT' => 'production' ]);
+// Hello Customer!
+
+$r->run([ 'ENVIRONMENT' => 'development' ]);
+// Hello Dev!'
 ```

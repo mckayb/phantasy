@@ -61,12 +61,12 @@ class Just
     }
 
     // Transformations
-    public function toEither()
+    public function toEither($val)
     {
         return new Right($this->value);
     }
 
-    public function toValidation()
+    public function toValidation($val)
     {
         return new Success($this->value);
     }

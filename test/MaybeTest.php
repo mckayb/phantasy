@@ -478,7 +478,7 @@ class MaybeTest extends TestCase
     public function testJustToEither()
     {
         $a = Maybe::of(85);
-        $either = $a->toEither();
+        $either = $a->toEither(0);
 
         $this->assertInstanceOf(Right::class, $either);
         $this->assertEquals(Either::of(85), $either);
