@@ -470,7 +470,7 @@ collection.
 Validation::zero();
 // Failure([])
 
-Failure::zero()->map(function($x) {
+Validation::zero()->map(function($x) {
     return $x + 1;
 });
 // Failure([])
