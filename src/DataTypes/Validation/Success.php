@@ -49,6 +49,16 @@ class Success
         return new Success($g($this->value));
     }
 
+    public function alt($v)
+    {
+        return $this;
+    }
+
+    public function reduce($f, $acc)
+    {
+        return $f($acc, $this->value);
+    }
+
     // Aliases
     public function cata($f, $g)
     {

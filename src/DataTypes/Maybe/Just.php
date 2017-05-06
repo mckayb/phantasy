@@ -39,6 +39,16 @@ class Just
         return $f($this->value);
     }
 
+    public function alt($maybe)
+    {
+        return $this;
+    }
+
+    public function reduce($f, $acc)
+    {
+        return $f($acc, $this->value);
+    }
+
     public function getOrElse($d)
     {
         return $this->value;

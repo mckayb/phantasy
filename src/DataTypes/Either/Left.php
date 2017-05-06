@@ -44,6 +44,16 @@ class Left
         return new Left($f($this->value));
     }
 
+    public function alt($e)
+    {
+        return $e;
+    }
+
+    public function reduce($f, $acc)
+    {
+        return $acc;
+    }
+
     // Aliases
     public function bind($f)
     {

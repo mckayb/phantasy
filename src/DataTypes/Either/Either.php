@@ -30,4 +30,9 @@ class Either
             }
         })(...func_get_args());
     }
+
+    public static function zero()
+    {
+        return new Left(null);
+    }
 }

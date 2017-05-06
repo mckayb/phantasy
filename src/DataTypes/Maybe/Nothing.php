@@ -27,6 +27,16 @@ class Nothing
         return $this;
     }
 
+    public function alt($maybe)
+    {
+        return $maybe;
+    }
+
+    public function reduce($f, $acc)
+    {
+        return $acc;
+    }
+
     public function getOrElse($d)
     {
         return $d;

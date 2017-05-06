@@ -49,6 +49,50 @@ class EitherTest extends TestCase
         $this->assertEquals(new Left(new \Exception('baz')), $a);
     }
 
+    public function testEitherZero()
+    {
+        $this->assertEquals(Either::zero(), new Left(null));
+    }
+
+    public function testEitherPlusRightIdentity()
+    {
+        $x = Either::of(3);
+        $this->assertEquals($x->alt(Either::zero()), $x);
+    }
+
+    public function testEitherPlusLeftIdentity()
+    {
+        $x = Either::of(3);
+        $this->assertEquals(Either::zero()->alt($x), $x);
+    }
+
+    public function testEitherPlusAnnihilation()
+    {
+        $x = Either::of(3);
+        $this->assertEquals(Either::zero()->map(function ($x) {
+            return $x + 1;
+        }), Either::zero());
+    }
+
+    public function testEitherAlternative()
+    {
+        $x = Either::of(3);
+        $f = Either::of(function ($x) {
+            return $x + 1;
+        });
+        $g = Either::of(function ($x) {
+            return $x - 1;
+        });
+
+        $f1 = new Left(null);
+        $g2 = new Left(null);
+
+        $this->assertEquals($x->ap($f->alt($g)), $x->ap($f)->alt($x->ap($g)));
+        $this->assertEquals($x->ap($f->alt($g2)), $x->ap($f)->alt($x->ap($g2)));
+        $this->assertEquals($x->ap($f1->alt($g)), $x->ap($f1)->alt($x->ap($g)));
+        $this->assertEquals($x->ap($f1->alt($g2)), $x->ap($f1)->alt($x->ap($g2)));
+    }
+
     public function testRightMapIdentity()
     {
         $a = Either::of(123)
@@ -254,6 +298,23 @@ class EitherTest extends TestCase
         $this->assertEquals(new Just($f), $m);
     }
 
+    public function testRightAlt()
+    {
+        $a = Either::of(2);
+        $b = Either::of(5);
+        $c = new Left('test');
+
+        $this->assertEquals($a->alt($b), $a);
+        $this->assertEquals($a->alt($c), $a);
+    }
+
+    public function testRightReduce()
+    {
+        $this->assertEquals(Either::of(2)->reduce(function ($prev, $curr) {
+            return $prev + $curr;
+        }, 2), 4);
+    }
+
     public function testRightToString()
     {
         $a = Either::of([1, 2]);
@@ -422,6 +483,23 @@ class EitherTest extends TestCase
         );
         $this->assertInstanceOf(Left::class, $a);
         $this->assertEquals(new Left(122), $a);
+    }
+
+    public function testLeftAlt()
+    {
+        $a = new Left('foo');
+        $b = Either::of('bar');
+        $c = new Left('baz');
+
+        $this->assertEquals($a->alt($b), $b);
+        $this->assertEquals($a->alt($c), $c);
+    }
+
+    public function testLeftReduce()
+    {
+        $this->assertEquals((new Left('foo'))->reduce(function ($prev, $curr) {
+            return $curr . $prev;
+        }, 'bar'), 'bar');
     }
 
     public function testLeftToMaybe()

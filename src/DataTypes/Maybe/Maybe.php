@@ -30,4 +30,9 @@ class Maybe
             }
         })(...func_get_args());
     }
+
+    public static function zero()
+    {
+        return new Nothing();
+    }
 }

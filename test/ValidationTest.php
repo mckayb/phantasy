@@ -52,6 +52,50 @@ class ValidationTest extends TestCase
         $this->assertEquals(new Failure(new \Exception('baz')), $a);
     }
 
+    public function testValidationZero()
+    {
+        $this->assertEquals(Validation::zero(), new Failure([]));
+    }
+
+    public function testValidationPlusRightIdentity()
+    {
+        $x = Validation::of(3);
+        $this->assertEquals($x->alt(Validation::zero()), $x);
+    }
+
+    public function testValidationPlusLeftIdentity()
+    {
+        $x = Validation::of(3);
+        $this->assertEquals(Validation::zero()->alt($x), $x);
+    }
+
+    public function testValidationPlusAnnihilation()
+    {
+        $x = Validation::of(3);
+        $this->assertEquals(Validation::zero()->map(function ($x) {
+            return $x + 1;
+        }), Validation::zero());
+    }
+
+    public function testValidationAlternative()
+    {
+        $x = Validation::of(3);
+        $f = Validation::of(function ($x) {
+            return $x + 1;
+        });
+        $g = Validation::of(function ($x) {
+            return $x - 1;
+        });
+
+        $f1 = new Failure([]);
+        $g2 = new Failure([]);
+
+        $this->assertEquals($x->ap($f->alt($g)), $x->ap($f)->alt($x->ap($g)));
+        $this->assertEquals($x->ap($f->alt($g2)), $x->ap($f)->alt($x->ap($g2)));
+        $this->assertEquals($x->ap($f1->alt($g)), $x->ap($f1)->alt($x->ap($g)));
+        $this->assertEquals($x->ap($f1->alt($g2)), $x->ap($f1)->alt($x->ap($g2)));
+    }
+
     public function testSuccessMapIdentity()
     {
         $a = Validation::of(123)
@@ -192,6 +236,23 @@ class ValidationTest extends TestCase
         $this->assertInstanceOf(Success::class, $a);
         $this->assertEquals(Validation::of("foobar"), $a);
         $this->assertEquals(new Success("foobar"), $a);
+    }
+
+    public function testSuccessAlt()
+    {
+        $a = Validation::of(2);
+        $b = Validation::of(5);
+        $c = new Failure(['test']);
+
+        $this->assertEquals($a->alt($b), $a);
+        $this->assertEquals($a->alt($c), $a);
+    }
+
+    public function testSuccessReduce()
+    {
+        $this->assertEquals(Validation::of(2)->reduce(function ($prev, $curr) {
+            return $prev + $curr;
+        }, 2), 4);
     }
 
     public function testSuccessToEither()
@@ -344,6 +405,22 @@ class ValidationTest extends TestCase
 
         $this->assertInstanceOf(Failure::class, $a);
         $this->assertEquals(new Failure("foobaz"), $a);
+    }
+
+    public function testFailureAlt()
+    {
+        $a = new Failure([]);
+        $b = Validation::of(12);
+        $c = new Failure(['foo']);
+
+        $this->assertEquals($a->alt($b), $b);
+        $this->assertEquals($a->alt($c), $c);
+    }
+
+    public function testFailureReduce()
+    {
+        $this->assertEquals((new Failure('foo'))->reduce(function ($prev, $curr) {
+        }, 'bar'), 'bar');
     }
 
     public function testFailureToEither()

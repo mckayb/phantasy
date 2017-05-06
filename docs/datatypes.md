@@ -43,6 +43,20 @@ Maybe::tryCatch($connectToDB);
 // If an exception is thrown, it returns Nothing()
 // If no exception was thrown, returns Just($connection)
 ```
+#### static zero ()
+Gives you the type-level empty instance for Maybe. You can think of this
+like an empty method such as `[]` for arrays, `''` for strings, but now
+we're dealing with the function level equivalent.
+In Maybe's case, this is just `Nothing`.
+```php
+Maybe::zero();
+// Nothing()
+
+Maybe::zero()->map(function($x) {
+    return $x + 1;
+});
+// Nothing()
+```
 #### map ($f)
 Used when you want to transform the value of your `Maybe` instance.
 If the instance is a `Just`, it performs the function `$f` on the value inside of our instance.
@@ -110,6 +124,47 @@ If it's a `Nothing`, it simply returns the parameter `$d`.
 ```php
 Maybe::fromNullable(null)->fold('foo');
 // 'foo'
+```
+#### alt (Maybe $m)
+Allows you to provide an alternative value as a fallback if the current
+instance computation fails. You can look at it as a type-level if/else
+statement, or as a computation with a contingency plan if something goes
+wrong.
+If the instance is already a `Just`, it just returns the current
+instance.
+```php
+Maybe::of(1)->alt(Maybe::of(2));
+// Just(1);
+
+Maybe::of(1)->alt(Nothing());
+// Just(1);
+```
+If the instance is a `Nothing`, it returns the parameter instance.
+```php
+Nothing()->alt(Just(1));
+// Just(1)
+
+Nothing()->alt(Nothing());
+// Nothing()
+```
+#### reduce ($f, $acc)
+Used to get the result of a function applied to an instance value.
+Pulls the computation out of the `Maybe` context and just returns the
+result.
+If the instance is a `Just`, it just returns the result of the reducing
+function.
+```php
+Maybe::of(1)->reduce(function($carry, $val) {
+    return $carry + $val;
+}, 2);
+// 3
+```
+If the instance is a `Nothing`, it just returns the accumulating value.
+```php
+Nothing()->reduce(function($carry, $val) {
+    return $carry + 1;
+}, 2);
+// 2
 ```
 #### toEither ($val)
 Used to transform a `Maybe` into an `Either` context.
@@ -180,6 +235,20 @@ Either::tryCatch($connectToDB);
 // was thrown.
 
 // If no exception was thrown, returns Right($connection)
+```
+#### static zero ()
+Gives you the type-level empty instance for Either. You can think of this
+like an empty method such as `[]` for arrays, `''` for strings, but now
+we're dealing with the function level equivalent.
+In Either's case, this is just `Left`.
+```php
+Either::zero();
+// Left(null)
+
+Either::zero()->map(function($x) {
+    return $x + 1;
+});
+// Left(null)
 ```
 #### map ($f)
 Used to transform the values inside of our Either instance.
@@ -280,6 +349,47 @@ $a = Left('foo')->bimap(function($x) {
 });
 // Left('foobaz')
 ```
+#### alt (Either $m)
+Allows you to provide an alternative value as a fallback if the current
+instance computation fails. You can look at it as a type-level if/else
+statement, or as a computation with a contingency plan if something goes
+wrong.
+If the instance is already a `Right`, it just returns the current
+instance.
+```php
+Either::of(1)->alt(Either::of(2));
+// Right(1);
+
+Either::of(1)->alt(Left(2));
+// Right(1);
+```
+If the instance is a `Left`, it returns the parameter instance.
+```php
+Left(1)->alt(Right(2));
+// Right(1)
+
+Left(1)->alt(Left(2));
+// Left(2)
+```
+#### reduce ($f, $acc)
+Used to get the result of a function applied to an instance value.
+Pulls the computation out of the `Either` context and just returns the
+result.
+If the instance is a `Right`, it just returns the result of the reducing
+function.
+```php
+Either::of(1)->reduce(function($carry, $val) {
+    return $carry + $val;
+}, 2);
+// 3
+```
+If the instance is a `Left`, it just returns the accumulating value.
+```php
+Left(12)->reduce(function($carry, $val) {
+    return $carry + 1;
+}, 2);
+// 2
+```
 #### toMaybe ()
 Converts an `Either` into a `Maybe` context.
 If the instance is a `Right`, it simply returns a `Just` with the same value.
@@ -347,6 +457,23 @@ Validation::tryCatch($connectToDB);
 // If an exception is thrown, it returns Failure(Exception('E_CONN_REFUSED'))
 // or whatever exception.
 // If no exception was thrown, returns Success($connection).
+```
+#### static zero ()
+Gives you the type-level empty instance for Validation. You can think of this
+like an empty method such as `[]` for arrays, `''` for strings, but now
+we're dealing with the function level equivalent.
+In Validation's case, this is just `Failure`.
+In my implementation, I chose to have it return `Failure([])`, assuming
+that arrays will be the most common use of Validation Failure
+collection.
+```php
+Validation::zero();
+// Failure([])
+
+Failure::zero()->map(function($x) {
+    return $x + 1;
+});
+// Failure([])
 ```
 #### map ($f)
 Used to transform the value inside of our `Validation`.
@@ -464,6 +591,48 @@ $b = Failure(['There was another problem.']);
 $c = $a->concat($b);
 // Failure(['There was a problem.', 'There was another problem.']);
 ```
+#### alt (Validation $m)
+Allows you to provide an alternative value as a fallback if the current
+instance computation fails. You can look at it as a type-level if/else
+statement, or as a computation with a contingency plan if something goes
+wrong.
+If the instance is already a `Success`, it just returns the current
+instance.
+```php
+Success(1)->alt(Success(2));
+// Success(1);
+
+Success(1)->alt(Failure(['Something went wrong...'));
+// Success(1);
+```
+If the instance is a `Failure`, it returns the parameter instance.
+```php
+Failure(['Something went wrong!'])->alt(Success(1));
+// Success(1)
+
+Failure(['Something went wrong!])->alt(Failure(['Something else went
+wrong!']);
+// Failure(['Something else went wrong!'])
+```
+#### reduce ($f, $acc)
+Used to get the result of a function applied to an instance value.
+Pulls the computation out of the `Validation` context and just returns the
+result.
+If the instance is a `Success`, it just returns the result of the reducing
+function.
+```php
+Validation::of(1)->reduce(function($carry, $val) {
+    return $carry + $val;
+}, 2);
+// 3
+```
+If the instance is a `Failure`, it just returns the accumulating value.
+```php
+Failure(12)->reduce(function($carry, $val) {
+    return $carry + 1;
+}, 2);
+// 2
+```
 #### toEither ()
 Used to move from a `Validation` context to an `Either` context.
 If the instance is a `Success`, it returns a `Right` with the same value.
@@ -488,7 +657,6 @@ If the instance is a `Failure`, it returns a `Nothing`.
 Failure('foo')->toMaybe();
 // Nothing()
 ```
-
 ## Reader
 ### Usage
 ```php

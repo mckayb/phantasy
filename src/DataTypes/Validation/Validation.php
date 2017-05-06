@@ -30,4 +30,9 @@ class Validation
             }
         })(...func_get_args());
     }
+
+    public static function zero()
+    {
+        return new Failure([]);
+    }
 }

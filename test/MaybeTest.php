@@ -49,6 +49,50 @@ class MaybeTest extends TestCase
         $this->assertEquals(new Nothing(), $a);
     }
 
+    public function testMaybeZero()
+    {
+        $this->assertEquals(Maybe::zero(), new Nothing());
+    }
+
+    public function testMaybePlusRightIdentity()
+    {
+        $x = Maybe::of(3);
+        $this->assertEquals($x->alt(Maybe::zero()), $x);
+    }
+
+    public function testMaybePlusLeftIdentity()
+    {
+        $x = Maybe::of(3);
+        $this->assertEquals(Maybe::zero()->alt($x), $x);
+    }
+
+    public function testMaybePlusAnnihilation()
+    {
+        $x = Maybe::of(3);
+        $this->assertEquals(Maybe::zero()->map(function ($x) {
+            return $x + 1;
+        }), Maybe::zero());
+    }
+
+    public function testMaybeAlternative()
+    {
+        $x = Maybe::of(3);
+        $f = Maybe::of(function ($x) {
+            return $x + 1;
+        });
+        $g = Maybe::of(function ($x) {
+            return $x - 1;
+        });
+
+        $f1 = new Nothing();
+        $g2 = new Nothing();
+
+        $this->assertEquals($x->ap($f->alt($g)), $x->ap($f)->alt($x->ap($g)));
+        $this->assertEquals($x->ap($f->alt($g2)), $x->ap($f)->alt($x->ap($g2)));
+        $this->assertEquals($x->ap($f1->alt($g)), $x->ap($f1)->alt($x->ap($g)));
+        $this->assertEquals($x->ap($f1->alt($g2)), $x->ap($f1)->alt($x->ap($g2)));
+    }
+
     public function testJustMapIdentity()
     {
         $a = Maybe::of(123)
@@ -320,6 +364,24 @@ class MaybeTest extends TestCase
         $this->assertEquals(3, $a);
     }
 
+    public function testJustAlt()
+    {
+        $a = Maybe::of(3);
+        $b = Maybe::of(5);
+        $c = new Nothing();
+
+        $this->assertEquals($a->alt($b), $a);
+        $this->assertEquals($a->alt($c), $a);
+    }
+
+    public function testJustReduce()
+    {
+        $a = Maybe::of(3)->reduce(function ($prev, $curr) {
+            return $prev + $curr;
+        }, 2);
+        $this->assertEquals($a, 5);
+    }
+
     public function testJustToString()
     {
         $a = Maybe::of([1, 2]);
@@ -448,6 +510,24 @@ class MaybeTest extends TestCase
     {
         $a = Maybe::fromNullable(null)->fold(10);
         $this->assertEquals($a, 10);
+    }
+
+    public function testNothingAlt()
+    {
+        $a = new Nothing();
+        $b = Maybe::of(3);
+        $c = new Nothing();
+
+        $this->assertEquals($a->alt($b), $b);
+        $this->assertEquals($a->alt($c), $c);
+    }
+
+    public function testNothingReduce()
+    {
+        $a = (new Nothing())->reduce(function ($prev, $curr) {
+            return $prev + $curr;
+        }, 2);
+        $this->assertEquals($a, 2);
     }
 
     public function testMonadLeftIdentity()
