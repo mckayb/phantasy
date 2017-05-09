@@ -607,6 +607,30 @@ concat($a, $b);
 // Any(true);
 ```
 
+## mempty
+### Usage
+```php
+use function Phantasy\Core\mempty;
+```
+### Description
+Returns the proper empty instance of the type representative passed in.
+### Examples
+```php
+mempty('foo bar');
+// ''
+
+mempty(['foo', 'bar']);
+// []
+
+$obj = new class() {
+    public function empty() {
+        return 'test';
+    }
+};
+mempty($obj);
+// 'test'
+```
+
 ## Type
 ### Usage
 ```php
