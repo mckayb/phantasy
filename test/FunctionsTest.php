@@ -11,6 +11,7 @@ use function Phantasy\Core\{
   map,
   fmap,
   ap,
+  mempty,
   filter,
   reduce,
   trace,
@@ -196,6 +197,34 @@ class FunctionsTest extends TestCase
         $a = true;
         $b = false;
         semigroupConcat($a, $b);
+    }
+
+    public function testMEmptyArray()
+    {
+        $this->assertEquals([], mempty([]));
+        $this->assertEquals([], mempty(['one', 'two']));
+    }
+
+    public function testMEmptyString()
+    {
+        $this->assertEquals('', mempty(''));
+        $this->assertEquals('', mempty('foo'));
+    }
+
+    public function testMEmptyObjectEmptyMethod()
+    {
+        $foo = new class {
+            public function empty() {
+                return 'test';
+            }
+        };
+
+        $this->assertEquals('test', mempty($foo));
+    }
+
+    public function testMEmptyNullIfDoesntMakeSense()
+    {
+        $this->assertNull(mempty(true));
     }
 
     public function testPropObjects()

@@ -1,8 +1,16 @@
 <?php
 use Phantasy\DataTypes\Reader\Reader;
+use Phantasy\DataTypes\Writer\Writer;
 use Phantasy\DataTypes\Maybe\{Nothing, Just};
 use Phantasy\DataTypes\Either\{Left, Right};
 use Phantasy\DataTypes\Validation\{Failure, Success};
+
+if (!function_exists('Writer')) {
+    function Writer($f)
+    {
+        return new Writer($f);
+    }
+}
 
 if (!function_exists('Reader')) {
     function Reader($f)

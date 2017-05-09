@@ -186,6 +186,26 @@ function concat()
     return semigroupConcat(...func_get_args());
 }
 
+function mempty()
+{
+    return curry(function($x) {
+        if (is_array($x))
+        {
+            return [];
+        }
+
+        if (is_string($x))
+        {
+            return '';
+        }
+
+        if (is_object($x) && method_exists($x, 'empty'))
+        {
+            return $x->empty();
+        }
+    })(...func_get_args());
+}
+
 function liftA()
 {
     $liftA = curry(function ($f, $a) {
