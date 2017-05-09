@@ -15,7 +15,7 @@ class Writer
 
     public static function of($val, $m = [])
     {
-        return new Writer(function() use ($val, $m) {
+        return new Writer(function () use ($val, $m) {
             return [$val, mempty($m)];
         });
     }
@@ -27,7 +27,7 @@ class Writer
 
     public function map($f)
     {
-        return new Writer(function() use ($f) {
+        return new Writer(function () use ($f) {
             list ($compVal, $logVal) = $this->run();
             return [$f($compVal), $logVal];
         });

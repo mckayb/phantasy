@@ -11,7 +11,7 @@ class ConstructorFunctionsTest extends TestCase
 {
     public function testWriter()
     {
-        $f = function() {
+        $f = function () {
             return 'test';
         };
         $this->assertEquals(Writer($f), new Writer($f));

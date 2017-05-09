@@ -213,8 +213,9 @@ class FunctionsTest extends TestCase
 
     public function testMEmptyObjectEmptyMethod()
     {
-        $foo = new class {
-            public function empty() {
+        $foo = new class () {
+            public function empty()
+            {
                 return 'test';
             }
         };

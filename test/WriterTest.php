@@ -13,7 +13,7 @@ class WriterTest extends TestCase
 
     public function testWriterMap()
     {
-        $this->assertEquals(Writer::of(12)->map(function($x) {
+        $this->assertEquals(Writer::of(12)->map(function ($x) {
             return $x + 1;
         })->run(), [13, []]);
     }
@@ -22,7 +22,7 @@ class WriterTest extends TestCase
     {
         $this->assertEquals(
             Writer::of('foo', '')
-                ->ap(Writer::of(function($x) {
+                ->ap(Writer::of(function ($x) {
                     return concat($x, 'bar');
                 }, ''))
                 ->run(),
@@ -34,8 +34,8 @@ class WriterTest extends TestCase
     {
         $this->assertEquals(
             Writer::of('foo')
-                ->chain(function($x) {
-                    return new Writer(function() use ($x) {
+                ->chain(function ($x) {
+                    return new Writer(function () use ($x) {
                         return [concat($x, 'bar'), ['Bar Stuff']];
                     });
                 })
@@ -48,7 +48,7 @@ class WriterTest extends TestCase
     {
         $this->assertEquals(
             Writer::of('foo')
-                ->bind(function($x) {
+                ->bind(function ($x) {
                     return Writer::of(concat($x, 'bar'));
                 })
                 ->run(),
@@ -60,7 +60,7 @@ class WriterTest extends TestCase
     {
         $this->assertEquals(
             Writer::of('foo')
-                ->flatMap(function($x) {
+                ->flatMap(function ($x) {
                     return Writer::of(concat($x, 'bar'));
                 })
                 ->run(),

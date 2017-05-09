@@ -188,19 +188,16 @@ function concat()
 
 function mempty()
 {
-    return curry(function($x) {
-        if (is_array($x))
-        {
+    return curry(function ($x) {
+        if (is_array($x)) {
             return [];
         }
 
-        if (is_string($x))
-        {
+        if (is_string($x)) {
             return '';
         }
 
-        if (is_object($x) && method_exists($x, 'empty'))
-        {
+        if (is_object($x) && method_exists($x, 'empty')) {
             return $x->empty();
         }
     })(...func_get_args());
