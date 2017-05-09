@@ -731,14 +731,15 @@ $r->run([ 'ENVIRONMENT' => 'development' ]);
 use Phantasy\DataTypes\Writer\Writer;
 ```
 ### Description
-The `Writer` type, similarly to the `Reader` type also encapsulates a function composition, but instead of reading from some environment state, it allows you to write to some state.
+The `Writer` type, similar to the `Reader` type, also encapsulates function composition, but instead of reading from some environment state, it allows you to write to some state.
 The most common use case allows you to keep a log as you go through your function composition.
 ### Methods
 #### static of ($x, $m = [])
 Creates a `Writer` with a function that just returns the parameter
 value `$x`. The difference between using `Writer::of` and just calling
 the helper function `Writer` is that `Writer::of` creates a function
-returning whatever was passed in, while `Writer` just takes the parameter function as it's function, without the extra level of nesting.
+returning whatever was passed in, while `Writer` just takes the parameter
+function as it's function, without the extra level of nesting.
 ```php
 Writer::of('foo')->run();
 // ['foo', []]
