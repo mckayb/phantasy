@@ -672,8 +672,7 @@ properties.
 Creates a `Reader` with a function that just returns the parameter
 value `$x`. The difference between using `Reader::of` and just calling
 the helper function `Reader` is that `Reader::of` creates a function
-returning whatever was passed in, while `Reader` just takes the parameter
-function as it's function, without the extra level of nesting.
+returning whatever was passed in, while `Reader` just takes the parameter function as it's function, without the extra level of nesting.
 ```php
 Reader::of(12)->run([]);
 // 12
@@ -725,4 +724,65 @@ $r->run([ 'ENVIRONMENT' => 'production' ]);
 
 $r->run([ 'ENVIRONMENT' => 'development' ]);
 // Hello Dev!'
+```
+## Writer
+### Usage
+```php
+use Phantasy\DataTypes\Writer\Writer;
+```
+### Description
+The `Writer` type, similarly to the `Reader` type also encapsulates a function composition, but instead of reading from some environment state, it allows you to write to some state.
+The most common use case allows you to keep a log as you go through your function composition.
+### Methods
+#### static of ($x, $m = [])
+Creates a `Writer` with a function that just returns the parameter
+value `$x`. The difference between using `Writer::of` and just calling
+the helper function `Writer` is that `Writer::of` creates a function
+returning whatever was passed in, while `Writer` just takes the parameter function as it's function, without the extra level of nesting.
+```php
+Writer::of('foo')->run();
+// ['foo', []]
+
+Writer::of('foobar', 'test')->run();
+// ['foobar', '']
+```
+#### run ($s)
+Runs the function that the current `Writer` instance is holding.
+This will return you an array with the first value as the result of the computation and the second value as the resulting log at the end of the computation.
+```php
+Writer::of('foo')->run();
+// ['foo', []]
+
+Writer::of('foobar', 'test')->run();
+// ['foobar', '']
+```
+#### map ($g)
+Used to transform the value that will be returned by the `Writer`.
+Simply runs the parameter function `$g` on the current value inside the `Writer`. This does not affect the log value.
+```php
+Writer::of('foo')->map(function($x) {
+    return $x . 'bar';
+})->run();
+// ['foobar', []]
+```
+#### ap (Reader $g)
+Used when you have a `Writer` whose computation value is a function, and you want to apply that function to the value inside of a different `Writer`. It also concatenates the log values of the two `Writer` instances.
+```php
+$a = Writer::of('foo');
+$b = Writer::of(function($x) {
+    return $x . 'bar';
+});
+
+$a->ap($b)->run();
+// ['foobar', []]
+```
+#### chain ($r) (aliases: bind, flatMap)
+Used when you want to map with a function that returns a `Writer`. The computation value becomes the result of the parameter function `$r`, while the log value is the result of combining the current instance with the returned `Writer`.
+```php
+Writer::of('foo')->chain(function($x) {
+    return Writer(function() use ($x) {
+        return [$x . 'bar', ['Bar Stuff']];
+    });
+});
+// ['foobar', ['Bar Stuff']]
 ```
