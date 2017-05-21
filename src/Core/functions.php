@@ -272,9 +272,13 @@ function liftA5()
     return $liftA5(...func_get_args());
 }
 
-function isTraversable($x)
+function isTraversable()
 {
-    return is_array($x) || $x instanceof \Traversable;
+    $isTraversable = curry(function ($x) {
+        return is_array($x) || $x instanceof \Traversable;
+    });
+
+    return $isTraversable(...func_get_args());
 }
 
 function Type()
