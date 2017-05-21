@@ -4,6 +4,21 @@ use Phantasy\DataTypes\Writer\Writer;
 use Phantasy\DataTypes\Maybe\{Nothing, Just};
 use Phantasy\DataTypes\Either\{Left, Right};
 use Phantasy\DataTypes\Validation\{Failure, Success};
+use Phantasy\DataTypes\LinkedList\{Cons, Nil};
+
+if (!function_exists('Cons')) {
+    function Cons($head, $tail)
+    {
+        return new Cons($head, $tail);
+    }
+}
+
+if (!function_exists('Nil')) {
+    function Nil()
+    {
+        return new Nil();
+    }
+}
 
 if (!function_exists('Writer')) {
     function Writer($f)

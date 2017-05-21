@@ -160,6 +160,28 @@ function ap()
     return $ap(...func_get_args());
 }
 
+function chain()
+{
+    $chain = curry(function ($f, $a) {
+        return $a->chain($f);
+    });
+
+    return $chain(...func_get_args());
+}
+
+function mjoin()
+{
+    $mjoin = curry(function ($a) {
+        if (method_exists($a, 'join')) {
+            return $a->join();
+        } elseif (method_exists($a, 'mjoin')) {
+            return $a->mjoin();
+        }
+    });
+
+    return $mjoin(...func_get_args());
+}
+
 function semigroupConcat()
 {
     $semigroupConcat = curry(function ($x, $y) {
@@ -246,6 +268,11 @@ function liftA5()
     });
 
     return $liftA5(...func_get_args());
+}
+
+function isTraversable($x)
+{
+    return is_array($x) || $x instanceof \Traversable;
 }
 
 function Type()

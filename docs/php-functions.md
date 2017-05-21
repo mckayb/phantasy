@@ -6013,7 +6013,7 @@ $json = '{"a":1,"b":2,"c":3}';
 json_decode2(true, $json);
 // ['a' => 3, 'b' => 2, 'c' => 3];
 
-$jsonDecodeAssoc = json_decode(true);
+$jsonDecodeAssoc = json_decode2(true);
 $jsonDecodeAssoc($json);
 // ['a' => 3, 'b' => 2, 'c' => 3];
 ```

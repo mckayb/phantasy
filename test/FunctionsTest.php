@@ -14,6 +14,9 @@ use function Phantasy\Core\{
   mempty,
   filter,
   reduce,
+  chain,
+  mjoin,
+  isTraversable,
   trace,
   liftA,
   liftA2,
@@ -783,5 +786,45 @@ class FunctionsTest extends TestCase
         ob_end_clean();
         $this->assertEquals(trim($b), 'string(6) "Hello!"');
         $this->assertEquals($a, 'Hello!');
+    }
+
+    public function testMJoinObjWithJoin()
+    {
+        $a = new class {
+            public function join() {
+                return 1;
+            }
+        };
+
+        $this->assertEquals(mjoin($a), 1);
+    }
+
+    public function testMJoinObjWithMJoin()
+    {
+        $a = new class {
+            public function mjoin() {
+                return 1;
+            }
+        };
+
+        $this->assertEquals(mjoin($a), 1);
+    }
+
+    public function testChain()
+    {
+        $a = new class {
+            public function chain($f) {
+                return $f(1);
+            }
+        };
+
+        $this->assertEquals(chain(function($x) {
+            return $x + 1;
+        }, $a), 2);
+    }
+
+    public function testIsTraversable()
+    {
+        $this->assertTrue(isTraversable([1]));
     }
 }

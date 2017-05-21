@@ -787,3 +787,86 @@ Writer::of('foo')->chain(function($x) {
 });
 // ['foobar', ['Bar Stuff']]
 ```
+## Linked List
+### Usage
+```php
+use Phantasy\DataTypes\LinkedList\{LinkedList, Cons, Nil};
+```
+### Description
+A purely functional linked list implementation.
+### Methods
+#### static fromArray ($arr)
+Used to convert a php array into a LinkedList, a List element whose
+only elements are the head of the list, and the tail which is another
+LinkedList.
+```php
+LinkedList::fromArray([1, 2, 3]);
+// Cons(1, Cons(2, Cons(3, Nil)))
+```
+#### static of ($x)
+Simply creates a `Cons($x, Nil())`, a LinkedList whose only element is `$x`.
+```php
+LinkedList::of(1);
+// Cons(1, Nil)
+```
+#### map ($f)
+Used when you want to run a transformation over all of the values of
+your list.
+If the instance is a `Cons`, it keeps running the transformation down the list until
+it hits `Nil`, giving you a new list.
+```php
+LinkedList::fromArray([1, 2])->map(function ($x) {
+    return $x + 1;
+});
+// Cons(2, Cons(3, Nil))
+```
+### ap ($c)
+Used when you have a LinkedList of functions that you want to apply to a
+LinkedList of values.
+If the instance is a `Cons`, it runs each function in `$c` over each value
+and append each result to a new list.
+```php
+$a = LinkedList::fromArray(['A', 'B']);
+$b = LinkedList::fromArray([
+    function ($x) {
+        return 'foo' . $x;
+    },
+    function ($x) {
+        return $x . '!';
+    }
+]);
+$a->ap($b);
+// Cons('fooA', Cons('fooB', Cons('A!', Cons('B!', Nil))))
+```
+### chain ($f)
+Used when you have a function that returns a LinkedList. It calls the
+function on each of the values in the current LinkedList and then
+flattens the results into a single LinkedList.
+```php
+$a = LinkedList::of(2)->chain(function($x) {
+    return LinkedList::of($x + 1);
+});
+// Cons(3, Nil)
+```
+### concat ($c)
+Used to concatenate two linked lists together.
+```php
+$a = LinkedList::of(2)->concat(LinkedList::of(3));
+// Cons(2, Cons(3, Nil))
+```
+### reduce ($f, $acc)
+Similar to `array_reduce`, this takes in a transformation function `$f`,
+and an accumulator `$acc`, runs `$f` on each value in the list, starting
+with `$acc` and returns the accumulated result.
+```php
+$a = LinkedList::fromArray([1, 2, 3])->reduce(function ($sum, $n) {
+    return $sum + $n;
+}, 5);
+// 11
+```
+### join ()
+Simply flattens a nested LinkedList one level.
+```php
+LinkedList::of(LinkedList::of(2))->join();
+// Cons(2, Nil)
+```
