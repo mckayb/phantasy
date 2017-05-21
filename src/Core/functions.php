@@ -210,7 +210,7 @@ function concat()
 
 function mempty()
 {
-    return curry(function ($x) {
+    $mempty = curry(function ($x) {
         if (is_array($x)) {
             return [];
         }
@@ -222,7 +222,9 @@ function mempty()
         if (is_object($x) && method_exists($x, 'empty')) {
             return $x->empty();
         }
-    })(...func_get_args());
+    });
+
+    return $mempty(...func_get_args());
 }
 
 function liftA()
