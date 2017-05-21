@@ -24,7 +24,7 @@ class LinkedListTest extends TestCase
 
     public function testConsMap()
     {
-        $a = LinkedList::of(2)->map(function($x) {
+        $a = LinkedList::of(2)->map(function ($x) {
             return $x + 1;
         });
 
@@ -34,7 +34,7 @@ class LinkedListTest extends TestCase
 
     public function testNilMap()
     {
-        $a = (new Nil())->map(function($x) {
+        $a = (new Nil())->map(function ($x) {
             return $x + 1;
         });
 
@@ -81,7 +81,7 @@ class LinkedListTest extends TestCase
     public function testConsAp()
     {
         $a = LinkedList::of(2);
-        $b = LinkedList::of(function($x) {
+        $b = LinkedList::of(function ($x) {
             return $x + 1;
         });
 
@@ -90,18 +90,18 @@ class LinkedListTest extends TestCase
 
     public function testConsApMultipleFunctions()
     {
-        $a = LinkedList::fromArray(['1', '2', '3']);
+        $a = LinkedList::fromArray(['1', '2']);
         $b = LinkedList::fromArray([
-            function($x) {
+            function ($x) {
                 return 'foo' . $x;
             },
-            function($x) {
+            function ($x) {
                 return $x . '!';
             }
         ]);
         $this->assertEquals(
             $a->ap($b),
-            new Cons('foo1', new Cons('foo2', new Cons('foo3', new Cons('1!', new Cons('2!', new Cons('3!', new Nil()))))))
+            new Cons('foo1', new Cons('foo2', new Cons('1!', new Cons('2!', new Nil()))))
         );
     }
 
@@ -115,7 +115,7 @@ class LinkedListTest extends TestCase
     public function testConsChain()
     {
         $a = LinkedList::of(2);
-        $this->assertEquals($a->chain(function($x) {
+        $this->assertEquals($a->chain(function ($x) {
             return LinkedList::of(3);
         }), new Cons(3, new Nil()));
     }
@@ -123,7 +123,7 @@ class LinkedListTest extends TestCase
     public function testNilChain()
     {
         $a = new Nil();
-        $this->assertEquals($a->chain(function($x) {
+        $this->assertEquals($a->chain(function ($x) {
             return LinkedList::of(3);
         }), new Nil());
     }

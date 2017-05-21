@@ -790,8 +790,10 @@ class FunctionsTest extends TestCase
 
     public function testMJoinObjWithJoin()
     {
-        $a = new class {
-            public function join() {
+        $a = new class
+        {
+            public function join()
+            {
                 return 1;
             }
         };
@@ -801,8 +803,10 @@ class FunctionsTest extends TestCase
 
     public function testMJoinObjWithMJoin()
     {
-        $a = new class {
-            public function mjoin() {
+        $a = new class
+        {
+            public function mjoin()
+            {
                 return 1;
             }
         };
@@ -812,13 +816,15 @@ class FunctionsTest extends TestCase
 
     public function testChain()
     {
-        $a = new class {
-            public function chain($f) {
+        $a = new class
+        {
+            public function chain($f)
+            {
                 return $f(1);
             }
         };
 
-        $this->assertEquals(chain(function($x) {
+        $this->assertEquals(chain(function ($x) {
             return $x + 1;
         }, $a), 2);
     }
