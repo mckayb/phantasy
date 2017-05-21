@@ -240,6 +240,39 @@ ap($mAdd, $m1);
 // Just(2)
 ```
 
+## chain
+### Usage
+```php
+use function Phantasy\Core\chain;
+```
+### Description
+A simple wrapper around the chain method found in a Monad.
+Used when you have a Monad with a function that returns a Monad, and a Monad with a value, and you want carry the computation through the result of the function.
+### Examples
+```php
+$a = Maybe::of(1);
+chain(function ($x) {
+    return Maybe::of($x + 1);
+}, $a);
+// Just(2)
+```
+
+## mjoin
+### Usage
+```php
+use function Phantasy\Core\mjoin;
+```
+### Description
+A simple wrapper around the join or mjoin method.
+If you have an object that has either of those defined, it will simply
+call those functions on that object.
+### Examples
+```php
+$a = LinkedList::of(LinkedList::of(2));
+mjoin($a);
+// Cons(2, Nil)
+```
+
 ## filter
 ### Usage
 ```php
@@ -629,6 +662,21 @@ $obj = new class() {
 };
 mempty($obj);
 // 'test'
+```
+## isTraversable
+### Usage
+```php
+use function Phantasy\Core\isTraversable;
+```
+### Description
+Returns if the given object is traversable or not.
+### Examples
+```php
+isTraversable(true);
+// false
+
+isTraversable([1, 2, 3]);
+// true
 ```
 
 ## Type

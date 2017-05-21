@@ -77,6 +77,25 @@ Success([1, 2, 3]);
 // Equivalent to new Success([1, 2, 3]);
 ```
 
+## Cons
+### Description
+A helper function to create a `Cons`, a nonempty LinkedList.
+### Examples
+```php
+Cons(1, Cons(2, Nil()));
+// Equivalent to new Cons(1, new Cons(2, new Nil()))
+```
+
+## Nil
+### Description
+A helper function to create a `Nil`, an empty LinkedList while avoiding
+the annoyances of new in PHP.
+### Examples
+```php
+Nil();
+// Equivalent to new Nil();
+```
+
 ## Reader
 ### Description
 A helper function to create a `Reader` while avoiding the annoyances of
@@ -87,4 +106,16 @@ Reader(function($x) {
     return $x;
 });
 // Equivalent to new Reader(function($x) { return $x; });
+```
+
+## Writer
+### Description
+A helper function to create a `Writer` while avoiding the annoyances of
+new in PHP.
+### Examples
+```php
+Writer(function() {
+    return ['Foo', ['Foo Log']];
+});
+// Equivalent to new Writer(function () { return ['Foo', 'Foo Log']; });
 ```
