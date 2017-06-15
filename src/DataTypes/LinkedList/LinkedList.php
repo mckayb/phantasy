@@ -17,7 +17,7 @@ class LinkedList
     public static function fromArray()
     {
         return curry(function (array $arr) {
-            return reduce(function($list, $x) {
+            return reduce(function ($list, $x) {
                 return $list->concat(new Cons($x, new Nil()));
             }, new Nil(), $arr);
         })(...func_get_args());

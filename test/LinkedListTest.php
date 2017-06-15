@@ -155,8 +155,8 @@ class LinkedListTest extends TestCase
     {
         $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
         $this->assertEquals(
-            $a->traverse(Either::of(), function($x) {
-                return $x->map(function($y) {
+            $a->traverse(Either::of(), function ($x) {
+                return $x->map(function ($y) {
                     return $y + 1;
                 });
             }),
@@ -167,7 +167,7 @@ class LinkedListTest extends TestCase
     public function testConsTraverseIntList()
     {
         $a = new Cons(0, new Cons(1, new Cons(2, new Cons(3, new Nil()))));
-        $toChar = function($n) {
+        $toChar = function ($n) {
             return $n < 0 || $n > 25
                 ? new Left($n . ' is out of bounds!')
                 : new Right(chr(833 + $n));
@@ -192,7 +192,7 @@ class LinkedListTest extends TestCase
     public function testConsTraverseNaturality()
     {
         $u = LinkedList::of(Either::of(1));
-        $t = function($m) {
+        $t = function ($m) {
             return $m->toMaybe();
         };
         $F = Either::of();
@@ -207,7 +207,7 @@ class LinkedListTest extends TestCase
     {
         $a = new Nil();
         $this->assertEquals(
-            $a->traverse(Either::of(), function($x) {
+            $a->traverse(Either::of(), function ($x) {
                 return $x + 1;
             }),
             new Right(new Nil())
@@ -227,7 +227,7 @@ class LinkedListTest extends TestCase
     public function testNilTraverseNaturality()
     {
         $u = new Nil();
-        $t = function($m) {
+        $t = function ($m) {
             return $m->toMaybe();
         };
         $F = Either::of();

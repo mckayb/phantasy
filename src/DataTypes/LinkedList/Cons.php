@@ -50,7 +50,7 @@ class Cons
     public function traverse($of, $f)
     {
         return $this->reduce(function ($ys, $x) use ($f) {
-            return $ys->ap($f($x)->map(curry(function($a, $b) {
+            return $ys->ap($f($x)->map(curry(function ($a, $b) {
                 return $b->concat(new Cons($a, new Nil()));
             })));
         }, $of(new Nil()));
