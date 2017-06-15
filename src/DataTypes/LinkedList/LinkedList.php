@@ -3,7 +3,7 @@
 namespace Phantasy\DataTypes\LinkedList;
 
 use Phantasy\DataTypes\LinkedList\{Cons, Nil};
-use function Phantasy\Core\curry;
+use function Phantasy\Core\{reduce, curry};
 
 class LinkedList
 {
@@ -17,11 +17,14 @@ class LinkedList
     public static function fromArray()
     {
         return curry(function (array $arr) {
-            $a = new Nil();
-            foreach ($arr as $x) {
-                $a = $a->concat(new Cons($x, new Nil()));
-            }
-            return $a;
+            return reduce(function($list, $x) {
+                return $list->concat(new Cons($x, new Nil()));
+            }, new Nil(), $arr);
         })(...func_get_args());
+    }
+
+    public static function empty()
+    {
+        return new Nil();
     }
 }

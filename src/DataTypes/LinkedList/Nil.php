@@ -33,4 +33,19 @@ class Nil
     {
         return new static();
     }
+
+    public function traverse($of, $f)
+    {
+        return $of(new Nil());
+    }
+
+    public function sequence($of)
+    {
+        return $of(new Nil());
+    }
+
+    public function __toString()
+    {
+        return "Nil()";
+    }
 }

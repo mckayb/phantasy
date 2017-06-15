@@ -2,7 +2,7 @@
 
 namespace Phantasy\DataTypes\LinkedList;
 
-use function Phantasy\Core\{liftA2, concat, curry};
+use function Phantasy\Core\{concat, curry, identity, map};
 
 class Cons
 {
@@ -45,5 +45,24 @@ class Cons
     public function join() : Cons
     {
         return $this->head->concat($this->tail->join());
+    }
+
+    public function traverse($of, $f)
+    {
+        return $this->reduce(function ($ys, $x) use ($f) {
+            return $ys->ap($f($x)->map(curry(function($a, $b) {
+                return $b->concat(new Cons($a, new Nil()));
+            })));
+        }, $of(new Nil()));
+    }
+
+    public function sequence($of)
+    {
+        return $this->traverse($of, identity());
+    }
+
+    public function __toString()
+    {
+        return "Cons(" . $this->head . ", " . $this->tail . ")";
     }
 }
