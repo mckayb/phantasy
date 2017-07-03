@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
-use function Phantasy\Core\{map, prop, identity, curry, compose, liftA, SumType};
+use function Phantasy\Core\{map, prop, identity, curry, compose, liftA};
 use function Phantasy\Core\PHP\{explode, implode, strtolower};
 
 class DocsTest extends TestCase
@@ -185,42 +185,5 @@ class DocsTest extends TestCase
     public function testLiftAExample()
     {
         $this->assertEquals(Maybe::of('foo bar'), liftA('strtolower', Maybe::of('Foo Bar')));
-    }
-
-    public function testSumTypeExample()
-    {
-        $List = SumType('List', [
-            'Cons' => ['head', 'tail'],
-            'Nil' => []
-        ]);
-
-        $List->map = function ($f) {
-            return $this->cata([
-                'Cons' => function ($head, $tail) use ($f) {
-                    return $this->Cons($f($head), map($f, $tail));
-                },
-                'Nil' => function () {
-                    return $this->Nil();
-                }
-            ]);
-        };
-
-        $List->toArray = function () {
-            return $this->cata([
-                'Cons' => function ($head, $tail) {
-                    return array_merge([$head], $tail);
-                },
-                'Nil' => function () {
-                    return [];
-                }
-            ]);
-        };
-
-        $c = $List->Cons(1, [2, 3])
-            ->map(function ($x) {
-                return $x * 2;
-            })
-            ->toArray();
-        $this->assertEquals([2, 4, 6], $c);
     }
 }
