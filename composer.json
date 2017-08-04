@@ -24,7 +24,6 @@
     },
     "files": [
       "src/Core/functions.php",
-      "src/Core/php-functions.php",
       "src/DataTypes/Either/Left.php",
       "src/DataTypes/Either/Right.php",
       "src/DataTypes/Maybe/Just.php",

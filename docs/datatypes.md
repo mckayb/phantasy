@@ -1,4 +1,5 @@
 # Data Types
+Note: In these docs, you'll sometimes see functions included from `Phantasy\PHP`, these come from the [phantasy-php](https://github.com/mckayb/phantasy-php) package.
 
 ## Maybe
 ### Usage
@@ -282,7 +283,7 @@ $a->ap($b);
 If the instance is a `Left`, it ignores the parameter and just returns the instance.
 ```php
 use Phantasy\DataTypes\Either\Either;
-use function Phantasy\Core\PHP\strtolower;
+use function Phantasy\PHP\strtolower;
 
 $a = Either::fromNullable('Val is null!', null);
 $b = Either::of(strtolower());

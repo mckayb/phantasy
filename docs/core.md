@@ -1,4 +1,5 @@
 # Core Functions
+Note: In these docs, you'll sometimes see functions included from `Phantasy\PHP`, these come from the [phantasy-php](https://github.com/mckayb/phantasy-php) package.
 
 ## identity
 ### Usage
@@ -118,7 +119,7 @@ It helps you to manage nesting and, when combined with currying, helps you creat
 ### Examples
 ```php
 use function Phantasy\Core\{compose, prop, map, curry};
-use function Phantasy\Core\PHP\{explode, implode, strtolower};
+use function Phantasy\PHP\{explode, implode, strtolower};
 
 $data = [
   [ "title" => "Foo Bar" ],
@@ -474,7 +475,7 @@ In other words, you can use this to call a function with one argument, but use A
 ### Examples
 ```php
 use function Phantasy\Core\liftA;
-use function Phantasy\Core\PHP\strtolower;
+use function Phantasy\PHP\strtolower;
 
 liftA(strtolower(), Maybe::of('Foo Bar'));
 // Just('foo bar');
@@ -646,7 +647,7 @@ to view the actual value inside one of your types at a certain point.
 ```php
 use Phantasy\DataTypes\Maybe\Maybe;
 use function Phantasy\Core\{curry, map, trace};
-use function Phantasy\Core\PHP\{explode, ucfirst, implode};
+use function Phantasy\PHP\{explode, ucfirst, implode};
 
 function titleCase($str) {
     return Maybe::fromNullable($str)
@@ -671,7 +672,7 @@ echo titleCase(null);
 
 ```php
 use function Phantasy\Core\{curry, compose, map, trace};
-use function Phantasy\Core\PHP\{implode, explode, ucfirst};
+use function Phantasy\PHP\{implode, explode, ucfirst};
 
 $titleCase = compose(
     implode(' ')
