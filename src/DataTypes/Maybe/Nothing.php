@@ -69,3 +69,8 @@ class Nothing
         return new Failure($val);
     }
 }
+
+function Nothing()
+{
+    return new Nothing();
+}

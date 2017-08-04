@@ -86,3 +86,8 @@ class Right
         return new Success($this->value);
     }
 }
+
+function Right($x)
+{
+    return new Right($x);
+}

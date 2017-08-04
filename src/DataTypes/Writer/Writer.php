@@ -62,3 +62,8 @@ class Writer
         return $this->chain($g);
     }
 }
+
+function Writer($f)
+{
+    return new Writer($f);
+}

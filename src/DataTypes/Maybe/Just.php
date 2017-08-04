@@ -81,3 +81,8 @@ class Just
         return new Success($this->value);
     }
 }
+
+function Just($x)
+{
+    return new Just($x);
+}

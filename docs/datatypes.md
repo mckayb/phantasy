@@ -3,6 +3,7 @@
 ## Maybe
 ### Usage
 ```php
+use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 ```
 ### Description
@@ -195,6 +196,7 @@ Maybe::fromNullable(null)->toValidation('No val set!');
 ## Either
 ### Usage
 ```php
+use function Phantasy\DataTypes\Either\{Left, Right};
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 ```
 ### Description
@@ -418,6 +420,7 @@ Either::fromNullable('No val set!', null)->toValidation();
 ## Validation
 ### Usage
 ```php
+use function Phantasy\DataTypes\Validation\{Success, Failure};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 ````
 ### Description
@@ -660,6 +663,7 @@ Failure('foo')->toMaybe();
 ## Reader
 ### Usage
 ```php
+use function Phantasy\DataTypes\Reader\Reader;
 use Phantasy\DataTypes\Reader\Reader;
 ```
 ### Description
@@ -728,6 +732,7 @@ $r->run([ 'ENVIRONMENT' => 'development' ]);
 ## Writer
 ### Usage
 ```php
+use function Phantasy\DataTypes\Writer\Writer;
 use Phantasy\DataTypes\Writer\Writer;
 ```
 ### Description
@@ -787,9 +792,68 @@ Writer::of('foo')->chain(function($x) {
 });
 // ['foobar', ['Bar Stuff']]
 ```
+## State
+### Usage
+```php
+use function Phantasy\DataTypes\State\State;
+use Phantasy\DataTypes\State\State;
+```
+### Description
+You can think of the `State` type as a combination of the `Reader` and `Writer` types. With `Reader`, we had a purely functional way to read from some state for a computation. With `Writer` we had a way of writing to some state during a computation. With `State`, we get both.
+The `State` holds 2 objects, the first being the value of the computation and the second being the current state the computation is managing.
+### Methods
+#### static of ($x)
+```php
+State::of('foo')->run('bar');
+// ['foo', 'bar']
+
+State::of('foobar')->run('bar');
+// ['foobar', 'bar']
+```
+#### run ($s)
+Runs the function that the current `State` instance is holding.
+This will return you an array with the first value as the result of the computation and the second value as the current state the computation is managing.
+```php
+State::of('foo')->run(['title' => 'Foo Bar']);
+// ['foo', ['title' => 'Foo Bar']]
+
+State::of('foobar')->run(12);
+// ['foobar', 12]
+```
+#### map ($g)
+Used to transform the value that will be returned by the `State`.
+Simply runs the parameter function `$g` on the current value inside the `State`. This does not affect the state, just the value.
+```php
+State::of('foo')->map(function($x) {
+    return $x . 'bar';
+})->run([]);
+// ['foobar', []]
+```
+#### ap (State $g)
+Used when you have a `State` whose computation value is a function, and you want to apply that function to the value inside of a different `State`. This does not affect the state value.
+```php
+$a = State::of('foo');
+$b = State::of(function($x) {
+    return $x . 'bar';
+});
+
+$a->ap($b)->run(15);
+// ['foobar', 15]
+```
+#### chain ($r) (aliases: bind, flatMap)
+Used when you want to map with a function that returns a `State`. The computation value becomes the result of the parameter function `$r`, while the state value is accessible to be read and changed.
+```php
+State::of('foo')->chain(function($x) {
+    return State(function($s) use ($x) {
+        return [$x . 'bar', $s . ' Stuff'];
+    });
+})->run('Bar');
+// ['foobar', 'Bar Stuff']
+```
 ## Linked List
 ### Usage
 ```php
+use function Phantasy\DataTypes\LinkedList\{Cons, Nil};
 use Phantasy\DataTypes\LinkedList\{LinkedList, Cons, Nil};
 ```
 ### Description
@@ -925,8 +989,9 @@ Used when you have types that you want to swap. For example, converting
 a `LinkedList` of `Maybe` to a `Maybe` of a `LinkedList`.
 If the instance is a `Cons`, then it simply swaps the types.
 ```php
-use Phantasy\DataTypes\Either\{Either, Right};
-use Phantasy\DataTypes\LinkedList\{Cons, Nil};
+use Phantasy\DataTypes\Either\Either;
+use function Phantasy\DataTypes\Either\Right;
+use function Phantasy\DataTypes\LinkedList\{Cons, Nil};
 
 $a = Cons(Right(1), Cons(Right(2), Nil()));
 $a->sequence(Either::of());
@@ -934,8 +999,8 @@ $a->sequence(Either::of());
 ```
 If the instance is a `Nil`, then it just wraps it in the result of `$of`.
 ```php
-use Phantasy\DataTypes\Either\{Either};
-use Phantasy\DataTypes\LinkedList\{Cons};
+use Phantasy\DataTypes\Either\Either;
+use function Phantasy\DataTypes\LinkedList\Nil;
 
 $a = Nil();
 $a->sequence(Either::of());
@@ -947,14 +1012,15 @@ transformation function. For example, converting
 a `LinkedList` of `Maybe` to a `Maybe` of a `LinkedList`.
 If the instance is a `Cons`, then it simply swaps the types.
 ```php
-use Phantasy\DataTypes\Either\{Either, Left, Right};
-use Phantasy\DataTypes\LinkedList\{Cons, Nil};
+use Phantasy\DataTypes\Either\Either;
+use function Phantasy\DataTypes\Either\{Left, Right};
+use function Phantasy\DataTypes\LinkedList\{Cons, Nil};
 
 $a = Cons(0, Cons(1, Cons(2, Cons(3, Nil()))));
 $toChar = function($n) {
     return $n < 0 || $n > 25
-        ? new Left($n . ' is out of bounds!')
-        : new Right(chr(833 + $n));
+        ? Left($n . ' is out of bounds!')
+        : Right(chr(833 + $n));
 };
 $a->traverse(Either::of(), $toChar);
 // Right(Cons('A', Cons('B', Cons('C', Cons('D', Nil)))))
@@ -962,7 +1028,7 @@ $a->traverse(Either::of(), $toChar);
 If the instance is a `Nil`, then it just wraps it in the result of `$of`.
 ```php
 use Phantasy\DataTypes\Either\{Either};
-use Phantasy\DataTypes\LinkedList\{Nil};
+use function Phantasy\DataTypes\LinkedList\Nil;
 use function Phantasy\Core\identity;
 
 $a = Nil();

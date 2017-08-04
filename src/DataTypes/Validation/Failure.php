@@ -76,3 +76,8 @@ class Failure
         return new Nothing();
     }
 }
+
+function Failure($x)
+{
+    return new Failure($x);
+}

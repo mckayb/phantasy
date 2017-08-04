@@ -5,9 +5,15 @@ use Phantasy\DataTypes\LinkedList\{LinkedList, Cons, Nil};
 use Phantasy\DataTypes\Either\{Either, Right};
 use Phantasy\DataTypes\Maybe\Maybe;
 use function Phantasy\Core\identity;
+use function Phantasy\DataTypes\LinkedList\{Cons, Nil};
 
 class LinkedListTest extends TestCase
 {
+    public function testConsNilFunc()
+    {
+        $this->assertEquals(Cons(12, Nil()), new Cons(12, new Nil()));
+    }
+
     public function testLinkedListOf()
     {
         $a = LinkedList::of(2);

@@ -4,9 +4,20 @@ use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
+use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 
 class MaybeTest extends TestCase
 {
+    public function testJustFunc()
+    {
+        $this->assertEquals(Just(12), new Just(12));
+    }
+
+    public function testNothingFunc()
+    {
+        $this->assertEquals(Nothing(), new Nothing());
+    }
+
     public function testMaybeOf()
     {
         $just123 = Maybe::of(123);

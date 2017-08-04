@@ -75,3 +75,8 @@ class Success
         return new Just($this->value);
     }
 }
+
+function Success($x)
+{
+    return new Success($x);
+}

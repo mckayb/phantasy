@@ -66,3 +66,8 @@ class Cons
         return "Cons(" . $this->head . ", " . $this->tail . ")";
     }
 }
+
+function Cons($head, $tail)
+{
+    return new Cons($head, $tail);
+}

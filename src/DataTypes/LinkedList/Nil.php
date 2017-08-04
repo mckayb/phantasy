@@ -49,3 +49,8 @@ class Nil
         return "Nil()";
     }
 }
+
+function Nil()
+{
+    return new Nil();
+}

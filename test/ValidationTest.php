@@ -4,9 +4,20 @@ use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
+use function Phantasy\DataTypes\Validation\{Success, Failure};
 
 class ValidationTest extends TestCase
 {
+    public function testSuccessFunc()
+    {
+        $this->assertEquals(Success(12), new Success(12));
+    }
+
+    public function testFailureFunc()
+    {
+        $this->assertEquals(Failure('foo'), new Failure('foo'));
+    }
+
     public function testValidationOf()
     {
         $f = function ($a, $b) {

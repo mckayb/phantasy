@@ -81,3 +81,8 @@ class Left
         return new Failure($this->value);
     }
 }
+
+function Left($x)
+{
+    return new Left($x);
+}

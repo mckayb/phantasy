@@ -6,7 +6,7 @@ class Reader
 {
     private $f;
 
-    public function __construct($f)
+    public function __construct(callable $f)
     {
         $this->f = $f;
     }
@@ -53,4 +53,9 @@ class Reader
     {
         return $this->chain($r);
     }
+}
+
+function Reader(callable $f)
+{
+    return new Reader($f);
 }

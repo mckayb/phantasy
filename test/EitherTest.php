@@ -4,9 +4,20 @@ use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
+use function Phantasy\DataTypes\Either\{Left, Right};
 
 class EitherTest extends TestCase
 {
+    public function testLeftFunc()
+    {
+        $this->assertEquals(Left(12), new Left(12));
+    }
+
+    public function testRightFunc()
+    {
+        $this->assertEquals(Right(12), new Right(12));
+    }
+
     public function testEitherOf()
     {
         $just123 = Either::of(123);

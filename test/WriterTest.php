@@ -3,9 +3,19 @@
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Writer\Writer;
 use function Phantasy\Core\concat;
+use function Phantasy\DataTypes\Writer\Writer;
 
 class WriterTest extends TestCase
 {
+    public function testWriterFunc()
+    {
+        $a = function () {
+            return ['foo', 'bar'];
+        };
+
+        $this->assertEquals(Writer($a), new Writer($a));
+    }
+
     public function testWriterOf()
     {
         $this->assertEquals(Writer::of(12)->run(), [12, []]);

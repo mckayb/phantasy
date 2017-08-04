@@ -3,9 +3,18 @@
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Reader\Reader;
 use function Phantasy\Core\concat;
+use function Phantasy\DataTypes\Reader\Reader;
 
 class ReaderTest extends TestCase
 {
+    public function testReaderFunc()
+    {
+        $a = function ($x) {
+            return $x + 1;
+        };
+        $this->assertEquals(Reader($a), new Reader($a));
+    }
+
     public function testReaderOf()
     {
         $r = Reader::of('Hello');

@@ -6,7 +6,7 @@ class State
 {
     private $func = null;
 
-    public function __construct($f)
+    public function __construct(callable $f)
     {
         $this->func = $f;
     }
@@ -57,4 +57,9 @@ class State
     {
         return $this->chain($f);
     }
+}
+
+function State(callable $f)
+{
+    return new State($f);
 }

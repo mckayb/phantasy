@@ -2,9 +2,18 @@
 
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\State\State;
+use function Phantasy\DataTypes\State\State;
 
 class StateTest extends TestCase
 {
+    public function testStateFunc()
+    {
+        $a = function ($s) {
+            return [12, $s];
+        };
+        $this->assertEquals(State($a), new State($a));
+    }
+
     public function testStateOfNoInitialState()
     {
         $this->assertEquals(
@@ -70,6 +79,20 @@ class StateTest extends TestCase
         $this->assertEquals(
             [11, 14],
             $a->run(12)
+        );
+    }
+
+    public function testMoreStateChaining()
+    {
+        $a = State::of('foo')->chain(function ($x) {
+            return new State(function ($s) use ($x) {
+                return [$x . 'bar', $s . ' Stuff'];
+            });
+        });
+
+        $this->assertEquals(
+            ['foobar', 'Bar Stuff'],
+            $a->run('Bar')
         );
     }
 

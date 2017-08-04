@@ -257,6 +257,76 @@ chain(function ($x) {
 // Just(2)
 ```
 
+## contramap (aliases: cmap)
+### Usage
+```php
+use function Phantasy\Core\contramap;
+```
+### Description
+A simple wrapper around the contramap method found in a Contravariant functor.
+Useful for mapping over the inputs of a function, rather than the outputs of a functions.
+Most common use case is when you have a type that is always the output of a function, but never really useful as an input to another function, such as functions generating Markdown such as HTML or JSX, or even JSON.
+### Examples
+```php
+$f = function ($s) {
+    return '<html>' . $s . '</html>';
+};
+
+$Comp = new class ($f) {
+    private $f = null;
+
+    public function __construct(callable $f)
+    {
+        $this->f = $f;
+    }
+
+    public function contramap(callable $g)
+    {
+        $f = $this->f;
+        return new static(function ($x) use ($f, $g) {
+            return $f($g($x));
+        });
+    }
+
+    public function fold($s = null)
+    {
+        return call_user_func($this->f, $s);
+    }
+};
+
+$a = contramap(function ($x) {
+    return '<body><div>' . $x . '</div></body>';
+}, $Comp);
+$b = contramap(function ($x) {
+    return $x["title"];
+}, $a);
+
+$html = $b->fold([ "title" => "Blue" ]),
+// "<html><body><div>Blue</div></body></html>"
+```
+
+## bimap
+### Usage
+```php
+use function Phantasy\Core\bimap;
+```
+### Description
+A simple wrapper around the bimap method of a Bifunctor.
+Simply calls the proper method on the object passed in.
+### Examples
+```php
+$left = function ($x) {
+  return $x - 1;
+};
+
+$right = function ($x) {
+  return $x + 1;
+};
+$a = Either::of(1);
+bimap($left, $right, $a);
+// Right(0)
+```
+
 ## mjoin
 ### Usage
 ```php
@@ -321,7 +391,7 @@ filter($isEven, $box);
 // Box([2]);
 ```
 
-## reduce
+## reduce (aliases: foldl)
 ### Usage
 ```php
 use function Phantasy\Core\reduce;
@@ -373,6 +443,24 @@ $oddSum = function($sum, $x) use ($isEven) {
 $box = new Box([1, 2, 3]);
 reduce($oddSum, 0, $box);
 // Box([2]);
+```
+
+## reduceRight (aliases: foldr)
+### Usage
+```php
+use function Phantasy\Core\reduceRight;
+```
+### Description
+Sometimes called foldr in other programming languages, reduceRight works the exact same as reduce, accumulating values over some object, but starts with the last item and works down to the first.
+### Examples
+```php
+reduceRight(concat(), '', ['a', 'b', 'c']);
+// 'cba'
+
+reduceRight(function ($prev, $curr) {
+  return $prev + $curr;
+}, 0, [1, 2, 3]);
+// 6
 ```
 
 ## liftA
