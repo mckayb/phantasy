@@ -1,13 +1,13 @@
 <?php
 namespace Phantasy\Core;
 
-function curry($callable)
+function curry(callable $callable)
 {
     $ref = new \ReflectionFunction($callable);
 
     $recurseFunc = function () use ($ref, &$recurseFunc) {
         $args = func_get_args();
-        if (func_num_args() === $ref->getNumberOfRequiredParameters()) {
+        if (func_num_args() >= $ref->getNumberOfRequiredParameters()) {
             return $ref->invokeArgs($args);
         } else {
             return function () use ($args, &$recurseFunc) {
@@ -21,7 +21,7 @@ function curry($callable)
 
 function curryN()
 {
-    $curryN = curry(function ($n, $callable) {
+    $curryN = curry(function (int $n, callable $callable) {
         $ref = new \ReflectionFunction($callable);
 
         $recurseFunc = function () use ($ref, &$recurseFunc, $n) {
@@ -96,7 +96,7 @@ function trace()
 function contramap()
 {
     $contramap = curry(
-        function ($f, $x) {
+        function (callable $f, $x) {
             if (is_object($x) && method_exists($x, 'contramap')) {
                 return $x->contramap($f);
             } elseif (is_object($x) && method_exists($x, 'cmap')) {
@@ -120,7 +120,7 @@ function cmap()
 function map()
 {
     $map = curry(
-        function ($f, $x) {
+        function (callable $f, $x) {
             if (is_object($x) && method_exists($x, 'map')) {
                 return $x->map($f);
             } else {
@@ -145,7 +145,7 @@ function fmap()
 function filter()
 {
     $filter = curry(
-        function ($f, $x) {
+        function (callable $f, $x) {
             if (is_object($x) && method_exists($x, 'filter')) {
                 return $x->filter($f);
             } else {
@@ -165,26 +165,12 @@ function filter()
 function bimap()
 {
     $bimap = curry(
-        function ($f, $g, $x) {
+        function (callable $f, callable $g, $x) {
             return $x->bimap($f, $g);
         }
     );
 
     return $bimap(...func_get_args());
-}
-
-// +flip :: (a -> b -> c) -> b -> a -> c
-function flip()
-{
-    $flip = curry(
-        function ($f) {
-            return curry(function ($b, $a) {
-                return $f($a, $b);
-            });
-        }
-    );
-
-    return $flip(...func_get_args());
 }
 
 // +foldl :: (a -> b -> a) -> a -> [b] -> a
@@ -203,7 +189,7 @@ function foldr()
 function reduce()
 {
     $reduce = curry(
-        function ($f, $i, $x) {
+        function (callable $f, $i, $x) {
             if (is_object($x) && method_exists($x, 'reduce')) {
                 return $x->reduce($f, $i);
             } elseif (is_object($x) && method_exists($x, 'foldl')) {
@@ -225,7 +211,7 @@ function reduce()
 function reduceRight()
 {
     $reduceRight = curry(
-        function ($f, $i, $x) {
+        function (callable $f, $i, $x) {
             if (is_object($x) && method_exists($x, 'reduceRight')) {
                 return $x->reduceRight($f, $i);
             } elseif (is_object($x) && method_exists($x, 'foldr')) {
@@ -257,7 +243,7 @@ function ap()
 // +chain :: Chain m => (a -> m b) -> m a -> m b
 function chain()
 {
-    $chain = curry(function ($f, $a) {
+    $chain = curry(function (callable $f, $a) {
         return $a->chain($f);
     });
 
@@ -272,6 +258,8 @@ function mjoin()
             return $a->join();
         } elseif (method_exists($a, 'mjoin')) {
             return $a->mjoin();
+        } else {
+            return null;
         }
     });
 
@@ -294,7 +282,7 @@ function semigroupConcat()
             return $x->concat($y);
         }
 
-        throw new \Exception('Couldn\'t find a concat method to work with. Please specify your own concat function.');
+        return null;
     });
 
     return $semigroupConcat(...func_get_args());
@@ -322,6 +310,8 @@ function mempty()
         if (is_object($x) && method_exists($x, 'empty')) {
             return $x->empty();
         }
+
+        return null;
     });
 
     return $mempty(...func_get_args());
@@ -330,7 +320,7 @@ function mempty()
 // +liftA :: Functor f => (a -> b) -> f a -> f b
 function liftA()
 {
-    $liftA = curry(function ($f, $a) {
+    $liftA = curry(function (callable $f, $a) {
         return $a->map($f);
     });
 
@@ -340,7 +330,7 @@ function liftA()
 // +liftA2 :: Apply f => (a -> b -> c) -> f a -> f b -> f c
 function liftA2()
 {
-    $liftA2 = curry(function ($f, $a1, $a2) {
+    $liftA2 = curry(function (callable $f, $a1, $a2) {
         return $a2->ap($a1->map($f));
     });
 
@@ -350,7 +340,7 @@ function liftA2()
 // +liftA3 :: Apply f => (a -> b -> c -> d) -> f a -> f b -> f c -> f d
 function liftA3()
 {
-    $liftA3 = curry(function ($f, $a1, $a2, $a3) {
+    $liftA3 = curry(function (callable $f, $a1, $a2, $a3) {
         return $a3->ap($a2->ap($a1->map($f)));
     });
 
@@ -360,7 +350,7 @@ function liftA3()
 // +liftA4 :: Apply f => (a -> b -> c -> d -> e) -> f a -> f b -> f c -> f d -> f e
 function liftA4()
 {
-    $liftA4 = curry(function ($f, $a1, $a2, $a3, $a4) {
+    $liftA4 = curry(function (callable $f, $a1, $a2, $a3, $a4) {
         return $a4->ap($a3->ap($a2->ap($a1->map($f))));
     });
 
@@ -370,7 +360,7 @@ function liftA4()
 // +liftA5 :: Apply f => (a -> b -> c -> d -> e -> g) -> f a -> f b -> f c -> f d -> f e -> f g
 function liftA5()
 {
-    $liftA5 = curry(function ($f, $a1, $a2, $a3, $a4, $a5) {
+    $liftA5 = curry(function (callable $f, $a1, $a2, $a3, $a4, $a5) {
         return $a5->ap($a4->ap($a3->ap($a2->ap($a1->map($f)))));
     });
 

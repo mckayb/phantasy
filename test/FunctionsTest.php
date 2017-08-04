@@ -2,6 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Maybe\Maybe;
+use Phantasy\DataTypes\Either\{Either, Left, Right};
 use function Phantasy\Core\{
   identity,
   compose,
@@ -24,7 +25,14 @@ use function Phantasy\Core\{
   liftA4,
   liftA5,
   semigroupConcat,
-  concat
+  concat,
+  contramap,
+  cmap,
+  flip,
+  foldl,
+  foldr,
+  reduceRight,
+  bimap
 };
 
 class FunctionsTest extends TestCase
@@ -190,14 +198,11 @@ class FunctionsTest extends TestCase
         $this->assertEquals($f('foobar'), $m);
     }
 
-    /**
-   * @expectedException Exception
-   */
     public function testSemigroupConcatNotAvailable()
     {
         $a = true;
         $b = false;
-        semigroupConcat($a, $b);
+        $this->assertNull(semigroupConcat($a, $b));
     }
 
     public function testMEmptyArray()
@@ -455,7 +460,7 @@ class FunctionsTest extends TestCase
         $this->assertEquals($sumWithInitial6([1, 2, 3]), 12);
     }
 
-    public function testReduceWithObject()
+    public function testReduceWithObjectWithReduceMethod()
     {
         $getClass = function ($x) {
             return new class($x) {
@@ -483,6 +488,96 @@ class FunctionsTest extends TestCase
         };
         $box = $getClass([1, 2, 3]);
         $this->assertEquals(reduce($oddSum, 0, $box), 4);
+    }
+
+    public function testReduceWithObjectWithFoldlMethod()
+    {
+        $getClass = function ($x) {
+            return new class($x) {
+                private $items = [];
+
+                public function __construct($items)
+                {
+                    $this->items = $items;
+                }
+
+                public function foldl($f, $i)
+                {
+                    return array_reduce($this->items, $f, $i);
+                }
+            };
+        };
+        $isOdd = function ($x) {
+            return $x % 2 === 1;
+        };
+        $oddSum = function ($sum, $x) use ($isOdd) {
+            if ($isOdd($x)) {
+                return $sum + $x;
+            }
+            return $sum;
+        };
+        $box = $getClass([1, 2, 3]);
+        $this->assertEquals(reduce($oddSum, 0, $box), 4);
+    }
+
+    public function testFoldlWithObjectWithFoldlMethod()
+    {
+        $getClass = function ($x) {
+            return new class($x) {
+                private $items = [];
+
+                public function __construct($items)
+                {
+                    $this->items = $items;
+                }
+
+                public function foldl($f, $i)
+                {
+                    return array_reduce($this->items, $f, $i);
+                }
+            };
+        };
+        $isOdd = function ($x) {
+            return $x % 2 === 1;
+        };
+        $oddSum = function ($sum, $x) use ($isOdd) {
+            if ($isOdd($x)) {
+                return $sum + $x;
+            }
+            return $sum;
+        };
+        $box = $getClass([1, 2, 3]);
+        $this->assertEquals(foldl($oddSum, 0, $box), 4);
+    }
+
+    public function testFoldlWithObjectWithReduceMethod()
+    {
+        $getClass = function ($x) {
+            return new class($x) {
+                private $items = [];
+
+                public function __construct($items)
+                {
+                    $this->items = $items;
+                }
+
+                public function reduce($f, $i)
+                {
+                    return array_reduce($this->items, $f, $i);
+                }
+            };
+        };
+        $isOdd = function ($x) {
+            return $x % 2 === 1;
+        };
+        $oddSum = function ($sum, $x) use ($isOdd) {
+            if ($isOdd($x)) {
+                return $sum + $x;
+            }
+            return $sum;
+        };
+        $box = $getClass([1, 2, 3]);
+        $this->assertEquals(foldl($oddSum, 0, $box), 4);
     }
 
     public function testLiftA()
@@ -611,6 +706,11 @@ class FunctionsTest extends TestCase
         $this->assertEquals(mjoin($a), 1);
     }
 
+    public function testMJoinReturnsNullOnFailure()
+    {
+        $this->assertNull(mjoin(12));
+    }
+
     public function testChain()
     {
         $a = new class
@@ -629,5 +729,321 @@ class FunctionsTest extends TestCase
     public function testIsTraversable()
     {
         $this->assertTrue(isTraversable([1]));
+    }
+
+    public function testContramapObjWithContramap()
+    {
+        $f = function ($s) {
+            return '<html>' . $s . '</html>';
+        };
+
+        $Comp = new class ($f) {
+            private $f = null;
+
+            public function __construct(callable $f)
+            {
+                $this->f = $f;
+            }
+
+            public function contramap(callable $g)
+            {
+                $f = $this->f;
+                return new static(function ($x) use ($f, $g) {
+                    return $f($g($x));
+                });
+            }
+
+            public function fold($s = null)
+            {
+                return call_user_func($this->f, $s);
+            }
+        };
+
+        $a = contramap(function ($x) {
+            return '<body><div>' . $x . '</div></body>';
+        }, $Comp);
+        $b = contramap(function ($x) {
+            return $x["title"];
+        }, $a);
+
+        $this->assertEquals(
+            $b->fold([ "title" => "Blue" ]),
+            "<html><body><div>Blue</div></body></html>"
+        );
+    }
+
+    public function testContramapObjectWithCmap()
+    {
+        $f = function ($s) {
+            return '<html>' . $s . '</html>';
+        };
+
+        $Comp = new class ($f) {
+            private $f = null;
+
+            public function __construct(callable $f)
+            {
+                $this->f = $f;
+            }
+
+            public function cmap(callable $g)
+            {
+                $f = $this->f;
+                return new static(function ($x) use ($f, $g) {
+                    return $f($g($x));
+                });
+            }
+
+            public function fold($s = null)
+            {
+                return call_user_func($this->f, $s);
+            }
+        };
+
+        $a = contramap(function ($x) {
+            return '<body><div>' . $x . '</div></body>';
+        }, $Comp);
+        $b = contramap(function ($x) {
+            return $x["title"];
+        }, $a);
+
+        $this->assertEquals(
+            $b->fold([ "title" => "Blue" ]),
+            "<html><body><div>Blue</div></body></html>"
+        );
+    }
+
+    public function testCmapObjWithContramap()
+    {
+        $f = function ($s) {
+            return '<html>' . $s . '</html>';
+        };
+
+        $Comp = new class ($f) {
+            private $f = null;
+
+            public function __construct(callable $f)
+            {
+                $this->f = $f;
+            }
+
+            public function contramap(callable $g)
+            {
+                $f = $this->f;
+                return new static(function ($x) use ($f, $g) {
+                    return $f($g($x));
+                });
+            }
+
+            public function fold($s = null)
+            {
+                return call_user_func($this->f, $s);
+            }
+        };
+
+        $a = cmap(function ($x) {
+            return '<body><div>' . $x . '</div></body>';
+        }, $Comp);
+        $b = cmap(function ($x) {
+            return $x["title"];
+        }, $a);
+
+        $this->assertEquals(
+            $b->fold([ "title" => "Blue" ]),
+            "<html><body><div>Blue</div></body></html>"
+        );
+    }
+
+    public function testCmapObjWithCmap()
+    {
+        $f = function ($s) {
+            return '<html>' . $s . '</html>';
+        };
+
+        $Comp = new class ($f) {
+            private $f = null;
+
+            public function __construct(callable $f)
+            {
+                $this->f = $f;
+            }
+
+            public function cmap(callable $g)
+            {
+                $f = $this->f;
+                return new static(function ($x) use ($f, $g) {
+                    return $f($g($x));
+                });
+            }
+
+            public function fold($s = null)
+            {
+                return call_user_func($this->f, $s);
+            }
+        };
+
+        $a = cmap(function ($x) {
+            return '<body><div>' . $x . '</div></body>';
+        }, $Comp);
+        $b = cmap(function ($x) {
+            return $x["title"];
+        }, $a);
+
+        $this->assertEquals(
+            $b->fold([ "title" => "Blue" ]),
+            "<html><body><div>Blue</div></body></html>"
+        );
+    }
+
+    public function testContramapReturnNull()
+    {
+        $this->assertNull(contramap(function ($x) {
+            return $x + 1;
+        }, true));
+    }
+
+    public function testCmapReturnNull()
+    {
+        $this->assertNull(cmap(function ($x) {
+            return $x + 1;
+        }, true));
+    }
+
+    public function testFoldl()
+    {
+        $this->assertEquals(
+            foldl(concat(), '', ['a', 'b', 'c']),
+            'abc'
+        );
+    }
+
+    public function testFoldr()
+    {
+        $this->assertEquals(
+            foldr(concat(), '', ['a', 'b', 'c']),
+            'cba'
+        );
+    }
+
+    public function testReduceRight()
+    {
+        $this->assertEquals(
+            reduceRight(concat(), '', ['a', 'b', 'c']),
+            'cba'
+        );
+    }
+
+    public function testFoldrWithObjectWithReduceRightMethod()
+    {
+        $getClass = function ($x) {
+            return new class($x) {
+                private $items = [];
+
+                public function __construct($items)
+                {
+                    $this->items = $items;
+                }
+
+                public function reduceRight($f, $i)
+                {
+                    return reduceRight($f, $i, $this->items);
+                }
+            };
+        };
+        $box = $getClass(['a', 'b', 'c']);
+        $this->assertEquals(foldr(concat(), '', $box), 'cba');
+    }
+
+    public function testFoldrWithObjectWithFoldrMethod()
+    {
+        $getClass = function ($x) {
+            return new class($x) {
+                private $items = [];
+
+                public function __construct($items)
+                {
+                    $this->items = $items;
+                }
+
+                public function foldr($f, $i)
+                {
+                    return reduceRight($f, $i, $this->items);
+                }
+            };
+        };
+        $box = $getClass(['a', 'b', 'c']);
+        $this->assertEquals(foldr(concat(), '', $box), 'cba');
+    }
+
+    public function testReduceRightWithObjectWithReduceRightMethod()
+    {
+        $getClass = function ($x) {
+            return new class($x) {
+                private $items = [];
+
+                public function __construct($items)
+                {
+                    $this->items = $items;
+                }
+
+                public function reduceRight($f, $i)
+                {
+                    return reduceRight($f, $i, $this->items);
+                }
+            };
+        };
+        $box = $getClass(['a', 'b', 'c']);
+        $this->assertEquals(reduceRight(concat(), '', $box), 'cba');
+    }
+
+    public function testReduceRightWithObjectWithFoldrMethod()
+    {
+        $getClass = function ($x) {
+            return new class($x) {
+                private $items = [];
+
+                public function __construct($items)
+                {
+                    $this->items = $items;
+                }
+
+                public function foldr($f, $i)
+                {
+                    return reduceRight($f, $i, $this->items);
+                }
+            };
+        };
+        $box = $getClass(['a', 'b', 'c']);
+        $this->assertEquals(reduceRight(concat(), '', $box), 'cba');
+    }
+
+    public function testBimapRight()
+    {
+        $a = Either::of(1);
+        $left = function ($x) {
+            return $x + 1;
+        };
+        $right = function ($x) {
+            return $x - 1;
+        };
+        $this->assertEquals(
+            bimap($left, $right, $a),
+            new Right(0)
+        );
+    }
+
+    public function testBimapLeft()
+    {
+        $a = Either::fromNullable(1, null);
+        $left = function ($x) {
+            return $x + 1;
+        };
+        $right = function ($x) {
+            return $x - 1;
+        };
+        $this->assertEquals(
+            bimap($left, $right, $a),
+            new Left(2)
+        );
     }
 }
