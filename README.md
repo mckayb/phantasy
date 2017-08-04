@@ -30,7 +30,7 @@ Just create an issue or open up a pull request.
 
 ## Want more?
 For other helpers not included in this repo, check out
-  * [Phantasy-PHP](https://github.com/mckayb/phantasy)
+  * [Phantasy-PHP](https://github.com/mckayb/phantasy-php)
   * [Phantasy-Types](https://github.com/mckayb/phantasy-types)
 
 ## Inspiration
