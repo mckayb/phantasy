@@ -22,12 +22,16 @@ For more information, read the [docs!](https://github.com/mckayb/phantasy/tree/m
 ## What's Included
   * Currying, Composition, Higher-Order Functions, etc
   * Maybe, Either, Reader, Writer, State, Linked List, Validation Data Types.
-  * Curried versions of common PHP Functions
   * More coming...
 
 ## Contributing
 Find a bug? Want to make any additions?
 Just create an issue or open up a pull request.
+
+## Want more?
+For other helpers not included in this repo, check out
+  * [Phantasy-PHP](https://github.com/mckayb/phantasy)
+  * [Phantasy-Types](https://github.com/mckayb/phantasy-types)
 
 ## Inspiration
   * [Monet](https://github.com/cwmyers/monet.js)
