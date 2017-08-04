@@ -54,6 +54,7 @@ function compose(...$fns)
     );
 }
 
+// +identity :: a -> a
 function identity()
 {
     $id = curry(function ($x) {
@@ -63,6 +64,7 @@ function identity()
     return $id(...func_get_args());
 }
 
+// +prop :: String -> a -> b
 function prop()
 {
     $prop = curry(
@@ -79,6 +81,7 @@ function prop()
     return $prop(...func_get_args());
 }
 
+// +trace :: a -> IO a
 function trace()
 {
     $trace = curry(function ($x) {
@@ -89,6 +92,31 @@ function trace()
     return $trace(...func_get_args());
 }
 
+// +contramap :: Contravariant f => (b -> a) -> f a -> f b
+function contramap()
+{
+    $contramap = curry(
+        function ($f, $x) {
+            if (is_object($x) && method_exists($x, 'contramap')) {
+                return $x->contramap($f);
+            } elseif (is_object($x) && method_exists($x, 'cmap')) {
+                return $x->cmap($f);
+            } else {
+                return null;
+            }
+        }
+    );
+
+    return $contramap(...func_get_args());
+}
+
+// +cmap :: Contravariant f => (b -> a) -> f a -> f b
+function cmap()
+{
+    return contramap(...func_get_args());
+}
+
+// +map :: Functor f => (a -> b) -> f a -> f b
 function map()
 {
     $map = curry(
@@ -107,11 +135,13 @@ function map()
     return $map(...func_get_args());
 }
 
+// +fmap :: Functor f => (a -> b) -> f a -> f b
 function fmap()
 {
     return map(...func_get_args());
 }
 
+// +filter :: (a -> Bool) -> [a] -> [a]
 function filter()
 {
     $filter = curry(
@@ -132,12 +162,52 @@ function filter()
     return $filter(...func_get_args());
 }
 
+function bimap()
+{
+    $bimap = curry(
+        function ($f, $g, $x) {
+            return $x->bimap($f, $g);
+        }
+    );
+
+    return $bimap(...func_get_args());
+}
+
+// +flip :: (a -> b -> c) -> b -> a -> c
+function flip()
+{
+    $flip = curry(
+        function ($f) {
+            return curry(function ($b, $a) {
+                return $f($a, $b);
+            });
+        }
+    );
+
+    return $flip(...func_get_args());
+}
+
+// +foldl :: (a -> b -> a) -> a -> [b] -> a
+function foldl()
+{
+    return reduce(...func_get_args());
+}
+
+// +foldr :: (a -> b -> b) -> b -> [a] -> b
+function foldr()
+{
+    return reduceRight(...func_get_args());
+}
+
+// +reduce :: (a -> b -> a) -> a -> [b] -> a
 function reduce()
 {
     $reduce = curry(
         function ($f, $i, $x) {
             if (is_object($x) && method_exists($x, 'reduce')) {
                 return $x->reduce($f, $i);
+            } elseif (is_object($x) && method_exists($x, 'foldl')) {
+                return $x->foldl($f, $i);
             } else {
                 $acc = $i;
                 foreach ($x as $y) {
@@ -151,6 +221,30 @@ function reduce()
     return $reduce(...func_get_args());
 }
 
+// +reduceRight :: (a -> b -> b) -> b -> [a] -> b
+function reduceRight()
+{
+    $reduceRight = curry(
+        function ($f, $i, $x) {
+            if (is_object($x) && method_exists($x, 'reduceRight')) {
+                return $x->reduceRight($f, $i);
+            } elseif (is_object($x) && method_exists($x, 'foldr')) {
+                return $x->foldr($f, $i);
+            } else {
+                $c = count($x);
+                $acc = $i;
+                for ($i = $c - 1; $i >= 0; $i--) {
+                    $acc = $f($acc, $x[$i]);
+                }
+                return $acc;
+            }
+        }
+    );
+
+    return $reduceRight(...func_get_args());
+}
+
+// +ap :: Apply f => f (a -> b) -> f a -> f b
 function ap()
 {
     $ap = curry(function ($fa, $a) {
@@ -160,6 +254,7 @@ function ap()
     return $ap(...func_get_args());
 }
 
+// +chain :: Chain m => (a -> m b) -> m a -> m b
 function chain()
 {
     $chain = curry(function ($f, $a) {
@@ -169,6 +264,7 @@ function chain()
     return $chain(...func_get_args());
 }
 
+// +mjoin :: Monad m => m (m a) -> m a
 function mjoin()
 {
     $mjoin = curry(function ($a) {
@@ -182,6 +278,7 @@ function mjoin()
     return $mjoin(...func_get_args());
 }
 
+// +semigroupConcat :: Semigroup a => a -> a -> a
 function semigroupConcat()
 {
     $semigroupConcat = curry(function ($x, $y) {
@@ -203,11 +300,14 @@ function semigroupConcat()
     return $semigroupConcat(...func_get_args());
 }
 
+// +concat :: Semigroup a => a -> a -> a
 function concat()
 {
     return semigroupConcat(...func_get_args());
 }
 
+// +mempty :: Monoid a => a -> a
+// Little bit annoying limitation here.
 function mempty()
 {
     $mempty = curry(function ($x) {
@@ -227,6 +327,7 @@ function mempty()
     return $mempty(...func_get_args());
 }
 
+// +liftA :: Functor f => (a -> b) -> f a -> f b
 function liftA()
 {
     $liftA = curry(function ($f, $a) {
@@ -236,6 +337,7 @@ function liftA()
     return $liftA(...func_get_args());
 }
 
+// +liftA2 :: Apply f => (a -> b -> c) -> f a -> f b -> f c
 function liftA2()
 {
     $liftA2 = curry(function ($f, $a1, $a2) {
@@ -245,6 +347,7 @@ function liftA2()
     return $liftA2(...func_get_args());
 }
 
+// +liftA3 :: Apply f => (a -> b -> c -> d) -> f a -> f b -> f c -> f d
 function liftA3()
 {
     $liftA3 = curry(function ($f, $a1, $a2, $a3) {
@@ -254,6 +357,7 @@ function liftA3()
     return $liftA3(...func_get_args());
 }
 
+// +liftA4 :: Apply f => (a -> b -> c -> d -> e) -> f a -> f b -> f c -> f d -> f e
 function liftA4()
 {
     $liftA4 = curry(function ($f, $a1, $a2, $a3, $a4) {
@@ -263,6 +367,7 @@ function liftA4()
     return $liftA4(...func_get_args());
 }
 
+// +liftA5 :: Apply f => (a -> b -> c -> d -> e -> g) -> f a -> f b -> f c -> f d -> f e -> f g
 function liftA5()
 {
     $liftA5 = curry(function ($f, $a1, $a2, $a3, $a4, $a5) {
@@ -272,6 +377,7 @@ function liftA5()
     return $liftA5(...func_get_args());
 }
 
+// +isTraversable :: a -> Bool
 function isTraversable()
 {
     $isTraversable = curry(function ($x) {

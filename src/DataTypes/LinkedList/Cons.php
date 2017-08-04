@@ -37,7 +37,7 @@ class Cons
         return new static($this->head, $this->tail->concat($c));
     }
 
-    public function reduce($f, $acc)
+    public function reduce(callable $f, $acc)
     {
         return $this->tail->reduce($f, $f($acc, $this->head));
     }
@@ -47,7 +47,7 @@ class Cons
         return $this->head->concat($this->tail->join());
     }
 
-    public function traverse($of, $f)
+    public function traverse(callable $of, callable $f)
     {
         return $this->reduce(function ($ys, $x) use ($f) {
             return $ys->ap($f($x)->map(curry(function ($a, $b) {
@@ -56,7 +56,7 @@ class Cons
         }, $of(new Nil()));
     }
 
-    public function sequence($of)
+    public function sequence(callable $of)
     {
         return $this->traverse($of, identity());
     }

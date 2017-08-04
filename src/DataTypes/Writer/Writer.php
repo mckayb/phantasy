@@ -25,7 +25,7 @@ class Writer
         return call_user_func($this->func);
     }
 
-    public function map($f)
+    public function map(callable $f) : Writer
     {
         return new Writer(function () use ($f) {
             list ($compVal, $logVal) = $this->run();
@@ -33,7 +33,7 @@ class Writer
         });
     }
 
-    public function ap($w)
+    public function ap(Writer $w) : Writer
     {
         return new Writer(function () use ($w) {
             list ($compX, $logX) = $this->run();
@@ -43,7 +43,7 @@ class Writer
         });
     }
 
-    public function chain($g)
+    public function chain(callable $g) : Writer
     {
         return new Writer(function () use ($g) {
             list($compX, $logX) = $this->run();
@@ -52,12 +52,12 @@ class Writer
         });
     }
 
-    public function bind($g)
+    public function bind(callable $g) : Writer
     {
         return $this->chain($g);
     }
 
-    public function flatMap($g)
+    public function flatMap(callable $g) : Writer
     {
         return $this->chain($g);
     }

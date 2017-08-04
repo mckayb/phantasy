@@ -19,9 +19,9 @@ class Just
         return "Just(" . var_export($this->value, true) . ")";
     }
 
-    public function map($f)
+    public function map(callable $f)
     {
-        return Maybe::of($f($this->value));
+        return new Just($f($this->value));
     }
 
     public function ap($maybeWithFunction)
@@ -34,7 +34,7 @@ class Just
         );
     }
 
-    public function chain($f)
+    public function chain(callable $f)
     {
         return $f($this->value);
     }
@@ -44,7 +44,7 @@ class Just
         return $this;
     }
 
-    public function reduce($f, $acc)
+    public function reduce(callable $f, $acc)
     {
         return $f($acc, $this->value);
     }
@@ -55,12 +55,12 @@ class Just
     }
 
     // Aliases
-    public function bind($f)
+    public function bind(callable $f)
     {
         return $this->chain($f);
     }
 
-    public function flatMap($f)
+    public function flatMap(callable $f)
     {
         return $this->chain($f);
     }
@@ -71,12 +71,12 @@ class Just
     }
 
     // Transformations
-    public function toEither($val)
+    public function toEither($val) : Right
     {
         return new Right($this->value);
     }
 
-    public function toValidation($val)
+    public function toValidation($val) : Success
     {
         return new Success($this->value);
     }

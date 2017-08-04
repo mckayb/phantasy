@@ -19,7 +19,7 @@ class Success
         return "Success(" . var_export($this->value, true) . ")";
     }
 
-    public function map($f)
+    public function map(callable $f) : Success
     {
         return new Success($f($this->value));
     }
@@ -39,38 +39,38 @@ class Success
         return $validation;
     }
 
-    public function fold($f, $g)
+    public function fold(callable $f, callable $g)
     {
         return $g($this->value);
     }
 
-    public function bimap($f, $g)
+    public function bimap(callable $f, callable $g) : Success
     {
         return new Success($g($this->value));
     }
 
-    public function alt($v)
+    public function alt($v) : Success
     {
         return $this;
     }
 
-    public function reduce($f, $acc)
+    public function reduce(callable $f, $acc)
     {
         return $f($acc, $this->value);
     }
 
     // Aliases
-    public function cata($f, $g)
+    public function cata(callable $f, callable $g)
     {
         return $this->fold($f, $g);
     }
 
-    public function toEither()
+    public function toEither() : Right
     {
         return new Right($this->value);
     }
 
-    public function toMaybe()
+    public function toMaybe() : Just
     {
         return new Just($this->value);
     }

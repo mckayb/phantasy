@@ -6,7 +6,7 @@ use function Phantasy\Core\curry;
 
 class Validation
 {
-    public static function of()
+    public static function of() : Success
     {
         return curry(function ($x) {
             return new Success($x);
@@ -31,7 +31,7 @@ class Validation
         })(...func_get_args());
     }
 
-    public static function zero()
+    public static function zero() : Failure
     {
         return new Failure([]);
     }

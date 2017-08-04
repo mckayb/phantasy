@@ -12,17 +12,17 @@ class Nothing
         return "Nothing()";
     }
 
-    public function map($f)
+    public function map(callable $f) : Nothing
     {
         return $this;
     }
 
-    public function ap($maybeWithFunction)
+    public function ap($maybeWithFunction) : Nothing
     {
         return $this;
     }
 
-    public function chain($f)
+    public function chain(callable $f) : Nothing
     {
         return $this;
     }
@@ -32,7 +32,7 @@ class Nothing
         return $maybe;
     }
 
-    public function reduce($f, $acc)
+    public function reduce(callable $f, $acc)
     {
         return $acc;
     }
@@ -43,12 +43,12 @@ class Nothing
     }
 
     // Aliases
-    public function bind($f)
+    public function bind(callable $f)
     {
         return $this->chain($f);
     }
 
-    public function flatMap($f)
+    public function flatMap(callable $f)
     {
         return $this->chain($f);
     }
@@ -59,12 +59,12 @@ class Nothing
     }
 
     // Conversions
-    public function toEither($val)
+    public function toEither($val) : Left
     {
         return new Left($val);
     }
 
-    public function toValidation($val)
+    public function toValidation($val) : Failure
     {
         return new Failure($val);
     }

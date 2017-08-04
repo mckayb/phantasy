@@ -22,7 +22,7 @@ class Maybe
 
     public static function tryCatch()
     {
-        return curry(function ($f) {
+        return curry(function (callable $f) {
             try {
                 return new Just($f());
             } catch (\Exception $e) {
@@ -31,7 +31,7 @@ class Maybe
         })(...func_get_args());
     }
 
-    public static function zero()
+    public static function zero() : Nothing
     {
         return new Nothing();
     }

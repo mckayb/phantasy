@@ -24,8 +24,7 @@
     },
     "files": [
       "src/Core/functions.php",
-      "src/Core/php-functions.php",
-      "src/Core/constructor-functions.php"
+      "src/Core/php-functions.php"
     ]
   },
   "scripts": {

@@ -13,44 +13,43 @@ class Reader
 
     public function run($x)
     {
-        $f = $this->f;
-        return $f($x);
+        return call_user_func($this->f, $x);
     }
 
-    public static function of($x)
+    public static function of($x) : Reader
     {
         return new Reader(function ($_) use ($x) {
             return $x;
         });
     }
 
-    public function map($g)
+    public function map(callable $g) : Reader
     {
         return new Reader(function ($x) use ($g) {
             return $g($this->run($x));
         });
     }
 
-    public function ap($g)
+    public function ap(Reader $g) : Reader
     {
         return new Reader(function ($x) use ($g) {
             return $g->run($x)($this->run($x));
         });
     }
 
-    public function chain($r)
+    public function chain(callable $r) : Reader
     {
         return new Reader(function ($s) use ($r) {
             return $r($this->run($s))->run($s);
         });
     }
 
-    public function bind($r)
+    public function bind(callable $r) : Reader
     {
         return $this->chain($r);
     }
 
-    public function flatMap($r)
+    public function flatMap(callable $r) : Reader
     {
         return $this->chain($r);
     }

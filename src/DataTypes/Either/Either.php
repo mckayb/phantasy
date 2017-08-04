@@ -22,7 +22,7 @@ class Either
 
     public static function tryCatch()
     {
-        return curry(function ($f) {
+        return curry(function (callable $f) {
             try {
                 return new Right($f());
             } catch (\Exception $e) {
@@ -31,7 +31,7 @@ class Either
         })(...func_get_args());
     }
 
-    public static function zero()
+    public static function zero() : Left
     {
         return new Left(null);
     }

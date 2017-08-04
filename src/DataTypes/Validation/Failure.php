@@ -20,17 +20,17 @@ class Failure
         return "Failure(" . var_export($this->value, true) . ")";
     }
 
-    public function map($f)
+    public function map(callable $f) : Failure
     {
         return $this;
     }
 
-    public function ap($v)
+    public function ap($v) : Failure
     {
         return $this;
     }
 
-    public function concat($v)
+    public function concat($v) : Failure
     {
         if ($v instanceof Success) {
             return $this;
@@ -39,12 +39,12 @@ class Failure
         }
     }
 
-    public function fold($f, $g)
+    public function fold(callable $f, callable $g)
     {
         return $f($this->value);
     }
 
-    public function bimap($f, $g)
+    public function bimap(callable $f, callable $g) : Failure
     {
         return new Failure($f($this->value));
     }
@@ -54,24 +54,24 @@ class Failure
         return $v;
     }
 
-    public function reduce($f, $acc)
+    public function reduce(callable $f, $acc)
     {
         return $acc;
     }
 
     // Aliases
-    public function cata($f, $g)
+    public function cata(callable $f, callable $g)
     {
         return $this->fold($f, $g);
     }
 
     // Transformations
-    public function toEither()
+    public function toEither() : Left
     {
         return new Left($this->value);
     }
 
-    public function toMaybe()
+    public function toMaybe() : Nothing
     {
         return new Nothing();
     }

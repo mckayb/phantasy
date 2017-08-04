@@ -23,7 +23,7 @@ class LinkedList
         })(...func_get_args());
     }
 
-    public static function empty()
+    public static function empty() : Nil
     {
         return new Nil();
     }

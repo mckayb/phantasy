@@ -6,17 +6,17 @@ class Nil
 {
     public function map(callable $f) : Nil
     {
-        return new static();
+        return new Nil();
     }
 
     public function ap($c) : Nil
     {
-        return new static();
+        return new Nil();
     }
 
     public function chain(callable $f) : Nil
     {
-        return new static();
+        return new Nil();
     }
 
     public function concat($c)
@@ -24,22 +24,22 @@ class Nil
         return $c;
     }
 
-    public function reduce($f, $acc)
+    public function reduce(callable $f, $acc)
     {
         return $acc;
     }
 
     public function join() : Nil
     {
-        return new static();
+        return new Nil();
     }
 
-    public function traverse($of, $f)
+    public function traverse(callable $of, callable $f)
     {
         return $of(new Nil());
     }
 
-    public function sequence($of)
+    public function sequence(callable $of)
     {
         return $of(new Nil());
     }
