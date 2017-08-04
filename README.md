@@ -21,7 +21,7 @@ For more information, read the [docs!](https://github.com/mckayb/phantasy/tree/m
 
 ## What's Included
   * Currying, Composition, Higher-Order Functions, etc
-  * Maybe, Either, Reader, Writer, Linked List, Validation Data Types.
+  * Maybe, Either, Reader, Writer, State, Linked List, Validation Data Types.
   * Curried versions of common PHP Functions
   * More coming...
 
