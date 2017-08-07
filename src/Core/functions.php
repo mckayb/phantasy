@@ -64,6 +64,12 @@ function identity()
     return $id(...func_get_args());
 }
 
+// +id :: a -> a
+function id()
+{
+    return identity(...func_get_args());
+}
+
 // +prop :: String -> a -> b
 function prop()
 {
@@ -90,6 +96,34 @@ function trace()
     });
 
     return $trace(...func_get_args());
+}
+
+// +equals :: Setoid a => a -> a -> Bool
+function equals()
+{
+    $equals = curry(function ($a, $b) {
+        if (is_object($a) && method_exists($a, 'equals')) {
+            return $a->equals($b);
+        }
+
+        return $a === $b;
+    });
+
+    return $equals(...func_get_args());
+}
+
+// +lte :: Ord a => a -> a -> Bool
+function lte()
+{
+    $lte = curry(function ($a, $b) {
+        if (is_object($a) && method_exists($a, 'lte')) {
+            return $a->lte($b);
+        }
+
+        return $a <= $b;
+    });
+
+    return $lte(...func_get_args());
 }
 
 // +contramap :: Contravariant f => (b -> a) -> f a -> f b
@@ -219,8 +253,8 @@ function reduceRight()
             } else {
                 $c = count($x);
                 $acc = $i;
-                for ($i = $c - 1; $i >= 0; $i--) {
-                    $acc = $f($acc, $x[$i]);
+                for ($j = $c - 1; $j >= 0; $j--) {
+                    $acc = $f($acc, $x[$j]);
                 }
                 return $acc;
             }
@@ -240,6 +274,21 @@ function ap()
     return $ap(...func_get_args());
 }
 
+// +of :: a -> b -> f b
+// Another weird workaround here
+function of()
+{
+    $of = curry(function ($a, $x) {
+        if (method_exists($a, 'of')) {
+            return $a->of($x);
+        }
+
+        return null;
+    });
+
+    return $of(...func_get_args());
+}
+
 // +chain :: Chain m => (a -> m b) -> m a -> m b
 function chain()
 {
@@ -248,6 +297,57 @@ function chain()
     });
 
     return $chain(...func_get_args());
+}
+
+// +alt :: Alt f => f a -> f a -> f a
+function alt()
+{
+    $alt = curry(function ($a, $b) {
+        if (is_object($a) && is_object($b) && method_exists($a, 'alt')) {
+            return $a->alt($b);
+        }
+
+        return $a || $b;
+    });
+}
+
+// +zero :: Plus f => a -> f b
+// Weird workaround here
+function zero()
+{
+    $zero = curry(function ($a) {
+        if (is_object($a) && method_exists($a, 'zero')) {
+            return $a->zero();
+        }
+
+        return null;
+    });
+
+    return $zero(...func_get_args());
+}
+
+function sequence()
+{
+}
+
+function traverse()
+{
+}
+
+function chainRec()
+{
+}
+
+function extend()
+{
+}
+
+function extract()
+{
+}
+
+function promap()
+{
 }
 
 // +mjoin :: Monad m => m (m a) -> m a
