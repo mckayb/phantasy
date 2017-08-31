@@ -15,7 +15,9 @@ class Set
 
     public static function fromList($l) : Set
     {
-        return $l->reduce(concat(), new Set());
+        return $l->reduce(function ($prev, $curr) {
+            return $prev->concat(new Set($curr));
+        }, new Set());
     }
 
     public static function empty() : Set
@@ -30,7 +32,7 @@ class Set
 
     public function __construct(...$xs)
     {
-        $this->xs = array_unique($xs);
+        $this->xs = array_values(array_unique($xs));
     }
 
     public function map(callable $f) : Set
@@ -71,12 +73,13 @@ class Set
 
     public function concat(Set $s) : Set
     {
-        return new Set(array_merge($this->items, $s->toArray()));
+        return new Set(...array_merge($this->xs, $s->toArray()));
     }
 
-    public function equals(Set $s) : boolean
+    public function equals(Set $s)
     {
-        return $this->xs == $s->toArray();
+        // Need equals regardless of order
+        return $s->toArray() == $this->xs;
     }
 
     public function join() : Set
@@ -121,17 +124,17 @@ class Set
         }, new Set());
     }
 
-    public function isSubsetOf(Set $s) : boolean
+    public function isSubsetOf(Set $s)
     {
         return $this->equals(Set::empty()) || $this->intersection($s)->equals($this);
     }
 
-    public function isProperSubsetOf(Set $s) : boolean
+    public function isProperSubsetOf(Set $s)
     {
         return $this->isSubsetOf($s) && !$this->equals($s);
     }
 
-    public function contains($x) : boolean
+    public function contains($x)
     {
         return Set::of($x)->isSubsetOf($this);
     }
