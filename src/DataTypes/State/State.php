@@ -2,8 +2,13 @@
 
 namespace Phantasy\DataTypes\State;
 
+use function Phantasy\Core\curry;
+use Phantasy\Traits\CurryNonPublicMethods;
+
 final class State
 {
+    use CurryNonPublicMethods;
+
     private $func = null;
 
     public function __construct(callable $f)
@@ -11,19 +16,19 @@ final class State
         $this->func = $f;
     }
 
-    public static function of($x) : State
+    private static function of($x) : State
     {
         return new State(function ($s) use ($x) {
             return [$x, $s];
         });
     }
 
-    public function run($s)
+    private function run($s)
     {
         return call_user_func($this->func, $s);
     }
 
-    public function map(callable $f) : State
+    private function map(callable $f) : State
     {
         return new State(function ($s) use ($f) {
             list ($x, $s2) = $this->run($s);
@@ -31,7 +36,7 @@ final class State
         });
     }
 
-    public function ap(State $m) : State
+    private function ap(State $m) : State
     {
         return new State(function ($s) use ($m) {
             list ($x1, $s1) = $this->run($s);
@@ -40,7 +45,7 @@ final class State
         });
     }
 
-    public function chain(callable $f) : State
+    private function chain(callable $f) : State
     {
         return new State(function ($s) use ($f) {
             list ($x, $s2) = $this->run($s);
@@ -48,18 +53,20 @@ final class State
         });
     }
 
-    public function bind(callable $f) : State
+    private function bind(callable $f) : State
     {
         return $this->chain($f);
     }
 
-    public function flatMap(callable $f) : State
+    private function flatMap(callable $f) : State
     {
         return $this->chain($f);
     }
 }
 
-function State(callable $f) : State
+function State()
 {
-    return new State($f);
+    return curry(function (callable $f) {
+        return new State($f);
+    })(...func_get_args());
 }

@@ -4,9 +4,13 @@ namespace Phantasy\DataTypes\Either;
 
 use Phantasy\DataTypes\Maybe\Nothing;
 use Phantasy\DataTypes\Validation\Failure;
+use Phantasy\Traits\CurryNonPublicMethods;
+use function Phantasy\Core\curry;
 
 final class Left extends Either
 {
+    use CurryNonPublicMethods;
+
     private $value = null;
 
     public function __construct($val)
@@ -19,70 +23,77 @@ final class Left extends Either
         return "Left(" . var_export($this->value, true) . ")";
     }
 
-    public function map(callable $f) : Either
+    public function equals(Either $e) : bool
+    {
+        return $this === $e;
+    }
+
+    private function map(callable $f) : Either
     {
         return $this;
     }
 
-    public function ap(Either $eitherWithFunction) : Either
+    private function ap(Either $eitherWithFunction) : Either
     {
         return $this;
     }
 
-    public function chain(callable $f) : Either
+    private function chain(callable $f) : Either
     {
         return $this;
     }
 
-    public function fold(callable $f, callable $g)
+    private function fold(callable $f, callable $g)
     {
         return $f($this->value);
     }
 
-    public function bimap(callable $f, callable $g) : Either
+    private function bimap(callable $f, callable $g) : Either
     {
         return new Left($f($this->value));
     }
 
-    public function alt(Either $e) : Either
+    private function alt(Either $e) : Either
     {
         return $e;
     }
 
-    public function reduce(callable $f, $acc)
+    private function reduce(callable $f, $acc)
     {
         return $acc;
     }
 
     // Aliases
-    public function bind(callable $f) : Left
+    private function bind(callable $f) : Left
     {
         return $this->chain($f);
     }
 
-    public function flatMap(callable $f) : Left
+    private function flatMap(callable $f) : Left
     {
         return $this->chain($f);
     }
 
-    public function cata($f, $g)
+    private function cata($f, $g)
     {
         return $this->fold($f, $g);
     }
 
     // Conversions
-    public function toMaybe()
+    private function toMaybe()
     {
         return new Nothing();
     }
 
-    public function toValidation()
+    private function toValidation()
     {
         return new Failure($this->value);
     }
 }
 
-function Left($x)
+function Left()
 {
-    return new Left($x);
+    return curry(function ($x) {
+        return new Left($x);
+    })(...func_get_args());
 }

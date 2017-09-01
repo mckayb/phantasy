@@ -3,24 +3,23 @@
 namespace Phantasy\DataTypes\LinkedList;
 
 use Phantasy\DataTypes\LinkedList\{Cons, Nil};
+use Phantasy\Traits\CurryNonPublicMethods;
 use function Phantasy\Core\{reduce, curry};
 
 class LinkedList
 {
-    final public static function of() : Cons
+    use CurryNonPublicMethods;
+
+    final private static function of($x) : Cons
     {
-        return curry(function ($x) {
-            return new Cons($x, new Nil());
-        })(...func_get_args());
+        return new Cons($x, new Nil());
     }
 
-    final public static function fromArray()
+    final private static function fromArray(array $arr)
     {
-        return curry(function (array $arr) {
-            return reduce(function ($list, $x) {
-                return $list->concat(new Cons($x, new Nil()));
-            }, new Nil(), $arr);
-        })(...func_get_args());
+        return reduce(function ($list, $x) {
+            return $list->concat(new Cons($x, new Nil()));
+        }, new Nil(), $arr);
     }
 
     final public static function empty() : Nil

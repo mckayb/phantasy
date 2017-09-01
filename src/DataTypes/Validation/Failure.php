@@ -2,12 +2,15 @@
 
 namespace Phantasy\DataTypes\Validation;
 
+use Phantasy\Traits\CurryNonPublicMethods;
 use Phantasy\DataTypes\Either\{Either, Left};
 use Phantasy\DataTypes\Maybe\{Maybe, Nothing};
-use function Phantasy\Core\concat;
+use function Phantasy\Core\{concat, curry};
 
 final class Failure extends Validation
 {
+    use CurryNonPublicMethods;
+
     private $value = null;
 
     public function __construct($val)
@@ -20,17 +23,22 @@ final class Failure extends Validation
         return "Failure(" . var_export($this->value, true) . ")";
     }
 
-    public function map(callable $f) : Validation
+    private function equals(Validation $v) : bool
+    {
+        return $this === $v;
+    }
+
+    private function map(callable $f) : Validation
     {
         return $this;
     }
 
-    public function ap(Validation $v) : Validation
+    private function ap(Validation $v) : Validation
     {
         return $this;
     }
 
-    public function concat(Validation $v) : Validation
+    private function concat(Validation $v) : Validation
     {
         if ($v instanceof Success) {
             return $this;
@@ -39,28 +47,28 @@ final class Failure extends Validation
         }
     }
 
-    public function fold(callable $f, callable $g)
+    private function fold(callable $f, callable $g)
     {
         return $f($this->value);
     }
 
-    public function bimap(callable $f, callable $g) : Validation
+    private function bimap(callable $f, callable $g) : Validation
     {
         return new Failure($f($this->value));
     }
 
-    public function alt(Validation $v) : Validation
+    private function alt(Validation $v) : Validation
     {
         return $v;
     }
 
-    public function reduce(callable $f, $acc)
+    private function reduce(callable $f, $acc)
     {
         return $acc;
     }
 
     // Aliases
-    public function cata(callable $f, callable $g)
+    private function cata(callable $f, callable $g)
     {
         return $this->fold($f, $g);
     }
@@ -77,7 +85,9 @@ final class Failure extends Validation
     }
 }
 
-function Failure($x) : Validation
+function Failure()
 {
-    return new Failure($x);
+    return curry(function ($x) {
+        return new Failure($x);
+    })(...func_get_args());
 }

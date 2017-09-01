@@ -4,9 +4,13 @@ namespace Phantasy\DataTypes\Either;
 
 use Phantasy\DataTypes\Maybe\Just;
 use Phantasy\DataTypes\Validation\Success;
+use Phantasy\Traits\CurryNonPublicMethods;
+use function Phantasy\Core\curry;
 
 final class Right extends Either
 {
+    use CurryNonPublicMethods;
+
     private $value = null;
 
     public function __construct($val)
@@ -19,12 +23,17 @@ final class Right extends Either
         return "Right(" . var_export($this->value, true) . ")";
     }
 
-    public function map(callable $f) : Either
+    private function equals(Either $e) : bool
+    {
+        return $this === $e;
+    }
+
+    private function map(callable $f) : Either
     {
         return new Right($f($this->value));
     }
 
-    public function ap(Either $eitherWithFunction)
+    private function ap(Either $eitherWithFunction)
     {
         $val = $this->value;
         return $eitherWithFunction->map(
@@ -34,60 +43,62 @@ final class Right extends Either
         );
     }
 
-    public function chain(callable $f) : Either
+    private function chain(callable $f) : Either
     {
         return $f($this->value);
     }
 
-    public function fold($f, $g)
+    private function fold($f, $g)
     {
         return $g($this->value);
     }
 
-    public function bimap($f, $g) : Either
+    private function bimap($f, $g) : Either
     {
         return new Right($g($this->value));
     }
 
-    public function alt(Either $e) : Either
+    private function alt(Either $e) : Either
     {
         return $this;
     }
 
-    public function reduce($f, $acc)
+    private function reduce($f, $acc)
     {
         return $f($acc, $this->value);
     }
 
     // Aliases
-    public function bind(callable $f) : Either
+    private function bind(callable $f) : Either
     {
         return $this->chain($f);
     }
 
-    public function flatMap(callable $f) : Either
+    private function flatMap(callable $f) : Either
     {
         return $this->chain($f);
     }
 
-    public function cata(callable $f, callable $g)
+    private function cata(callable $f, callable $g)
     {
         return $this->fold($f, $g);
     }
 
     // Conversions
-    public function toMaybe()
+    private function toMaybe()
     {
         return new Just($this->value);
     }
 
-    public function toValidation()
+    private function toValidation()
     {
         return new Success($this->value);
     }
 }
 
-function Right($x)
+function Right()
 {
-    return new Right($x);
+    return curry(function ($x) {
+        return new Right($x);
+    })(...func_get_args());
 }

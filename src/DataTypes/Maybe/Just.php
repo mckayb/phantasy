@@ -2,11 +2,15 @@
 
 namespace Phantasy\DataTypes\Maybe;
 
-use Phantasy\DataTypes\Either\Right;
-use Phantasy\DataTypes\Validation\Success;
+use Phantasy\DataTypes\Either\{Either, Right};
+use Phantasy\DataTypes\Validation\{Validation, Success};
+use Phantasy\Traits\CurryNonPublicMethods;
+use function Phantasy\Core\curry;
 
 final class Just extends Maybe
 {
+    use CurryNonPublicMethods;
+
     private $value = null;
 
     public function __construct($val)
@@ -19,12 +23,17 @@ final class Just extends Maybe
         return "Just(" . var_export($this->value, true) . ")";
     }
 
-    public function map(callable $f)
+    private function equals(Maybe $m) : bool
+    {
+        return $this === $m;
+    }
+
+    private function map(callable $f) : Maybe
     {
         return new Just($f($this->value));
     }
 
-    public function ap($maybeWithFunction)
+    private function ap(Maybe $maybeWithFunction) : Maybe
     {
         $val = $this->value;
         return $maybeWithFunction->map(
@@ -34,12 +43,12 @@ final class Just extends Maybe
         );
     }
 
-    public function chain(callable $f)
+    public function chain(callable $f) : Maybe
     {
         return $f($this->value);
     }
 
-    public function alt($maybe)
+    public function alt(Maybe $m) : Maybe
     {
         return $this;
     }
@@ -55,12 +64,12 @@ final class Just extends Maybe
     }
 
     // Aliases
-    public function bind(callable $f)
+    public function bind(callable $f) : Maybe
     {
         return $this->chain($f);
     }
 
-    public function flatMap(callable $f)
+    public function flatMap(callable $f) : Maybe
     {
         return $this->chain($f);
     }
@@ -71,18 +80,20 @@ final class Just extends Maybe
     }
 
     // Transformations
-    public function toEither($val) : Right
+    public function toEither($val) : Either
     {
         return new Right($this->value);
     }
 
-    public function toValidation($val) : Success
+    public function toValidation($val) : Validation
     {
         return new Success($this->value);
     }
 }
 
-function Just($x)
+function Just()
 {
-    return new Just($x);
+    return curry(function ($x) {
+        return new Just($x);
+    })(...func_get_args());
 }

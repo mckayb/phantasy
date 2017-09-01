@@ -4,9 +4,13 @@ namespace Phantasy\DataTypes\Validation;
 
 use Phantasy\DataTypes\Maybe\{Maybe, Just};
 use Phantasy\DataTypes\Either\{Either, Right};
+use Phantasy\Traits\CurryNonPublicMethods;
+use function Phantasy\Core\curry;
 
 final class Success extends Validation
 {
+    use CurryNonPublicMethods;
+
     private $value = null;
 
     public function __construct($val)
@@ -19,12 +23,17 @@ final class Success extends Validation
         return "Success(" . var_export($this->value, true) . ")";
     }
 
-    public function map(callable $f) : Validation
+    private function equals(Validation $v) : bool
+    {
+        return $this === $v;
+    }
+
+    private function map(callable $f) : Validation
     {
         return new Success($f($this->value));
     }
 
-    public function ap(Validation $validationWithFunc) : Validation
+    private function ap(Validation $validationWithFunc) : Validation
     {
         $val = $this->value;
         return $validationWithFunc->map(
@@ -34,33 +43,33 @@ final class Success extends Validation
         );
     }
 
-    public function concat(Validation $v) : Validation
+    private function concat(Validation $v) : Validation
     {
         return $v;
     }
 
-    public function fold(callable $f, callable $g)
+    private function fold(callable $f, callable $g)
     {
         return $g($this->value);
     }
 
-    public function bimap(callable $f, callable $g) : Validation
+    private function bimap(callable $f, callable $g) : Validation
     {
         return new Success($g($this->value));
     }
 
-    public function alt(Validation $v) : Validation
+    private function alt(Validation $v) : Validation
     {
         return $this;
     }
 
-    public function reduce(callable $f, $acc)
+    private function reduce(callable $f, $acc)
     {
         return $f($acc, $this->value);
     }
 
     // Aliases
-    public function cata(callable $f, callable $g)
+    private function cata(callable $f, callable $g)
     {
         return $this->fold($f, $g);
     }
@@ -76,7 +85,9 @@ final class Success extends Validation
     }
 }
 
-function Success($x) : Validation
+function Success()
 {
-    return new Success($x);
+    return curry(function ($x) {
+        return new Success($x);
+    })(...func_get_args());
 }

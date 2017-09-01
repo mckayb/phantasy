@@ -4,45 +4,64 @@ use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Maybe\Maybe;
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 use function Phantasy\Core\{
-  identity,
-  compose,
-  curry,
-  curryN,
-  prop,
-  map,
-  fmap,
-  ap,
-  mempty,
-  filter,
-  reduce,
-  chain,
-  mjoin,
-  isTraversable,
-  trace,
-  liftA,
-  liftA2,
-  liftA3,
-  liftA4,
-  liftA5,
-  semigroupConcat,
-  concat,
-  contramap,
-  cmap,
-  flip,
-  foldl,
-  foldr,
-  reduceRight,
-  bimap
+    id,
+    identity,
+    equals,
+    compose,
+    curry,
+    curryN,
+    prop,
+    map,
+    fmap,
+    ap,
+    mempty,
+    filter,
+    reduce,
+    chain,
+    mjoin,
+    isTraversable,
+    trace,
+    liftA,
+    liftA2,
+    liftA3,
+    liftA4,
+    liftA5,
+    semigroupConcat,
+    concat,
+    contramap,
+    cmap,
+    flip,
+    foldl,
+    foldr,
+    reduceRight,
+    bimap
 };
 
 class FunctionsTest extends TestCase
 {
+    public function testId()
+    {
+        $this->assertEquals(1, id(1));
+        $this->assertEquals(false, id(false));
+        $this->assertEquals(true, id(true));
+        $this->assertEquals("Foo bar", id("Foo bar"));
+    }
+
     public function testIdentity()
     {
         $this->assertEquals(1, identity(1));
         $this->assertEquals(false, identity(false));
         $this->assertEquals(true, identity(true));
         $this->assertEquals("Foo bar", identity("Foo bar"));
+    }
+
+    public function equals()
+    {
+        $this->assertTrue(equals(1, 1));
+        $this->assertFalse(equals(1, '1'));
+        $this->assertFalse(equals(false, true));
+        $this->assertFalse(equals('foo ', 'foo'));
+        $this->assertTrue(equals(new Right(1), new Right(1)));
     }
 
     public function testIdentityCurried()

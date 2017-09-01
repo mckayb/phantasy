@@ -2,69 +2,77 @@
 
 namespace Phantasy\DataTypes\Maybe;
 
-use Phantasy\DataTypes\Either\Left;
-use Phantasy\DataTypes\Validation\Failure;
+use Phantasy\DataTypes\Either\{Either, Left};
+use Phantasy\DataTypes\Validation\{Validation, Failure};
+use Phantasy\Traits\CurryNonPublicMethods;
 
 final class Nothing extends Maybe
 {
+    use CurryNonPublicMethods;
+
     public function __toString()
     {
         return "Nothing()";
     }
 
-    public function map(callable $f) : Maybe
+    private function equals(Maybe $m) : bool
+    {
+        return $this === $m;
+    }
+
+    private function map(callable $f) : Maybe
     {
         return $this;
     }
 
-    public function ap(Maybe $maybeWithFunction) : Maybe
+    private function ap(Maybe $maybeWithFunction) : Maybe
     {
         return $this;
     }
 
-    public function chain(callable $f) : Maybe
+    private function chain(callable $f) : Maybe
     {
         return $this;
     }
 
-    public function alt(Maybe $m) : Maybe
+    private function alt(Maybe $m) : Maybe
     {
         return $m;
     }
 
-    public function reduce(callable $f, $acc)
+    private function reduce(callable $f, $acc)
     {
         return $acc;
     }
 
-    public function getOrElse($d)
+    private function getOrElse($d)
     {
         return $d;
     }
 
     // Aliases
-    public function bind(callable $f)
+    private function bind(callable $f) : Maybe
     {
         return $this->chain($f);
     }
 
-    public function flatMap(callable $f)
+    private function flatMap(callable $f) : Maybe
     {
         return $this->chain($f);
     }
 
-    public function fold($d)
+    private function fold($d)
     {
         return $this->getOrElse($d);
     }
 
     // Conversions
-    public function toEither($val) : Left
+    private function toEither($val) : Either
     {
         return new Left($val);
     }
 
-    public function toValidation($val) : Failure
+    private function toValidation($val) : Validation
     {
         return new Failure($val);
     }

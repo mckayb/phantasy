@@ -2,44 +2,53 @@
 
 namespace Phantasy\DataTypes\LinkedList;
 
+use Phantasy\Traits\CurryNonPublicMethods;
+
 final class Nil extends LinkedList
 {
-    public function map(callable $f) : LinkedList
+    use CurryNonPublicMethods;
+
+    private function equals(LinkedList $l) : bool
+    {
+        return $this === $l;
+    }
+
+    private function map(callable $f) : LinkedList
     {
         return new Nil();
     }
 
-    public function ap(LinkedList $c) : LinkedList
+    private function ap(LinkedList $c) : LinkedList
     {
         return new Nil();
     }
 
-    public function chain(callable $f) : LinkedList
+    private function chain(callable $f) : LinkedList
     {
         return new Nil();
     }
 
-    public function concat(LinkedList $c) : LinkedList
+    private function concat(LinkedList $c) : LinkedList
     {
         return $c;
     }
 
-    public function reduce(callable $f, $acc)
+    private function reduce(callable $f, $acc)
     {
         return $acc;
     }
 
-    public function join() : LinkedList
+    private function join() : LinkedList
     {
         return new Nil();
     }
 
-    public function traverse(callable $of, callable $f)
+    private function traverse(callable $of, callable $f)
     {
         return $of(new Nil());
     }
 
-    public function sequence(callable $of)
+    private function sequence(callable $of)
     {
         return $of(new Nil());
     }

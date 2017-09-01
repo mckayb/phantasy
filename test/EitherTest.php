@@ -13,15 +13,33 @@ class EitherTest extends TestCase
         $this->assertEquals(Left(12), new Left(12));
     }
 
+    public function testLeftFuncCurried()
+    {
+        $l = Left();
+        $this->assertEquals($l(12), new Left(12));
+    }
+
     public function testRightFunc()
     {
         $this->assertEquals(Right(12), new Right(12));
+    }
+
+    public function testRightFuncCurried()
+    {
+        $r = Right();
+        $this->assertEquals($r(12), new Right(12));
     }
 
     public function testEitherOf()
     {
         $just123 = Either::of(123);
         $this->assertInstanceOf(Right::class, $just123);
+    }
+
+    public function testEitherOfCurried()
+    {
+        $of = Either::of();
+        $this->assertEquals(Right(12), $of(12));
     }
 
     public function testEitherFromNullable()
@@ -33,6 +51,13 @@ class EitherTest extends TestCase
         $this->assertInstanceOf(Left::class, $left);
         $this->assertEquals(new Right("foo"), $right);
         $this->assertEquals(Either::of("foo"), $right);
+    }
+
+    public function testEitherFromNullableCurried()
+    {
+        $withDef = Either::fromNullable("left");
+        $this->assertEquals(new Right("foo"), $withDef("foo"));
+        $this->assertEquals(new Left("left"), $withDef(null));
     }
 
     public function testEitherTryCatchRight()
@@ -60,6 +85,20 @@ class EitherTest extends TestCase
         $this->assertEquals(new Left(new \Exception('baz')), $a);
     }
 
+    public function testEitherTryCatchCurried()
+    {
+        $tryCatchEither = Either::tryCatch();
+        $a = $tryCatchEither(
+            function () {
+                return "foo bar";
+            }
+        );
+
+        $this->assertInstanceOf(Right::class, $a);
+        $this->assertEquals(new Right("foo bar"), $a);
+        $this->assertEquals(Either::of("foo bar"), $a);
+    }
+
     public function testEitherZero()
     {
         $this->assertEquals(Either::zero(), new Left(null));
@@ -85,6 +124,17 @@ class EitherTest extends TestCase
         }), Either::zero());
     }
 
+    public function testEitherAltCurried()
+    {
+        $alt = Either::of(3)->alt();
+        $this->assertEquals($alt(Right(4)), Right(3));
+        $this->assertEquals($alt(Left(2)), Right(3));
+
+        $alt2 = Left(3)->alt();
+        $this->assertEquals($alt2(Right(2)), Right(2));
+        $this->assertEquals($alt2(Left(5)), Left(5));
+    }
+
     public function testEitherAlternative()
     {
         $x = Either::of(3);
@@ -102,6 +152,15 @@ class EitherTest extends TestCase
         $this->assertEquals($x->ap($f->alt($g2)), $x->ap($f)->alt($x->ap($g2)));
         $this->assertEquals($x->ap($f1->alt($g)), $x->ap($f1)->alt($x->ap($g)));
         $this->assertEquals($x->ap($f1->alt($g2)), $x->ap($f1)->alt($x->ap($g2)));
+    }
+
+    public function testRightMapCurried()
+    {
+        $a = Right(123);
+        $map = $a->map();
+        $this->assertEquals($map(function ($x) {
+            return $x + 1;
+        }), Right(124));
     }
 
     public function testRightMapIdentity()
@@ -174,6 +233,27 @@ class EitherTest extends TestCase
         $this->assertEquals(new Right(124), $a);
     }
 
+    public function testRightBimapCurried()
+    {
+        $left = function ($lv) {
+            return $lv - 1;
+        };
+
+        $right = function ($rv) {
+            return $rv + 1;
+        };
+        $a = Either::of(123)->bimap($left, $right);
+        $b = Either::of(123)->bimap();
+        $bWithLeft = $b($left);
+        $bWithBoth = $bWithLeft($right);
+
+        $c = Either::of(123)->bimap($left);
+        $cWithBoth = $c($right);
+        $this->assertEquals(Right(124), $a);
+        $this->assertEquals(Right(124), $bWithBoth);
+        $this->assertEquals(Right(124), $cWithBoth);
+    }
+
     public function testRightFoldOnlyAppliesRightFunction()
     {
         $a = Either::of(12)->fold(
@@ -188,6 +268,23 @@ class EitherTest extends TestCase
         $this->assertEquals(13, $a);
     }
 
+    public function testRightFoldCurried()
+    {
+        $left = function ($x) {
+            return $x - 1;
+        };
+        $right = function ($x) {
+            return $x + 1;
+        };
+        $a = Either::of(12)->fold($left, $right);
+        $b = Either::of(12)->fold();
+        $bWithLeft = $b($left);
+        $bWithBoth = $bWithLeft($right);
+
+        $this->assertEquals(13, $a);
+        $this->assertEquals(13, $bWithBoth);
+    }
+
     public function testRightCataOnlyAppliesRightFunction()
     {
         $a = Either::of(12)->cata(
@@ -200,6 +297,23 @@ class EitherTest extends TestCase
         );
 
         $this->assertEquals(13, $a);
+    }
+
+    public function testRightCataIsCurried()
+    {
+        $left = function ($x) {
+            return $x - 1;
+        };
+        $right = function ($x) {
+            return $x + 1;
+        };
+        $a = Either::of(12)->cata($left, $right);
+        $b = Either::of(12)->cata();
+        $bWithLeft = $b($left);
+        $bWithBoth = $bWithLeft($right);
+
+        $this->assertEquals(13, $a);
+        $this->assertEquals(13, $bWithBoth);
     }
 
     public function testRightChain()

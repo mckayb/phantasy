@@ -2,18 +2,21 @@
 
 namespace Phantasy\DataTypes\Writer;
 
-use function Phantasy\Core\{mempty, concat};
+use function Phantasy\Core\{mempty, concat, curry};
+use Phantasy\Traits\CurryNonPublicMethods;
 
 final class Writer
 {
+    use CurryNonPublicMethods;
+
     private $func = null;
 
-    public function __construct($f)
+    public function __construct(callable $f)
     {
         $this->func = $f;
     }
 
-    public static function of($val, $m = [])
+    private static function of($m, $val) : Writer
     {
         return new Writer(function () use ($val, $m) {
             return [$val, mempty($m)];
@@ -25,7 +28,7 @@ final class Writer
         return call_user_func($this->func);
     }
 
-    public function map(callable $f) : Writer
+    private function map(callable $f) : Writer
     {
         return new Writer(function () use ($f) {
             list ($compVal, $logVal) = $this->run();
@@ -33,7 +36,7 @@ final class Writer
         });
     }
 
-    public function ap(Writer $w) : Writer
+    private function ap(Writer $w) : Writer
     {
         return new Writer(function () use ($w) {
             list ($compX, $logX) = $this->run();
@@ -43,7 +46,7 @@ final class Writer
         });
     }
 
-    public function chain(callable $g) : Writer
+    private function chain(callable $g) : Writer
     {
         return new Writer(function () use ($g) {
             list($compX, $logX) = $this->run();
@@ -52,18 +55,20 @@ final class Writer
         });
     }
 
-    public function bind(callable $g) : Writer
+    private function bind(callable $g) : Writer
     {
         return $this->chain($g);
     }
 
-    public function flatMap(callable $g) : Writer
+    private function flatMap(callable $g) : Writer
     {
         return $this->chain($g);
     }
 }
 
-function Writer($f) : Writer
+function Writer()
 {
-    return new Writer($f);
+    return curry(function (callable $f) {
+        return new Writer($f);
+    })(...func_get_args());
 }

@@ -2,36 +2,32 @@
 
 namespace Phantasy\DataTypes\Validation;
 
-use function Phantasy\Core\curry;
+use Phantasy\Traits\CurryNonPublicMethods;
 
 class Validation
 {
-    public static function of() : Success
+    use CurryNonPublicMethods;
+
+    private static function of($x) : Validation
     {
-        return curry(function ($x) {
-            return new Success($x);
-        })(...func_get_args());
+        return new Success($x);
     }
 
-    public static function fromNullable()
+    private static function fromNullable($failVal, $val) : Validation
     {
-        return curry(function ($failVal, $val) {
-            return is_null($val) ? new Failure($failVal) : new Success($val);
-        })(...func_get_args());
+        return is_null($val) ? new Failure($failVal) : new Success($val);
     }
 
-    public static function tryCatch()
+    private static function tryCatch(callable $f) : Validation
     {
-        return curry(function ($f) {
-            try {
-                return new Success($f());
-            } catch (\Exception $e) {
-                return new Failure($e);
-            }
-        })(...func_get_args());
+        try {
+            return new Success($f());
+        } catch (\Exception $e) {
+            return new Failure($e);
+        }
     }
 
-    public static function zero() : Failure
+    public static function zero() : Validation
     {
         return new Failure([]);
     }

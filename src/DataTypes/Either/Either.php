@@ -3,32 +3,29 @@
 namespace Phantasy\DataTypes\Either;
 
 use function Phantasy\Core\curry;
+use Phantasy\Traits\CurryNonPublicMethods;
 
 class Either
 {
-    final public static function of()
+    use CurryNonPublicMethods;
+
+    final private static function of($val)
     {
-        return curry(function ($val) {
-            return new Right($val);
-        })(...func_get_args());
+        return new Right($val);
     }
 
-    final public static function fromNullable()
+    final private static function fromNullable($failVal, $val)
     {
-        return curry(function ($failVal, $val) {
-            return is_null($val) ? new Left($failVal) : new Right($val);
-        })(...func_get_args());
+        return is_null($val) ? new Left($failVal) : new Right($val);
     }
 
-    final public static function tryCatch()
+    final private static function tryCatch(callable $f)
     {
-        return curry(function (callable $f) {
-            try {
-                return new Right($f());
-            } catch (\Exception $e) {
-                return new Left($e);
-            }
-        })(...func_get_args());
+        try {
+            return new Right($f());
+        } catch (\Exception $e) {
+            return new Left($e);
+        }
     }
 
     final public static function zero() : Either

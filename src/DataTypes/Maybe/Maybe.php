@@ -3,32 +3,29 @@
 namespace Phantasy\DataTypes\Maybe;
 
 use function Phantasy\Core\curry;
+use Phantasy\Traits\CurryNonPublicMethods;
 
 class Maybe
 {
-    final public static function of()
+    use CurryNonPublicMethods;
+
+    final private static function of($val) : Maybe
     {
-        return curry(function ($val) {
-            return new Just($val);
-        })(...func_get_args());
+        return new Just($val);
     }
 
-    final public static function fromNullable()
+    final private static function fromNullable($val) : Maybe
     {
-        return curry(function ($val) {
-            return is_null($val) ? new Nothing() : new Just($val);
-        })(...func_get_args());
+        return is_null($val) ? new Nothing() : new Just($val);
     }
 
-    final public static function tryCatch()
+    final private static function tryCatch(callable $f) : Maybe
     {
-        return curry(function (callable $f) {
-            try {
-                return new Just($f());
-            } catch (\Exception $e) {
-                return new Nothing();
-            }
-        })(...func_get_args());
+        try {
+            return new Just($f());
+        } catch (\Exception $e) {
+            return new Nothing();
+        }
     }
 
     final public static function zero() : Maybe

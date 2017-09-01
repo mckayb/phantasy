@@ -2,10 +2,13 @@
 
 namespace Phantasy\DataTypes\LinkedList;
 
+use Phantasy\Traits\CurryNonPublicMethods;
 use function Phantasy\Core\{concat, curry, identity, map};
 
 final class Cons extends LinkedList
 {
+    use CurryNonPublicMethods;
+
     private $head = null;
     private $tail = null;
 
@@ -15,39 +18,44 @@ final class Cons extends LinkedList
         $this->tail = $tail;
     }
 
-    public function map(callable $f) : LinkedList
+    private function equals(LinkedList $l) : bool
+    {
+        return $this === $l;
+    }
+
+    private function map(callable $f) : LinkedList
     {
         return new static($f($this->head), $this->tail->map($f));
     }
 
-    public function ap(LinkedList $c) : LinkedList
+    private function ap(LinkedList $c) : LinkedList
     {
         return $c->map(function ($fn) {
             return $this->map($fn);
         })->join();
     }
 
-    public function chain(callable $f)
+    private function chain(callable $f)
     {
         return $this->map($f)->join();
     }
 
-    public function concat(LinkedList $c) : LinkedList
+    private function concat(LinkedList $c) : LinkedList
     {
         return new static($this->head, $this->tail->concat($c));
     }
 
-    public function reduce(callable $f, $acc)
+    private function reduce(callable $f, $acc)
     {
         return $this->tail->reduce($f, $f($acc, $this->head));
     }
 
-    public function join() : LinkedList
+    private function join() : LinkedList
     {
         return $this->head->concat($this->tail->join());
     }
 
-    public function traverse(callable $of, callable $f)
+    private function traverse(callable $of, callable $f)
     {
         return $this->reduce(function ($ys, $x) use ($f) {
             return $ys->ap($f($x)->map(curry(function ($a, $b) {
@@ -56,7 +64,7 @@ final class Cons extends LinkedList
         }, $of(new Nil()));
     }
 
-    public function sequence(callable $of)
+    private function sequence(callable $of)
     {
         return $this->traverse($of, identity());
     }
@@ -67,7 +75,9 @@ final class Cons extends LinkedList
     }
 }
 
-function Cons($head, $tail) : LinkedList
+function Cons()
 {
-    return new Cons($head, $tail);
+    return curry(function ($head, $tail) {
+        return new Cons($head, $tail);
+    })(...func_get_args());
 }
