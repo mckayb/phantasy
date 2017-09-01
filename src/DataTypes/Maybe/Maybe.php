@@ -6,21 +6,21 @@ use function Phantasy\Core\curry;
 
 class Maybe
 {
-    public static function of()
+    final public static function of()
     {
         return curry(function ($val) {
             return new Just($val);
         })(...func_get_args());
     }
 
-    public static function fromNullable()
+    final public static function fromNullable()
     {
         return curry(function ($val) {
             return is_null($val) ? new Nothing() : new Just($val);
         })(...func_get_args());
     }
 
-    public static function tryCatch()
+    final public static function tryCatch()
     {
         return curry(function (callable $f) {
             try {
@@ -31,7 +31,7 @@ class Maybe
         })(...func_get_args());
     }
 
-    public static function zero() : Nothing
+    final public static function zero() : Maybe
     {
         return new Nothing();
     }

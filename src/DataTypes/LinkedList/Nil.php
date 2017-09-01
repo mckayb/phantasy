@@ -2,24 +2,24 @@
 
 namespace Phantasy\DataTypes\LinkedList;
 
-class Nil
+final class Nil extends LinkedList
 {
-    public function map(callable $f) : Nil
+    public function map(callable $f) : LinkedList
     {
         return new Nil();
     }
 
-    public function ap($c) : Nil
+    public function ap(LinkedList $c) : LinkedList
     {
         return new Nil();
     }
 
-    public function chain(callable $f) : Nil
+    public function chain(callable $f) : LinkedList
     {
         return new Nil();
     }
 
-    public function concat($c)
+    public function concat(LinkedList $c) : LinkedList
     {
         return $c;
     }
@@ -29,7 +29,7 @@ class Nil
         return $acc;
     }
 
-    public function join() : Nil
+    public function join() : LinkedList
     {
         return new Nil();
     }
@@ -50,7 +50,7 @@ class Nil
     }
 }
 
-function Nil()
+function Nil() : LinkedList
 {
     return new Nil();
 }

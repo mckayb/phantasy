@@ -4,7 +4,7 @@ namespace Phantasy\DataTypes\LinkedList;
 
 use function Phantasy\Core\{concat, curry, identity, map};
 
-class Cons
+final class Cons extends LinkedList
 {
     private $head = null;
     private $tail = null;
@@ -15,12 +15,12 @@ class Cons
         $this->tail = $tail;
     }
 
-    public function map(callable $f) : Cons
+    public function map(callable $f) : LinkedList
     {
         return new static($f($this->head), $this->tail->map($f));
     }
 
-    public function ap($c)
+    public function ap(LinkedList $c) : LinkedList
     {
         return $c->map(function ($fn) {
             return $this->map($fn);
@@ -32,7 +32,7 @@ class Cons
         return $this->map($f)->join();
     }
 
-    public function concat($c) : Cons
+    public function concat(LinkedList $c) : LinkedList
     {
         return new static($this->head, $this->tail->concat($c));
     }
@@ -42,7 +42,7 @@ class Cons
         return $this->tail->reduce($f, $f($acc, $this->head));
     }
 
-    public function join() : Cons
+    public function join() : LinkedList
     {
         return $this->head->concat($this->tail->join());
     }
@@ -67,7 +67,7 @@ class Cons
     }
 }
 
-function Cons($head, $tail)
+function Cons($head, $tail) : LinkedList
 {
     return new Cons($head, $tail);
 }

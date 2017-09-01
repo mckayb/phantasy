@@ -5,7 +5,7 @@ namespace Phantasy\DataTypes\Either;
 use Phantasy\DataTypes\Maybe\Just;
 use Phantasy\DataTypes\Validation\Success;
 
-class Right
+final class Right extends Either
 {
     private $value = null;
 
@@ -19,12 +19,12 @@ class Right
         return "Right(" . var_export($this->value, true) . ")";
     }
 
-    public function map($f)
+    public function map(callable $f) : Either
     {
-        return Either::of($f($this->value));
+        return new Right($f($this->value));
     }
 
-    public function ap($eitherWithFunction)
+    public function ap(Either $eitherWithFunction)
     {
         $val = $this->value;
         return $eitherWithFunction->map(
@@ -34,7 +34,7 @@ class Right
         );
     }
 
-    public function chain($f)
+    public function chain(callable $f) : Either
     {
         return $f($this->value);
     }
@@ -44,12 +44,12 @@ class Right
         return $g($this->value);
     }
 
-    public function bimap($f, $g)
+    public function bimap($f, $g) : Either
     {
         return new Right($g($this->value));
     }
 
-    public function alt($e)
+    public function alt(Either $e) : Either
     {
         return $this;
     }
@@ -60,17 +60,17 @@ class Right
     }
 
     // Aliases
-    public function bind($f)
+    public function bind(callable $f) : Either
     {
         return $this->chain($f);
     }
 
-    public function flatMap($f)
+    public function flatMap(callable $f) : Either
     {
         return $this->chain($f);
     }
 
-    public function cata($f, $g)
+    public function cata(callable $f, callable $g)
     {
         return $this->fold($f, $g);
     }

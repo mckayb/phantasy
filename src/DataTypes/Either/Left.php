@@ -5,7 +5,7 @@ namespace Phantasy\DataTypes\Either;
 use Phantasy\DataTypes\Maybe\Nothing;
 use Phantasy\DataTypes\Validation\Failure;
 
-class Left
+final class Left extends Either
 {
     private $value = null;
 
@@ -19,17 +19,17 @@ class Left
         return "Left(" . var_export($this->value, true) . ")";
     }
 
-    public function map(callable $f) : Left
+    public function map(callable $f) : Either
     {
         return $this;
     }
 
-    public function ap($eitherWithFunction) : Left
+    public function ap(Either $eitherWithFunction) : Either
     {
         return $this;
     }
 
-    public function chain(callable $f) : Left
+    public function chain(callable $f) : Either
     {
         return $this;
     }
@@ -39,12 +39,12 @@ class Left
         return $f($this->value);
     }
 
-    public function bimap(callable $f, callable $g) : Left
+    public function bimap(callable $f, callable $g) : Either
     {
         return new Left($f($this->value));
     }
 
-    public function alt($e)
+    public function alt(Either $e) : Either
     {
         return $e;
     }

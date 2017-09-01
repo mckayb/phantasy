@@ -5,31 +5,31 @@ namespace Phantasy\DataTypes\Maybe;
 use Phantasy\DataTypes\Either\Left;
 use Phantasy\DataTypes\Validation\Failure;
 
-class Nothing
+final class Nothing extends Maybe
 {
     public function __toString()
     {
         return "Nothing()";
     }
 
-    public function map(callable $f) : Nothing
+    public function map(callable $f) : Maybe
     {
         return $this;
     }
 
-    public function ap($maybeWithFunction) : Nothing
+    public function ap(Maybe $maybeWithFunction) : Maybe
     {
         return $this;
     }
 
-    public function chain(callable $f) : Nothing
+    public function chain(callable $f) : Maybe
     {
         return $this;
     }
 
-    public function alt($maybe)
+    public function alt(Maybe $m) : Maybe
     {
-        return $maybe;
+        return $m;
     }
 
     public function reduce(callable $f, $acc)

@@ -2,7 +2,7 @@
 
 namespace Phantasy\DataTypes\State;
 
-class State
+final class State
 {
     private $func = null;
 
@@ -59,7 +59,7 @@ class State
     }
 }
 
-function State(callable $f)
+function State(callable $f) : State
 {
     return new State($f);
 }

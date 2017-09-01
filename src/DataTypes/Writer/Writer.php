@@ -4,7 +4,7 @@ namespace Phantasy\DataTypes\Writer;
 
 use function Phantasy\Core\{mempty, concat};
 
-class Writer
+final class Writer
 {
     private $func = null;
 
@@ -63,7 +63,7 @@ class Writer
     }
 }
 
-function Writer($f)
+function Writer($f) : Writer
 {
     return new Writer($f);
 }

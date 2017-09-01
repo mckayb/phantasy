@@ -7,14 +7,14 @@ use function Phantasy\Core\{reduce, curry};
 
 class LinkedList
 {
-    public static function of() : Cons
+    final public static function of() : Cons
     {
         return curry(function ($x) {
             return new Cons($x, new Nil());
         })(...func_get_args());
     }
 
-    public static function fromArray()
+    final public static function fromArray()
     {
         return curry(function (array $arr) {
             return reduce(function ($list, $x) {
@@ -23,7 +23,7 @@ class LinkedList
         })(...func_get_args());
     }
 
-    public static function empty() : Nil
+    final public static function empty() : Nil
     {
         return new Nil();
     }

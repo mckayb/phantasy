@@ -5,7 +5,7 @@ namespace Phantasy\DataTypes\Maybe;
 use Phantasy\DataTypes\Either\Right;
 use Phantasy\DataTypes\Validation\Success;
 
-class Just
+final class Just extends Maybe
 {
     private $value = null;
 

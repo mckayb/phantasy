@@ -6,21 +6,21 @@ use function Phantasy\Core\curry;
 
 class Either
 {
-    public static function of()
+    final public static function of()
     {
         return curry(function ($val) {
             return new Right($val);
         })(...func_get_args());
     }
 
-    public static function fromNullable()
+    final public static function fromNullable()
     {
         return curry(function ($failVal, $val) {
             return is_null($val) ? new Left($failVal) : new Right($val);
         })(...func_get_args());
     }
 
-    public static function tryCatch()
+    final public static function tryCatch()
     {
         return curry(function (callable $f) {
             try {
@@ -31,7 +31,7 @@ class Either
         })(...func_get_args());
     }
 
-    public static function zero() : Left
+    final public static function zero() : Either
     {
         return new Left(null);
     }

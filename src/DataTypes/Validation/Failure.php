@@ -2,11 +2,11 @@
 
 namespace Phantasy\DataTypes\Validation;
 
-use Phantasy\DataTypes\Either\Left;
-use Phantasy\DataTypes\Maybe\Nothing;
+use Phantasy\DataTypes\Either\{Either, Left};
+use Phantasy\DataTypes\Maybe\{Maybe, Nothing};
 use function Phantasy\Core\concat;
 
-class Failure
+final class Failure extends Validation
 {
     private $value = null;
 
@@ -20,17 +20,17 @@ class Failure
         return "Failure(" . var_export($this->value, true) . ")";
     }
 
-    public function map(callable $f) : Failure
+    public function map(callable $f) : Validation
     {
         return $this;
     }
 
-    public function ap($v) : Failure
+    public function ap(Validation $v) : Validation
     {
         return $this;
     }
 
-    public function concat($v) : Failure
+    public function concat(Validation $v) : Validation
     {
         if ($v instanceof Success) {
             return $this;
@@ -44,12 +44,12 @@ class Failure
         return $f($this->value);
     }
 
-    public function bimap(callable $f, callable $g) : Failure
+    public function bimap(callable $f, callable $g) : Validation
     {
         return new Failure($f($this->value));
     }
 
-    public function alt($v)
+    public function alt(Validation $v) : Validation
     {
         return $v;
     }
@@ -66,18 +66,18 @@ class Failure
     }
 
     // Transformations
-    public function toEither() : Left
+    public function toEither() : Either
     {
         return new Left($this->value);
     }
 
-    public function toMaybe() : Nothing
+    public function toMaybe() : Maybe
     {
         return new Nothing();
     }
 }
 
-function Failure($x)
+function Failure($x) : Validation
 {
     return new Failure($x);
 }

@@ -328,26 +328,88 @@ function zero()
 
 function sequence()
 {
+    $sequence = curry(function (callable $of, $x) {
+        if (is_object($x)) {
+            if (method_exists($x, 'sequence')) {
+                return $x->sequence($of);
+            } elseif (method_exists($x, 'traverse')) {
+                return $x->traverse($of, identity());
+            }
+        }
+        return null;
+    });
+
+    return $sequence(...func_get_args());
 }
 
 function traverse()
 {
+    $traverse = curry(function (callable $of, callable $f, $x) {
+        if (is_object($x) && method_exists($x, 'traverse')) {
+            return $x->traverse($of, $f);
+        }
+        return null;
+    });
+
+    return $traverse(...func_get_args());
 }
 
 function chainRec()
 {
+    $chainRec = curry(function (callable $f, $x, $m) {
+        if (is_object($m) && method_exists($m, 'chainRec')) {
+            return $m->chainRec($f, $x);
+        }
+        return null;
+    });
+
+    return $chainRec(...func_get_args());
 }
 
 function extend()
 {
+    $extend = curry(function ($f, $w) {
+        if (is_object($w) && method_exists('extend')) {
+            return $w->extend($f);
+        }
+        return null;
+    });
+
+    return $extend(...func_get_args());
 }
 
 function extract()
 {
+    $extract = curry(function ($x) {
+        if (is_object($x) && method_exists($x, 'extract')) {
+            return $x->extract();
+        }
+
+        return null;
+    });
+
+    return $extract(...func_get_args());
 }
 
 function promap()
 {
+    $promap = curry(function (callable $f, callable $g, $x) {
+        if (is_object($x)) {
+            if (method_exists($x, 'promap')) {
+                return $x->promap($f, $g);
+            } elseif (method_exists($x, 'dimap')) {
+                return $x->dimap($f, $g);
+            }
+        }
+        return null;
+    });
+
+    return $promap(...func_get_args());
+}
+
+function dimap()
+{
+    return promap(...func_get_args());
 }
 
 // +mjoin :: Monad m => m (m a) -> m a

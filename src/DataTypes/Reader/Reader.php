@@ -2,7 +2,7 @@
 
 namespace Phantasy\DataTypes\Reader;
 
-class Reader
+final class Reader
 {
     private $f;
 
@@ -55,7 +55,7 @@ class Reader
     }
 }
 
-function Reader(callable $f)
+function Reader(callable $f) : Reader
 {
     return new Reader($f);
 }
