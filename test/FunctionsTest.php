@@ -1,8 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use Phantasy\DataTypes\Maybe\Maybe;
+use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Either\{Either, Left, Right};
+use Phantasy\DataTypes\LinkedList\{LinkedList, Cons, Nil};
 use function Phantasy\Core\{
     id,
     identity,
@@ -16,7 +17,9 @@ use function Phantasy\Core\{
     map,
     fmap,
     ap,
+    alt,
     mempty,
+    zero,
     filter,
     reduce,
     chain,
@@ -192,6 +195,153 @@ class FunctionsTest extends TestCase
         $this->assertEquals($f(2), 4);
     }
 
+    public function testAlt()
+    {
+        $a = new Left(1);
+        $b = new Left(2);
+        $c = new Right(2);
+        $this->assertEquals(alt($a, $b), $b);
+        $this->assertEquals(alt($a, $c), $c);
+        $this->assertEquals(alt($c, $a), $c);
+        $this->assertEquals(alt($c, $b), $c);
+    }
+
+    public function testAltCurried()
+    {
+        $a = new Left(1);
+        $b = new Left(2);
+        $c = new Right(2);
+        $alt = alt();
+        $this->assertEquals($alt($a, $b), $b);
+        $this->assertEquals($alt($a, $c), $c);
+        $this->assertEquals($alt($c, $a), $c);
+        $this->assertEquals($alt($c, $b), $c);
+        $altA = $alt($a);
+        $this->assertEquals($altA($b), $b);
+        $this->assertEquals($altA($c), $c);
+        $altC = $alt($c);
+        $this->assertEquals($altC($a), $c);
+        $this->assertEquals($altC($b), $c);
+    }
+
+    public function testZero()
+    {
+        $this->assertEquals(zero(Maybe::class), new Nothing());
+    }
+
+    public function testZeroCurried()
+    {
+        $zero = zero();
+        $this->assertEquals($zero(Maybe::class), new Nothing());
+    }
+
+    public function testSequence()
+    {
+        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
+        $this->assertEquals(
+            $a->sequence(Either::class),
+            new Right(new Cons(1, new Cons(2, new Nil())))
+        );
+    }
+
+    public function testSequenceCurried()
+    {
+        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
+        $sequence = $a->sequence;
+        $sequence_ = $a->sequence();
+        $sequence__ = $sequence();
+
+        $expected = new Right(new Cons(1, new Cons(2, new Nil())));
+        $this->assertEquals($sequence(Either::class), $expected);
+        $this->assertEquals($sequence_(Either::class), $expected);
+        $this->assertEquals($sequence__(Either::class), $expected);
+    }
+
+    public function testTraverse()
+    {
+        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
+        $traverse = $a->traverse;
+        $traverse_ = $a->traverse();
+        $traverse__ = $traverse();
+
+        $f = function ($x) {
+            return $x->toMaybe()->map(function ($x) {
+                return $x + 1;
+            });
+        };
+
+        $expected = new Just(new Cons(2, new Cons(3, new Nil())));
+        $this->assertEquals($traverse(Maybe::class, $f), $expected);
+        $this->assertEquals($traverse_(Maybe::class, $f), $expected);
+        $this->assertEquals($traverse__(Maybe::class, $f), $expected);
+    }
+
+    public function testTraverseCurried()
+    {
+        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
+        $traverse = $a->traverse;
+        $traverse_ = $a->traverse();
+        $traverse__ = $traverse();
+
+        $traverseMaybe = $traverse(Maybe::class);
+        $traverseMaybe_ = $traverse_(Maybe::class);
+        $traverseMaybe__ = $traverse__(Maybe::class);
+
+        $f = function ($x) {
+            return $x->toMaybe()->map(function ($x) {
+                return $x + 1;
+            });
+        };
+
+        $expected = new Just(new Cons(2, new Cons(3, new Nil())));
+        $this->assertEquals($traverse(Maybe::class, $f), $expected);
+        $this->assertEquals($traverse_(Maybe::class, $f), $expected);
+        $this->assertEquals($traverse__(Maybe::class, $f), $expected);
+        $this->assertEquals($traverseMaybe($f), $expected);
+        $this->assertEquals($traverseMaybe_($f), $expected);
+        $this->assertEquals($traverseMaybe__($f), $expected);
+    }
+
+    public function testChainRec()
+    {
+    }
+
+    public function testChainRecCurried()
+    {
+    }
+
+    public function testExtend()
+    {
+    }
+
+    public function testExtendCurried()
+    {
+    }
+
+    public function testExtract()
+    {
+    }
+
+    public function testExtractCurried()
+    {
+    }
+
+    public function testPromap()
+    {
+    }
+
+    public function testPromapCurried()
+    {
+    }
+
+    public function testDimap()
+    {
+    }
+
+    public function testDimapCurried()
+    {
+    }
+
     public function testCurry()
     {
         $add = curry(
@@ -359,6 +509,11 @@ class FunctionsTest extends TestCase
         };
 
         $this->assertEquals('test', mempty($foo));
+    }
+
+    public function testMEmptyClassName()
+    {
+        $this->assertEquals(mempty(LinkedList::class), new Nil());
     }
 
     public function testMEmptyNullIfDoesntMakeSense()

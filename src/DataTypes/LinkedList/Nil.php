@@ -43,14 +43,22 @@ final class Nil extends LinkedList
         return new Nil();
     }
 
-    private function traverse(callable $of, callable $f)
+    private function traverse(string $className, callable $f)
     {
-        return $of(new Nil());
+        if (!class_exists($className) || !method_exists($className, 'of')) {
+            throw new InvalidArgumentException('Method must be a class name of an Applicative (must have an of method).');
+        }
+
+        return $className::of(new Nil());
     }
 
-    private function sequence(callable $of)
+    private function sequence(string $className)
     {
-        return $of(new Nil());
+        if (!class_exists($className) || !method_exists($className, 'of')) {
+            throw new InvalidArgumentException('Method must be a class name of an Applicative (must have an of method).');
+        }
+
+        return $className::of(new Nil());
     }
 
     public function __toString()

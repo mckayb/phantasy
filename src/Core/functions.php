@@ -313,6 +313,8 @@ function alt()
 
         return $a || $b;
     });
+
+    return $alt(...func_get_args());
 }
 
 // +zero :: Plus f => a -> f b
@@ -320,6 +322,10 @@ function alt()
 function zero()
 {
     $zero = curry(function ($a) {
+        if (is_string($a)) {
+            return $a::zero();
+        }
+
         if (is_object($a) && method_exists($a, 'zero')) {
             return $a->zero();
         }
@@ -332,12 +338,16 @@ function zero()
 
 function sequence()
 {
-    $sequence = curry(function (callable $of, $x) {
+    $sequence = curry(function (string $className, $x) {
+        if (!class_exists($className) || !method_exists($className, 'of')) {
+            throw new InvalidArgumentException('Method must be a class name of an Applicative (must have an of method).');
+        }
+
         if (is_object($x)) {
             if (method_exists($x, 'sequence')) {
-                return $x->sequence($of);
+                return $x->sequence($className);
             } elseif (method_exists($x, 'traverse')) {
-                return $x->traverse($of, identity());
+                return $x->traverse($className, identity());
             }
         }
         return null;
@@ -348,9 +358,13 @@ function sequence()
 
 function traverse()
 {
-    $traverse = curry(function (callable $of, callable $f, $x) {
+    $traverse = curry(function (string $className, callable $f, $x) {
+        if (!class_exists($className) || !method_exists($className, 'of')) {
+            throw new InvalidArgumentException('Method must be a class name of an Applicative (must have an of method).');
+        }
+
         if (is_object($x) && method_exists($x, 'traverse')) {
-            return $x->traverse($of, $f);
+            return $x->traverse($className, $f);
         }
         return null;
     });
@@ -469,11 +483,14 @@ function mempty()
             return [];
         }
 
+        $methodExists = method_exists($x, 'empty');
         if (is_string($x)) {
-            return '';
+            return $methodExists
+                ? $x::empty()
+                : '';
         }
 
-        if (is_object($x) && method_exists($x, 'empty')) {
+        if ($methodExists && is_object($x)) {
             return $x->empty();
         }
 

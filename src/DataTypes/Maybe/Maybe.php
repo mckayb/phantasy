@@ -5,7 +5,7 @@ namespace Phantasy\DataTypes\Maybe;
 use function Phantasy\Core\curry;
 use Phantasy\Traits\CurryNonPublicMethods;
 
-class Maybe
+abstract class Maybe
 {
     use CurryNonPublicMethods;
 
