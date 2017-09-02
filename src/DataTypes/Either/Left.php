@@ -25,7 +25,7 @@ final class Left extends Either
 
     public function equals(Either $e) : bool
     {
-        return $this === $e;
+        return $this == $e;
     }
 
     private function map(callable $f) : Either

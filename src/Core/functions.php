@@ -279,6 +279,10 @@ function ap()
 function of()
 {
     $of = curry(function ($a, $x) {
+        if (is_string($a)) {
+            return $a::of($x);
+        }
+
         if (method_exists($a, 'of')) {
             return $a->of($x);
         }

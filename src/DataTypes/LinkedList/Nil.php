@@ -10,7 +10,7 @@ final class Nil extends LinkedList
 
     private function equals(LinkedList $l) : bool
     {
-        return $this === $l;
+        return $this == $l;
     }
 
     private function map(callable $f) : LinkedList

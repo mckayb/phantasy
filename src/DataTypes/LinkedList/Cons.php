@@ -3,7 +3,7 @@
 namespace Phantasy\DataTypes\LinkedList;
 
 use Phantasy\Traits\CurryNonPublicMethods;
-use function Phantasy\Core\{concat, curry, identity, map};
+use function Phantasy\Core\{concat, curry, identity, map, liftA2};
 
 final class Cons extends LinkedList
 {
@@ -20,7 +20,7 @@ final class Cons extends LinkedList
 
     private function equals(LinkedList $l) : bool
     {
-        return $this === $l;
+        return $this == $l;
     }
 
     private function map(callable $f) : LinkedList
@@ -50,7 +50,7 @@ final class Cons extends LinkedList
         return $this->tail->reduce($f, $f($acc, $this->head));
     }
 
-    private function join() : LinkedList
+    public function join() : LinkedList
     {
         return $this->head->concat($this->tail->join());
     }
@@ -58,9 +58,9 @@ final class Cons extends LinkedList
     private function traverse(callable $of, callable $f)
     {
         return $this->reduce(function ($ys, $x) use ($f) {
-            return $ys->ap($f($x)->map(curry(function ($a, $b) {
-                return $b->concat(new Cons($a, new Nil()));
-            })));
+            return liftA2(curry(function ($a, $b) {
+                return $b->concat(Cons($a, Nil()));
+            }), $f($x), $ys);
         }, $of(new Nil()));
     }
 

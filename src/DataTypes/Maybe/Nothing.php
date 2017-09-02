@@ -17,7 +17,7 @@ final class Nothing extends Maybe
 
     private function equals(Maybe $m) : bool
     {
-        return $this === $m;
+        return $this == $m;
     }
 
     private function map(callable $f) : Maybe

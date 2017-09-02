@@ -25,7 +25,7 @@ final class Failure extends Validation
 
     private function equals(Validation $v) : bool
     {
-        return $this === $v;
+        return $this == $v;
     }
 
     private function map(callable $f) : Validation

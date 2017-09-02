@@ -6,12 +6,20 @@ use Phantasy\DataTypes\Either\{Either, Right};
 use Phantasy\DataTypes\Maybe\Maybe;
 use function Phantasy\Core\identity;
 use function Phantasy\DataTypes\LinkedList\{Cons, Nil};
+use function Phantasy\DataTypes\Maybe\{Just, Nothing};
+use function Phantasy\DataTypes\Either\Right;
 
 class LinkedListTest extends TestCase
 {
     public function testConsNilFunc()
     {
         $this->assertEquals(Cons(12, Nil()), new Cons(12, new Nil()));
+    }
+
+    public function testConsCurried()
+    {
+        $cons = Cons();
+        $this->assertEquals($cons(12, Nil()), new Cons(12, new Nil()));
     }
 
     public function testLinkedListOf()
@@ -22,6 +30,12 @@ class LinkedListTest extends TestCase
         $this->assertEquals($a, new Cons(2, new Nil()));
     }
 
+    public function testLinkedListOfCurried()
+    {
+        $ll = LinkedList::of();
+        $this->assertEquals($ll(12), Cons(12, Nil()));
+    }
+
     public function testLinkedListFromArray()
     {
         $a = LinkedList::fromArray([1, 2, 3]);
@@ -29,9 +43,28 @@ class LinkedListTest extends TestCase
         $this->assertEquals($a, new Cons(1, new Cons(2, new Cons(3, new Nil()))));
     }
 
+    public function testLinkedListFromArrayCurried()
+    {
+        $llfa = LinkedList::fromArray();
+        $this->assertEquals($llfa([1, 2]), Cons(1, Cons(2, Nil())));
+    }
+
     public function testLinkedListEmpty()
     {
         $this->assertEquals(LinkedList::empty(), new Nil());
+    }
+
+    public function testConsEquals()
+    {
+        $this->assertTrue(Cons(1, Nil())->equals(Cons(1, Nil())));
+        $this->assertFalse(Cons(1, Nil())->equals(Cons(2, Nil())));
+        $this->assertFalse(Cons(1, Nil())->equals(Nil()));
+    }
+
+    public function testNilEquals()
+    {
+        $this->assertTrue(Nil()->equals(Nil()));
+        $this->assertFalse(Nil()->equals(Cons(1, Nil())));
     }
 
     public function testConsMap()
@@ -44,6 +77,22 @@ class LinkedListTest extends TestCase
         $this->assertEquals($a, new Cons(3, new Nil()));
     }
 
+    public function testConsMapCurried()
+    {
+        $a = LinkedList::of(2);
+        $mapA = $a->map;
+        $mapA_ = $a->map();
+        $mapA__ = $mapA_();
+
+        $f = function ($x) {
+            return $x + 1;
+        };
+
+        $this->assertEquals($mapA($f), Cons(3, Nil()));
+        $this->assertEquals($mapA_($f), Cons(3, Nil()));
+        $this->assertEquals($mapA__($f), Cons(3, Nil()));
+    }
+
     public function testNilMap()
     {
         $a = (new Nil())->map(function ($x) {
@@ -52,6 +101,22 @@ class LinkedListTest extends TestCase
 
         $this->assertInstanceOf(Nil::class, $a);
         $this->assertEquals($a, new Nil());
+    }
+
+    public function testNilMapCurried()
+    {
+        $a = Nil();
+        $mapA = $a->map;
+        $mapA_ = $a->map();
+        $mapA__ = $mapA_();
+
+        $f = function ($x) {
+            return $x + 1;
+        };
+
+        $this->assertEquals($mapA($f), Nil());
+        $this->assertEquals($mapA_($f), Nil());
+        $this->assertEquals($mapA__($f), Nil());
     }
 
     public function testConsConcatCons()
@@ -76,6 +141,38 @@ class LinkedListTest extends TestCase
     {
         $a = (new Nil())->concat(new Nil());
         $this->assertEquals($a, new Nil());
+    }
+
+    public function testConsConcatCurried()
+    {
+        $a = Cons(1, Nil());
+        $b = Cons(2, Nil());
+
+        $concat = $a->concat;
+        $concat_ = $a->concat();
+        $concat__ = $concat();
+
+        $expected = Cons(1, Cons(2, Nil()));
+
+        $this->assertEquals($concat($b), $expected);
+        $this->assertEquals($concat_($b), $expected);
+        $this->assertEquals($concat__($b), $expected);
+    }
+
+    public function testNilConcatCurried()
+    {
+        $a = Nil();
+        $b = Cons(2, Nil());
+
+        $concat = $a->concat;
+        $concat_ = $a->concat();
+        $concat__ = $concat();
+
+        $expected = Cons(2, Nil());
+
+        $this->assertEquals($concat($b), $expected);
+        $this->assertEquals($concat_($b), $expected);
+        $this->assertEquals($concat__($b), $expected);
     }
 
     public function testConsJoin()
@@ -117,11 +214,41 @@ class LinkedListTest extends TestCase
         );
     }
 
+    public function testConsApCurried()
+    {
+        $a = LinkedList::of(2);
+        $b = LinkedList::of(function ($x) {
+            return $x + 1;
+        });
+
+        $apToA = $a->ap;
+        $apToA_ = $a->ap();
+        $apToA__ = $apToA();
+
+        $this->assertEquals($apToA($b), new Cons(3, new Nil()));
+        $this->assertEquals($apToA_($b), new Cons(3, new Nil()));
+        $this->assertEquals($apToA__($b), new Cons(3, new Nil()));
+    }
+
     public function testNilAp()
     {
         $a = new Nil();
         $b = LinkedList::of(2);
         $this->assertEquals($a->ap($b), new Nil());
+    }
+
+    public function testNilApCurried()
+    {
+        $a = Nil();
+        $b = LinkedList::of(2);
+
+        $apToA = $a->ap;
+        $apToA_ = $a->ap();
+        $apToA__ = $apToA();
+
+        $this->assertEquals($apToA($b), Nil());
+        $this->assertEquals($apToA_($b), Nil());
+        $this->assertEquals($apToA__($b), Nil());
     }
 
     public function testConsChain()
@@ -132,12 +259,44 @@ class LinkedListTest extends TestCase
         }), new Cons(3, new Nil()));
     }
 
+    public function testConsChainCurried()
+    {
+        $a = LinkedList::of(2);
+        $chain = $a->chain;
+        $chain_ = $a->chain();
+        $chain__ = $chain();
+
+        $f = function ($x) {
+            return LinkedList::of($x + 1);
+        };
+
+        $this->assertEquals($chain($f), Cons(3, Nil()));
+        $this->assertEquals($chain_($f), Cons(3, Nil()));
+        $this->assertEquals($chain__($f), Cons(3, Nil()));
+    }
+
     public function testNilChain()
     {
         $a = new Nil();
         $this->assertEquals($a->chain(function ($x) {
             return LinkedList::of(3);
         }), new Nil());
+    }
+
+    public function testNilChainCurried()
+    {
+        $a = Nil();
+        $chain = $a->chain;
+        $chain_ = $a->chain();
+        $chain__ = $chain();
+
+        $f = function ($x) {
+            return LinkedList::of($x + 1);
+        };
+
+        $this->assertEquals($chain($f), Nil());
+        $this->assertEquals($chain_($f), Nil());
+        $this->assertEquals($chain__($f), Nil());
     }
 
     public function testConsReduce()
@@ -149,12 +308,54 @@ class LinkedListTest extends TestCase
         }, 1), 2);
     }
 
+    public function testConsReduceCurried()
+    {
+        $a = Cons(1, Cons(2, Nil()));
+        $reduce = $a->reduce;
+        $reduce_ = $a->reduce();
+        $reduce__ = $reduce();
+
+        $f = function ($prev, $curr) {
+            return $prev + $curr;
+        };
+
+        $reduce___ = $a->reduce($f);
+        $reduce____ = $a->reduce($f, 2);
+
+        $this->assertEquals($reduce($f, 0), 3);
+        $this->assertEquals($reduce_($f, 0), 3);
+        $this->assertEquals($reduce__($f, 0), 3);
+        $this->assertEquals($reduce___(0), 3);
+        $this->assertEquals($reduce____, 5);
+    }
+
     public function testNilReduce()
     {
         $a = new Nil();
         $this->assertEquals($a->reduce(function ($prev, $curr) {
             return $prev - $curr;
         }, 3), 3);
+    }
+
+    public function testNilReduceCurried()
+    {
+        $a = Nil();
+        $reduce = $a->reduce;
+        $reduce_ = $a->reduce();
+        $reduce__ = $reduce();
+
+        $f = function ($prev, $curr) {
+            return $prev + $curr;
+        };
+
+        $reduce___ = $a->reduce($f);
+        $reduce____ = $a->reduce($f, 2);
+
+        $this->assertEquals($reduce($f, 0), 0);
+        $this->assertEquals($reduce_($f, 0), 0);
+        $this->assertEquals($reduce__($f, 0), 0);
+        $this->assertEquals($reduce___(0), 0);
+        $this->assertEquals($reduce____, 2);
     }
 
     public function testConsTraverse()
@@ -209,6 +410,32 @@ class LinkedListTest extends TestCase
         );
     }
 
+    public function testConsTraverseCurried()
+    {
+        $u = Cons(Right(1), Cons(Right(2), Nil()));
+        $t = function ($m) {
+            return $m->toMaybe();
+        };
+        $G = Maybe::of();
+        $traverse = $u->traverse;
+        $traverse_ = $u->traverse();
+        $traverse__ = $traverse();
+
+        $traverseMaybe = $u->traverse($G);
+        $traverseMaybe_ = $traverse_($G);
+        $traverseMaybe__ = $traverse__($G);
+
+        $expected = Just(Cons(1, Cons(2, Nil())));
+
+        $this->assertEquals($u->traverse($G, $t), $expected);
+        $this->assertEquals($traverse($G, $t), $expected);
+        $this->assertEquals($traverse_($G, $t), $expected);
+        $this->assertEquals($traverse__($G, $t), $expected);
+        $this->assertEquals($traverseMaybe($t), $expected);
+        $this->assertEquals($traverseMaybe_($t), $expected);
+        $this->assertEquals($traverseMaybe__($t), $expected);
+    }
+
     public function testNilTraverse()
     {
         $a = new Nil();
@@ -244,6 +471,33 @@ class LinkedListTest extends TestCase
         );
     }
 
+    public function testNilTraverseCurried()
+    {
+        $u = new Nil();
+        $t = function ($m) {
+            return $m->toMaybe();
+        };
+        $G = Maybe::of();
+
+        $traverse = $u->traverse;
+        $traverse_ = $u->traverse();
+        $traverse__ = $traverse();
+
+        $traverseMaybe = $u->traverse($G);
+        $traverseMaybe_ = $traverse_($G);
+        $traverseMaybe__ = $traverse__($G);
+
+        $expected = Just(Nil());
+
+        $this->assertEquals($u->traverse($G, $t), $expected);
+        $this->assertEquals($traverse($G, $t), $expected);
+        $this->assertEquals($traverse_($G, $t), $expected);
+        $this->assertEquals($traverse__($G, $t), $expected);
+        $this->assertEquals($traverseMaybe($t), $expected);
+        $this->assertEquals($traverseMaybe_($t), $expected);
+        $this->assertEquals($traverseMaybe__($t), $expected);
+    }
+
     public function testConsSequence()
     {
         $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
@@ -253,6 +507,18 @@ class LinkedListTest extends TestCase
         );
     }
 
+    public function testConsSequenceCurried()
+    {
+        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
+        $expected = new Right(new Cons(1, new Cons(2, new Nil())));
+        $seq = $a->sequence;
+        $seq_ = $a->sequence();
+        $seq__ = $seq();
+        $this->assertEquals($seq(Either::of()), $expected);
+        $this->assertEquals($seq_(Either::of()), $expected);
+        $this->assertEquals($seq__(Either::of()), $expected);
+    }
+
     public function testNilSequence()
     {
         $a = new Nil();
@@ -260,6 +526,18 @@ class LinkedListTest extends TestCase
             $a->sequence(Either::of()),
             new Right(new Nil())
         );
+    }
+
+    public function testNilSequenceCurried()
+    {
+        $a = new Nil();
+        $expected = new Right(new Nil());
+        $seq = $a->sequence;
+        $seq_ = $a->sequence();
+        $seq__ = $seq();
+        $this->assertEquals($seq(Either::of()), $expected);
+        $this->assertEquals($seq_(Either::of()), $expected);
+        $this->assertEquals($seq__(Either::of()), $expected);
     }
 
     public function testConsToString()

@@ -25,7 +25,7 @@ final class Just extends Maybe
 
     private function equals(Maybe $m) : bool
     {
-        return $this === $m;
+        return $this == $m;
     }
 
     private function map(callable $f) : Maybe
@@ -43,49 +43,49 @@ final class Just extends Maybe
         );
     }
 
-    public function chain(callable $f) : Maybe
+    private function chain(callable $f) : Maybe
     {
         return $f($this->value);
     }
 
-    public function alt(Maybe $m) : Maybe
+    private function alt(Maybe $m) : Maybe
     {
         return $this;
     }
 
-    public function reduce(callable $f, $acc)
+    private function reduce(callable $f, $acc)
     {
         return $f($acc, $this->value);
     }
 
-    public function getOrElse($d)
+    private function getOrElse($d)
     {
         return $this->value;
     }
 
     // Aliases
-    public function bind(callable $f) : Maybe
+    private function bind(callable $f) : Maybe
     {
         return $this->chain($f);
     }
 
-    public function flatMap(callable $f) : Maybe
+    private function flatMap(callable $f) : Maybe
     {
         return $this->chain($f);
     }
 
-    public function fold($d)
+    private function fold($d)
     {
         return $this->getOrElse($d);
     }
 
     // Transformations
-    public function toEither($val) : Either
+    private function toEither($val) : Either
     {
         return new Right($this->value);
     }
 
-    public function toValidation($val) : Validation
+    private function toValidation($val) : Validation
     {
         return new Success($this->value);
     }

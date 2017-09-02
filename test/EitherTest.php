@@ -154,6 +154,21 @@ class EitherTest extends TestCase
         $this->assertEquals($x->ap($f1->alt($g2)), $x->ap($f1)->alt($x->ap($g2)));
     }
 
+    public function testRightEquals()
+    {
+        $this->assertTrue(Right(12)->equals(Right(12)));
+        $this->assertFalse(Right(12)->equals(Right(13)));
+        $this->assertFalse(Right(12)->equals(Left(12)));
+    }
+
+    public function testRightEqualsCurried()
+    {
+        $equals = Right(12)->equals;
+        $equals_ = $equals();
+        $this->assertTrue($equals(Right(12)));
+        $this->assertTrue($equals_(Right(12)));
+    }
+
     public function testRightMapCurried()
     {
         $a = Right(123);
@@ -498,6 +513,25 @@ class EitherTest extends TestCase
         $this->assertEquals($expectedC, $actualC);
     }
 
+    public function testLeftEquals()
+    {
+        $this->assertTrue(Left(12)->equals(Left(12)));
+        $this->assertFalse(Left(12)->equals(Left(13)));
+        $this->assertFalse(Left(12)->equals(Right(12)));
+    }
+
+    public function testLeftEqualsCurried()
+    {
+        $equals = Left(12)->equals;
+        $equals_ = $equals();
+        $this->assertTrue($equals(Left(12)));
+        $this->assertTrue($equals_(Left(12)));
+        $this->assertFalse($equals(Right(12)));
+        $this->assertFalse($equals_(Right(12)));
+        $this->assertFalse($equals(Left(13)));
+        $this->assertFalse($equals_(Left(13)));
+    }
+
     public function testLeftMap()
     {
         $a = Either::fromNullable(null, null);
@@ -510,6 +544,21 @@ class EitherTest extends TestCase
 
         $this->assertInstanceOf(Left::class, $b);
         $this->assertEquals(new Left(null), $b);
+    }
+
+    public function testLeftMapCurried()
+    {
+        $a = Left(12);
+        $map = $a->map;
+        $map_ = $a->map();
+        $map__ = $map();
+
+        $f = function ($x) {
+            return $x - 1;
+        };
+        $this->assertEquals($map($f), $a);
+        $this->assertEquals($map_($f), $a);
+        $this->assertEquals($map__($f), $a);
     }
 
     public function testLeftAp()
@@ -527,6 +576,21 @@ class EitherTest extends TestCase
         $this->assertEquals(new Left(null), $b);
     }
 
+    public function testLeftApCurried()
+    {
+        $a = Left(12);
+        $f = Left(function ($x) {
+            return $x + 1;
+        });
+        $ap = $a->ap;
+        $ap_ = $a->ap();
+        $ap__ = $ap();
+
+        $this->assertEquals($ap($f), $a);
+        $this->assertEquals($ap_($f), $a);
+        $this->assertEquals($ap__($f), $a);
+    }
+
     public function testLeftChain()
     {
         $a = Either::fromNullable(null, null)
@@ -538,6 +602,21 @@ class EitherTest extends TestCase
 
         $this->assertInstanceOf(Left::class, $a);
         $this->assertEquals(new Left(null), $a);
+    }
+
+    public function testLeftChainCurried()
+    {
+        $a = Left(12);
+        $f = function ($x) {
+            return Left($x + 1);
+        };
+
+        $chain = $a->chain;
+        $chain_ = $a->chain();
+        $chain__ = $chain();
+        $this->assertEquals($chain($f), $a);
+        $this->assertEquals($chain_($f), $a);
+        $this->assertEquals($chain__($f), $a);
     }
 
     public function testLeftBind()
@@ -553,6 +632,21 @@ class EitherTest extends TestCase
         $this->assertEquals(new Left(null), $a);
     }
 
+    public function testLeftBindCurried()
+    {
+        $a = Left(12);
+        $f = function ($x) {
+            return Left($x + 1);
+        };
+
+        $chain = $a->bind;
+        $chain_ = $a->bind();
+        $chain__ = $chain();
+        $this->assertEquals($chain($f), $a);
+        $this->assertEquals($chain_($f), $a);
+        $this->assertEquals($chain__($f), $a);
+    }
+
     public function testLeftFlatMap()
     {
         $a = Either::fromNullable(null, null)
@@ -564,6 +658,21 @@ class EitherTest extends TestCase
 
         $this->assertInstanceOf(Left::class, $a);
         $this->assertEquals(new Left(null), $a);
+    }
+
+    public function testLeftFlatMapCurried()
+    {
+        $a = Left(12);
+        $f = function ($x) {
+            return Left($x + 1);
+        };
+
+        $chain = $a->flatMap;
+        $chain_ = $a->flatMap();
+        $chain__ = $chain();
+        $this->assertEquals($chain($f), $a);
+        $this->assertEquals($chain_($f), $a);
+        $this->assertEquals($chain__($f), $a);
     }
 
     public function testLeftFoldOnlyUsesFirstFunction()
@@ -581,6 +690,31 @@ class EitherTest extends TestCase
         $this->assertEquals("Error", $a);
     }
 
+    public function testLeftFoldCurried()
+    {
+        $a = Left(12);
+        $f = function ($x) {
+            return $x + 1;
+        };
+        $g = function ($x) {
+            return $x - 1;
+        };
+        $fold = $a->fold;
+        $fold_ = $a->fold();
+        $fold__ = $fold();
+
+        $foldL = $fold($f);
+        $foldL_ = $fold_($f);
+        $foldL__ = $fold__($f);
+
+        $this->assertEquals($fold($f, $g), 13);
+        $this->assertEquals($fold_($f, $g), 13);
+        $this->assertEquals($fold__($f, $g), 13);
+        $this->assertEquals($foldL($g), 13);
+        $this->assertEquals($foldL_($g), 13);
+        $this->assertEquals($foldL__($g), 13);
+    }
+
     public function testLeftCataOnlyUsesFirstFunction()
     {
         $a = Either::fromNullable(null, null)
@@ -594,6 +728,31 @@ class EitherTest extends TestCase
         );
 
         $this->assertEquals("Error", $a);
+    }
+
+    public function testLeftCataCurried()
+    {
+        $a = Left(12);
+        $f = function ($x) {
+            return $x + 1;
+        };
+        $g = function ($x) {
+            return $x - 1;
+        };
+        $fold = $a->cata;
+        $fold_ = $a->cata();
+        $fold__ = $fold();
+
+        $foldL = $fold($f);
+        $foldL_ = $fold_($f);
+        $foldL__ = $fold__($f);
+
+        $this->assertEquals($fold($f, $g), 13);
+        $this->assertEquals($fold_($f, $g), 13);
+        $this->assertEquals($fold__($f, $g), 13);
+        $this->assertEquals($foldL($g), 13);
+        $this->assertEquals($foldL_($g), 13);
+        $this->assertEquals($foldL__($g), 13);
     }
 
     public function testLeftBimap()
@@ -610,6 +769,31 @@ class EitherTest extends TestCase
         $this->assertEquals(new Left(122), $a);
     }
 
+    public function testLeftBimapCurried()
+    {
+        $a = Left(12);
+        $f = function ($x) {
+            return $x + 1;
+        };
+        $g = function ($x) {
+            return $x - 1;
+        };
+        $bimap = $a->bimap;
+        $bimap_ = $a->bimap();
+        $bimap__ = $bimap();
+
+        $bimapL = $bimap($f);
+        $bimapL_ = $bimap_($f);
+        $bimapL__ = $bimap__($f);
+
+        $this->assertEquals($bimap($f, $g), Left(13));
+        $this->assertEquals($bimap_($f, $g), Left(13));
+        $this->assertEquals($bimap__($f, $g), Left(13));
+        $this->assertEquals($bimapL($g), Left(13));
+        $this->assertEquals($bimapL_($g), Left(13));
+        $this->assertEquals($bimapL__($g), Left(13));
+    }
+
     public function testLeftAlt()
     {
         $a = new Left('foo');
@@ -620,11 +804,51 @@ class EitherTest extends TestCase
         $this->assertEquals($a->alt($c), $c);
     }
 
+    public function testLeftAltCurried()
+    {
+        $a = Left('foo');
+        $b = Right('bar');
+        $c = Left('baz');
+
+        $alt = $a->alt;
+        $alt_ = $a->alt();
+        $alt__ = $alt();
+
+        $this->assertEquals($alt($b), $b);
+        $this->assertEquals($alt_($b), $b);
+        $this->assertEquals($alt__($b), $b);
+        $this->assertEquals($alt($c), $c);
+        $this->assertEquals($alt_($c), $c);
+        $this->assertEquals($alt__($c), $c);
+    }
+
     public function testLeftReduce()
     {
         $this->assertEquals((new Left('foo'))->reduce(function ($prev, $curr) {
             return $curr . $prev;
         }, 'bar'), 'bar');
+    }
+
+    public function testLeftReduceCurried()
+    {
+        $a = Left('foo');
+        $f = function ($prev, $curr) {
+            return $prev . $curr;
+        };
+        $reduce = $a->reduce;
+        $reduce_ = $a->reduce();
+        $reduce__ = $reduce();
+
+        $reduceF = $reduce($f);
+        $reduceF_ = $reduce_($f);
+        $reduceF__ = $reduce__($f);
+
+        $this->assertEquals($reduce($f, 'bar'), 'bar');
+        $this->assertEquals($reduce_($f, 'bar'), 'bar');
+        $this->assertEquals($reduce__($f, 'bar'), 'bar');
+        $this->assertEquals($reduceF('bar'), 'bar');
+        $this->assertEquals($reduceF_('bar'), 'bar');
+        $this->assertEquals($reduceF__('bar'), 'bar');
     }
 
     public function testLeftToMaybe()

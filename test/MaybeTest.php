@@ -13,6 +13,12 @@ class MaybeTest extends TestCase
         $this->assertEquals(Just(12), new Just(12));
     }
 
+    public function testJustCurried()
+    {
+        $just = Just();
+        $this->assertEquals($just(12), new Just(12));
+    }
+
     public function testNothingFunc()
     {
         $this->assertEquals(Nothing(), new Nothing());
@@ -24,6 +30,12 @@ class MaybeTest extends TestCase
         $this->assertInstanceOf(Just::class, $just123);
     }
 
+    public function testMaybeOfCurried()
+    {
+        $of = Maybe::of();
+        $this->assertEquals($of(12), new Just(12));
+    }
+
     public function testMaybeFromNullable()
     {
         $just = Maybe::fromNullable("foo");
@@ -33,6 +45,13 @@ class MaybeTest extends TestCase
         $this->assertInstanceOf(Nothing::class, $nothing);
         $this->assertEquals(new Just("foo"), $just);
         $this->assertEquals(Maybe::of("foo"), $just);
+    }
+
+    public function testMaybeFromNullableCurried()
+    {
+        $fn = Maybe::fromNullable();
+        $this->assertEquals($fn(null), Nothing());
+        $this->assertEquals($fn(12), Just(12));
     }
 
     public function testMaybeTryCatchRight()
@@ -58,6 +77,14 @@ class MaybeTest extends TestCase
 
         $this->assertInstanceOf(Nothing::class, $a);
         $this->assertEquals(new Nothing(), $a);
+    }
+
+    public function testMaybeTryCatchCurried()
+    {
+        $tryCatch = Maybe::tryCatch();
+        $this->assertEquals($tryCatch(function () {
+            return 1;
+        }), Just(1));
     }
 
     public function testMaybeZero()
@@ -102,6 +129,61 @@ class MaybeTest extends TestCase
         $this->assertEquals($x->ap($f->alt($g2)), $x->ap($f)->alt($x->ap($g2)));
         $this->assertEquals($x->ap($f1->alt($g)), $x->ap($f1)->alt($x->ap($g)));
         $this->assertEquals($x->ap($f1->alt($g2)), $x->ap($f1)->alt($x->ap($g2)));
+    }
+
+    public function testJustEquals()
+    {
+        $this->assertTrue(Just(2)->equals(Just(2)));
+        $this->assertFalse(Just(2)->equals(Nothing()));
+        $this->assertFalse(Just(2)->equals(Just(3)));
+    }
+
+    public function testJustEqualsCurried()
+    {
+        $a = Just(2);
+        $equals = $a->equals;
+        $equals_ = $a->equals();
+        $equals__ = $equals();
+        $this->assertTrue($equals(Just(2)));
+        $this->assertTrue($equals_(Just(2)));
+        $this->assertTrue($equals__(Just(2)));
+
+        $this->assertFalse($equals(Just(3)));
+        $this->assertFalse($equals_(Just(3)));
+        $this->assertFalse($equals__(Just(3)));
+    }
+
+    public function testNothingEquals()
+    {
+        $this->assertTrue(Nothing()->equals(Nothing()));
+        $this->assertFalse(Nothing()->equals(Just('foo')));
+    }
+
+    public function testNothingEqualsCurried()
+    {
+        $a = Nothing();
+        $equals = $a->equals;
+        $equals_ = $a->equals();
+        $equals__ = $equals();
+        $this->assertTrue($equals(Nothing()));
+        $this->assertTrue($equals_(Nothing()));
+        $this->assertTrue($equals__(Nothing()));
+
+        $this->assertFalse($equals(Just(3)));
+        $this->assertFalse($equals_(Just(3)));
+        $this->assertFalse($equals__(Just(3)));
+    }
+
+    public function testJustAltCurried()
+    {
+        $x = Maybe::of(3);
+        $alt = $x->alt;
+        $alt_ = $x->alt();
+        $alt__ = $alt();
+
+        $this->assertEquals($alt(Nothing()), $x);
+        $this->assertEquals($alt_(Just(2)), $x);
+        $this->assertEquals($alt__(Just(2)), $x);
     }
 
     public function testJustMapIdentity()
@@ -175,6 +257,23 @@ class MaybeTest extends TestCase
         $this->assertEquals(new Just(124), $b);
     }
 
+    public function testJustMapCurried()
+    {
+        $a = Maybe::of(123);
+        $map = $a->map;
+        $map_ = $a->map();
+        $map__ = $map();
+
+        $f = function ($x) {
+            return $x + 1;
+        };
+        $expected = Just(124);
+
+        $this->assertEquals($map($f), $expected);
+        $this->assertEquals($map_($f), $expected);
+        $this->assertEquals($map__($f), $expected);
+    }
+
     public function testJustChain()
     {
         $a = Maybe::of(123)
@@ -232,6 +331,22 @@ class MaybeTest extends TestCase
         );
     }
 
+    public function testJustChainCurried()
+    {
+        $a = Maybe::of(1);
+        $f = function ($x) {
+            return Maybe::of($x + 1);
+        };
+
+        $chain = $a->chain;
+        $chain_ = $a->chain();
+        $chain__ = $chain();
+        $expected = Maybe::of(2);
+        $this->assertEquals($chain($f), $expected);
+        $this->assertEquals($chain_($f), $expected);
+        $this->assertEquals($chain__($f), $expected);
+    }
+
     public function testJustBind()
     {
         $a = Maybe::of(123)
@@ -249,6 +364,22 @@ class MaybeTest extends TestCase
         $this->assertInstanceOf(Just::class, $a);
         $this->assertEquals(Maybe::of(62), $a);
         $this->assertEquals(new Just(62), $a);
+    }
+
+    public function testJustBindCurried()
+    {
+        $a = Maybe::of(1);
+        $f = function ($x) {
+            return Maybe::of($x + 1);
+        };
+
+        $chain = $a->bind;
+        $chain_ = $a->bind();
+        $chain__ = $chain();
+        $expected = Maybe::of(2);
+        $this->assertEquals($chain($f), $expected);
+        $this->assertEquals($chain_($f), $expected);
+        $this->assertEquals($chain__($f), $expected);
     }
 
     public function testJustFlatMap()
@@ -270,6 +401,22 @@ class MaybeTest extends TestCase
         $this->assertEquals(new Just(62), $a);
     }
 
+    public function testJustFlatMapCurried()
+    {
+        $a = Maybe::of(1);
+        $f = function ($x) {
+            return Maybe::of($x + 1);
+        };
+
+        $chain = $a->flatMap;
+        $chain_ = $a->flatMap();
+        $chain__ = $chain();
+        $expected = Maybe::of(2);
+        $this->assertEquals($chain($f), $expected);
+        $this->assertEquals($chain_($f), $expected);
+        $this->assertEquals($chain__($f), $expected);
+    }
+
     public function testJustAp()
     {
         $a = Maybe::of(123)
@@ -283,6 +430,23 @@ class MaybeTest extends TestCase
         $this->assertInstanceOf(Just::class, $a);
         $this->assertEquals(Maybe::of(124), $a);
         $this->assertEquals(new Just(124), $a);
+    }
+
+    public function testJustApCurried()
+    {
+        $a = Maybe::of(123);
+        $fm = Maybe::of(function ($x) {
+            return $x + 1;
+        });
+
+        $ap = $a->ap;
+        $ap_ = $a->ap();
+        $ap__ = $ap();
+        $expected = Just(124);
+
+        $this->assertEquals($ap($fm), $expected);
+        $this->assertEquals($ap_($fm), $expected);
+        $this->assertEquals($ap__($fm), $expected);
     }
 
     public function testJustApComposition()
@@ -369,10 +533,34 @@ class MaybeTest extends TestCase
         $this->assertEquals(12, $a);
     }
 
+    public function testJustGetOrElseCurried()
+    {
+        $a = Maybe::of(2);
+        $g = $a->getOrElse;
+        $g_ = $a->getOrElse();
+        $g__ = $g();
+
+        $this->assertEquals($g(12), 2);
+        $this->assertEquals($g_(12), 2);
+        $this->assertEquals($g__(12), 2);
+    }
+
     public function testJustFold()
     {
         $a = Maybe::of(3)->fold(15);
         $this->assertEquals(3, $a);
+    }
+
+    public function testJustFoldCurried()
+    {
+        $a = Maybe::of(3);
+        $g = $a->fold;
+        $g_ = $a->fold();
+        $g__ = $g();
+
+        $this->assertEquals($g(12), 3);
+        $this->assertEquals($g_(12), 3);
+        $this->assertEquals($g__(12), 3);
     }
 
     public function testJustAlt()
@@ -391,6 +579,34 @@ class MaybeTest extends TestCase
             return $prev + $curr;
         }, 2);
         $this->assertEquals($a, 5);
+    }
+
+    public function testJustReduceCurried()
+    {
+        $a = Maybe::of(3);
+        $reduce = $a->reduce;
+        $reduce_ = $a->reduce();
+        $reduce__ = $reduce();
+
+        $f = function ($prev, $curr) {
+            return $prev + $curr;
+        };
+
+        $reduceF = $a->reduce($f);
+        $reduceF_ = $reduce($f);
+        $reduceF__ = $reduce_($f);
+        $reduceF___ = $reduce__($f);
+
+        $initial = 5;
+        $expected = 8;
+
+        $this->assertEquals($reduce($f, $initial), $expected);
+        $this->assertEquals($reduce_($f, $initial), $expected);
+        $this->assertEquals($reduce__($f, $initial), $expected);
+        $this->assertEquals($reduceF($initial), $expected);
+        $this->assertEquals($reduceF_($initial), $expected);
+        $this->assertEquals($reduceF__($initial), $expected);
+        $this->assertEquals($reduceF___($initial), $expected);
     }
 
     public function testJustToString()
@@ -445,6 +661,23 @@ class MaybeTest extends TestCase
         $this->assertEquals(new Nothing(), $a);
     }
 
+    public function testNothingMapCurried()
+    {
+        $a = Nothing();
+        $map = $a->map;
+        $map_ = $a->map();
+        $map__ = $map();
+
+        $f = function ($x) {
+            return $x + 1;
+        };
+        $expected = Nothing();
+
+        $this->assertEquals($map($f), $expected);
+        $this->assertEquals($map_($f), $expected);
+        $this->assertEquals($map__($f), $expected);
+    }
+
     public function testNothingAp()
     {
         $a = Maybe::of(
@@ -457,6 +690,22 @@ class MaybeTest extends TestCase
 
         $this->assertInstanceOf(Nothing::class, $b);
         $this->assertEquals(new Nothing(), $b);
+    }
+
+    public function testNothingApCurried()
+    {
+        $a = Nothing();
+        $b = Nothing();
+
+        $ap = $a->ap;
+        $ap_ = $a->ap();
+        $ap__ = $ap();
+
+        $expected = Nothing();
+
+        $this->assertEquals($ap($b), $expected);
+        $this->assertEquals($ap_($b), $expected);
+        $this->assertEquals($ap__($b), $expected);
     }
 
     public function testNothingChain()
@@ -472,6 +721,24 @@ class MaybeTest extends TestCase
         $this->assertEquals(new Nothing(), $a);
     }
 
+    public function testNothingChainCurried()
+    {
+        $a = Nothing();
+        $f = function ($x) {
+            return Maybe::of($x + 1);
+        };
+
+        $chain = $a->chain;
+        $chain_ = $a->chain();
+        $chain__ = $chain();
+
+        $expected = Nothing();
+
+        $this->assertEquals($chain($f), $expected);
+        $this->assertEquals($chain_($f), $expected);
+        $this->assertEquals($chain__($f), $expected);
+    }
+
     public function testNothingBind()
     {
         $a = Maybe::fromNullable(null)
@@ -483,6 +750,24 @@ class MaybeTest extends TestCase
 
         $this->assertInstanceOf(Nothing::class, $a);
         $this->assertEquals(new Nothing(), $a);
+    }
+
+    public function testNothingBindCurried()
+    {
+        $a = Nothing();
+        $f = function ($x) {
+            return Maybe::of($x + 1);
+        };
+
+        $chain = $a->bind;
+        $chain_ = $a->bind();
+        $chain__ = $chain();
+
+        $expected = Nothing();
+
+        $this->assertEquals($chain($f), $expected);
+        $this->assertEquals($chain_($f), $expected);
+        $this->assertEquals($chain__($f), $expected);
     }
 
     public function testNothingFlatMap()
@@ -498,6 +783,24 @@ class MaybeTest extends TestCase
         $this->assertEquals(new Nothing(), $a);
     }
 
+    public function testNothingFlatMapCurried()
+    {
+        $a = Nothing();
+        $f = function ($x) {
+            return Maybe::of($x + 1);
+        };
+
+        $chain = $a->flatMap;
+        $chain_ = $a->flatMap();
+        $chain__ = $chain();
+
+        $expected = Nothing();
+
+        $this->assertEquals($chain($f), $expected);
+        $this->assertEquals($chain_($f), $expected);
+        $this->assertEquals($chain__($f), $expected);
+    }
+
     public function testNothingToEither()
     {
         $a = Maybe::fromNullable(null)
@@ -505,6 +808,12 @@ class MaybeTest extends TestCase
 
         $this->assertInstanceOf(Left::class, $a);
         $this->assertEquals(new Left('Failure'), $a);
+    }
+
+    public function testNothingToEitherCurried()
+    {
+        $te = Maybe::fromNullable(null)->toEither();
+        $this->assertEquals($te('Failure'), new Left('Failure'));
     }
 
     public function testNothingGetOrElse()
@@ -517,10 +826,22 @@ class MaybeTest extends TestCase
         $this->assertEquals('foo', $a);
     }
 
+    public function testNothingGetOrElseCurried()
+    {
+        $goe = Maybe::fromNullable(null)->getOrElse();
+        $this->assertEquals($goe('Failure'), 'Failure');
+    }
+
     public function testNothingFold()
     {
         $a = Maybe::fromNullable(null)->fold(10);
         $this->assertEquals($a, 10);
+    }
+
+    public function testNothingFoldCurried()
+    {
+        $f = Maybe::fromNullable(null)->fold();
+        $this->assertEquals($f(10), 10);
     }
 
     public function testNothingAlt()
@@ -533,12 +854,47 @@ class MaybeTest extends TestCase
         $this->assertEquals($a->alt($c), $c);
     }
 
+    public function testNothingAltCurried()
+    {
+        $a = new Nothing();
+        $b = Maybe::of(3);
+
+        $alt = $a->alt;
+        $alt_ = $a->alt();
+        $alt__ = $alt();
+
+        $this->assertEquals($alt($b), $b);
+        $this->assertEquals($alt_($b), $b);
+        $this->assertEquals($alt__($b), $b);
+    }
+
     public function testNothingReduce()
     {
         $a = (new Nothing())->reduce(function ($prev, $curr) {
             return $prev + $curr;
         }, 2);
         $this->assertEquals($a, 2);
+    }
+
+    public function testNothingReduceCurried()
+    {
+        $a = Nothing();
+
+        $reduce = $a->reduce;
+        $reduce_ = $a->reduce();
+        $reduce__ = $reduce();
+
+        $expected = 1;
+        $f = function ($prev, $curr) {
+            return $prev + $curr;
+        };
+
+        $this->assertEquals($reduce($f, 1), $expected);
+        $this->assertEquals($reduce_($f, 1), $expected);
+        $this->assertEquals($reduce_($f, 1), $expected);
+        $this->assertEquals(($reduce($f))(1), $expected);
+        $this->assertEquals(($reduce_($f))(1), $expected);
+        $this->assertEquals(($reduce__($f))(1), $expected);
     }
 
     public function testMonadLeftIdentity()
@@ -576,6 +932,20 @@ class MaybeTest extends TestCase
         $this->assertEquals(new Right(85), $either);
     }
 
+    public function testJustToEitherCurried()
+    {
+        $a = Maybe::of(85);
+        $te = $a->toEither;
+        $te_ = $a->toEither();
+        $te__ = $te();
+
+        $expected = new Right(85);
+
+        $this->assertEquals($te(0), $expected);
+        $this->assertEquals($te_(0), $expected);
+        $this->assertEquals($te__(0), $expected);
+    }
+
     public function testJustToValidation()
     {
         $a = Maybe::of(85);
@@ -585,11 +955,39 @@ class MaybeTest extends TestCase
         $this->assertEquals(new Success(85), $vali);
     }
 
+    public function testJustToValidationCurried()
+    {
+        $a = Maybe::of(85);
+        $te = $a->toValidation;
+        $te_ = $a->toValidation();
+        $te__ = $te();
+
+        $expected = new Success(85);
+
+        $this->assertEquals($te(0), $expected);
+        $this->assertEquals($te_(0), $expected);
+        $this->assertEquals($te__(0), $expected);
+    }
+
     public function testNothingToValidation()
     {
         $a = Maybe::fromNullable(null);
         $vali = $a->toValidation('foobar');
         $this->assertInstanceOf(Failure::class, $vali);
         $this->assertEquals(new Failure('foobar'), $vali);
+    }
+
+    public function testNothingToValidationCurried()
+    {
+        $a = new Nothing();
+        $te = $a->toValidation;
+        $te_ = $a->toValidation();
+        $te__ = $te();
+
+        $expected = new Failure(0);
+
+        $this->assertEquals($te(0), $expected);
+        $this->assertEquals($te_(0), $expected);
+        $this->assertEquals($te__(0), $expected);
     }
 }

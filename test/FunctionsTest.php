@@ -7,6 +7,8 @@ use function Phantasy\Core\{
     id,
     identity,
     equals,
+    lte,
+    of,
     compose,
     curry,
     curryN,
@@ -47,21 +49,18 @@ class FunctionsTest extends TestCase
         $this->assertEquals("Foo bar", id("Foo bar"));
     }
 
+    public function testIdCurried()
+    {
+        $id = id();
+        $this->assertEquals($id(1), 1);
+    }
+
     public function testIdentity()
     {
         $this->assertEquals(1, identity(1));
         $this->assertEquals(false, identity(false));
         $this->assertEquals(true, identity(true));
         $this->assertEquals("Foo bar", identity("Foo bar"));
-    }
-
-    public function equals()
-    {
-        $this->assertTrue(equals(1, 1));
-        $this->assertFalse(equals(1, '1'));
-        $this->assertFalse(equals(false, true));
-        $this->assertFalse(equals('foo ', 'foo'));
-        $this->assertTrue(equals(new Right(1), new Right(1)));
     }
 
     public function testIdentityCurried()
@@ -71,6 +70,98 @@ class FunctionsTest extends TestCase
         $this->assertEquals(false, $identity(false));
         $this->assertEquals(true, $identity(true));
         $this->assertEquals([1, 2], $identity([1, 2]));
+    }
+
+    public function testEquals()
+    {
+        $this->assertTrue(equals(1, 1));
+        $this->assertFalse(equals(1, '1'));
+        $this->assertFalse(equals(false, true));
+        $this->assertFalse(equals('foo ', 'foo'));
+        $this->assertTrue(equals(new Right(1), new Right(1)));
+    }
+
+    public function testEqualsCurried()
+    {
+        $equals = equals();
+        $equalsOne = equals(1);
+        $this->assertTrue($equals(1, 1));
+        $this->assertTrue($equalsOne(1));
+        $this->assertFalse($equals(1, 3));
+        $this->assertFalse($equalsOne(3));
+    }
+
+    public function testLte()
+    {
+        $f = function ($x) {
+            return new class($x) {
+                public $val;
+                public function __construct($x)
+                {
+                    $this->val = $x;
+                }
+
+                public function lte($a)
+                {
+                    return $this->val <= $a->val;
+                }
+            };
+        };
+        $a = $f(1);
+        $b = $f(2);
+        $this->assertTrue(lte($a, $b));
+        $this->assertFalse(lte($b, $a));
+
+        $this->assertTrue(lte(1, 2));
+        $this->assertTrue(lte(2, 2));
+        $this->assertTrue(lte(2, 3));
+    }
+
+    public function testLteCurried()
+    {
+        $f = function ($x) {
+            return new class($x) {
+                public $val;
+                public function __construct($x)
+                {
+                    $this->val = $x;
+                }
+
+                public function lte($a)
+                {
+                    return $this->val <= $a->val;
+                }
+            };
+        };
+        $a = $f(1);
+        $b = $f(2);
+        $lte = lte();
+        $lteA = $lte($a);
+        $lteB = $lte($b);
+        $this->assertTrue($lte($a, $b));
+        $this->assertTrue($lteA($b));
+        $this->assertFalse($lte($b, $a));
+        $this->assertFalse($lteB($a));
+    }
+
+    public function testOf()
+    {
+        $this->assertEquals(of(Either::class, 2), new Right(2));
+        $this->assertEquals(of(new Either(), 2), new Right(2));
+    }
+
+    public function testOfCurried()
+    {
+        $of = of();
+        $ofEither = $of(Either::class);
+        $ofEither_ = $of(new Either());
+        $this->assertEquals($ofEither(2), new Right(2));
+        $this->assertEquals($ofEither_(2), new Right(2));
+    }
+
+    public function testOfReturnsNullOnFailure()
+    {
+        $this->assertNull(of(1, 2));
     }
 
     public function testCompose()
@@ -180,6 +271,17 @@ class FunctionsTest extends TestCase
         $this->assertEquals($f('foobar'), $m);
     }
 
+    public function testConcatCurried()
+    {
+        $a = 'foo';
+        $b = 'bar';
+        $concat = concat();
+        $prependFoo = concat($a);
+
+        $this->assertEquals($concat($a, $b), 'foobar');
+        $this->assertEquals($prependFoo('bar'), 'foobar');
+    }
+
     public function testSemigroupConcatArrays()
     {
         $a = semigroupConcat([1, 2], [3, 4]);
@@ -224,6 +326,17 @@ class FunctionsTest extends TestCase
         $this->assertNull(semigroupConcat($a, $b));
     }
 
+    public function testSemigroupconcatCurried()
+    {
+        $a = 'foo';
+        $b = 'bar';
+        $concat = semigroupConcat();
+        $prependFoo = semigroupConcat($a);
+
+        $this->assertEquals($concat($a, $b), 'foobar');
+        $this->assertEquals($prependFoo('bar'), 'foobar');
+    }
+
     public function testMEmptyArray()
     {
         $this->assertEquals([], mempty([]));
@@ -251,6 +364,13 @@ class FunctionsTest extends TestCase
     public function testMEmptyNullIfDoesntMakeSense()
     {
         $this->assertNull(mempty(true));
+    }
+
+    public function testMEmptyCurried()
+    {
+        $empty = mempty();
+        $this->assertEquals($empty('foo'), '');
+        $this->assertEquals($empty(['bar']), []);
     }
 
     public function testPropObjects()
@@ -676,6 +796,19 @@ class FunctionsTest extends TestCase
         );
     }
 
+    public function testLiftACurried()
+    {
+        $add1 = function ($x) {
+            return $x + 1;
+        };
+        $liftA = liftA();
+        $this->assertEquals($liftA($add1, Maybe::of(2)), Maybe::of(3));
+        $this->assertEquals(
+            liftA($add1, Maybe::fromNullable(null)),
+            Maybe::fromNullable(null)
+        );
+    }
+
     public function testTrace()
     {
         ini_set('xdebug.overload_var_dump', 0);
@@ -730,6 +863,19 @@ class FunctionsTest extends TestCase
         $this->assertNull(mjoin(12));
     }
 
+    public function testMJoinCurried()
+    {
+        $mjoin = mjoin();
+        $a = new class
+        {
+            public function mjoin()
+            {
+                return 1;
+            }
+        };
+        $this->assertEquals($mjoin($a), 1);
+    }
+
     public function testChain()
     {
         $a = new class
@@ -745,9 +891,29 @@ class FunctionsTest extends TestCase
         }, $a), 2);
     }
 
+    public function testChainCurried()
+    {
+        $a = Either::of(1);
+        $f = function ($x) {
+            return Either::of($x + 1);
+        };
+        $chain = chain();
+        $chainF = $chain($f);
+        $this->assertEquals($chain($f, $a), new Right(2));
+        $this->assertEquals($chainF($a), new Right(2));
+    }
+
     public function testIsTraversable()
     {
         $this->assertTrue(isTraversable([1]));
+        $this->assertFalse(isTraversable(1));
+    }
+
+    public function testIsTraversableCurried()
+    {
+        $f = isTraversable();
+        $this->assertTrue($f([1]));
+        $this->assertFalse($f(1));
     }
 
     public function testContramapObjWithContramap()
@@ -914,6 +1080,99 @@ class FunctionsTest extends TestCase
         );
     }
 
+    public function testCmapCurried()
+    {
+        $f = function ($s) {
+            return '<html>' . $s . '</html>';
+        };
+
+        $Comp = new class ($f) {
+            private $f = null;
+
+            public function __construct(callable $f)
+            {
+                $this->f = $f;
+            }
+
+            public function contramap(callable $g)
+            {
+                $f = $this->f;
+                return new static(function ($x) use ($f, $g) {
+                    return $f($g($x));
+                });
+            }
+
+            public function fold($s = null)
+            {
+                return call_user_func($this->f, $s);
+            }
+        };
+        $f = function ($x) {
+            return '<body><div>' . $x . '</div></body>';
+        };
+        $g = function ($x) {
+            return $x["title"];
+        };
+
+        $contramap = cmap();
+        $contramapF = $contramap($f);
+        $contramapG = $contramap($g);
+        $a = $contramapF($Comp);
+        $b = $contramapG($a);
+
+        $this->assertEquals(
+            $b->fold([ "title" => "Blue" ]),
+            "<html><body><div>Blue</div></body></html>"
+        );
+    }
+
+    public function testContramapCurried()
+    {
+        $f = function ($s) {
+            return '<html>' . $s . '</html>';
+        };
+
+        $Comp = new class ($f) {
+            private $f = null;
+
+            public function __construct(callable $f)
+            {
+                $this->f = $f;
+            }
+
+            public function contramap(callable $g)
+            {
+                $f = $this->f;
+                return new static(function ($x) use ($f, $g) {
+                    return $f($g($x));
+                });
+            }
+
+            public function fold($s = null)
+            {
+                return call_user_func($this->f, $s);
+            }
+        };
+
+        $f = function ($x) {
+            return '<body><div>' . $x . '</div></body>';
+        };
+        $g = function ($x) {
+            return $x["title"];
+        };
+
+        $contramap = contramap();
+        $contramapF = $contramap($f);
+        $contramapG = $contramap($g);
+        $a = $contramapF($Comp);
+        $b = $contramapG($a);
+
+        $this->assertEquals(
+            $b->fold([ "title" => "Blue" ]),
+            "<html><body><div>Blue</div></body></html>"
+        );
+    }
+
     public function testContramapReturnNull()
     {
         $this->assertNull(contramap(function ($x) {
@@ -936,6 +1195,16 @@ class FunctionsTest extends TestCase
         );
     }
 
+    public function testFoldlCurried()
+    {
+        $foldl = foldl();
+        $foldlConcat = $foldl(concat());
+        $foldlConcatStr = $foldlConcat('');
+        $this->assertEquals($foldl(concat(), '', ['a', 'b', 'c']), 'abc');
+        $this->assertEquals($foldlConcat('', ['a', 'b', 'c']), 'abc');
+        $this->assertEquals($foldlConcatStr(['a', 'b', 'c']), 'abc');
+    }
+
     public function testFoldr()
     {
         $this->assertEquals(
@@ -944,12 +1213,32 @@ class FunctionsTest extends TestCase
         );
     }
 
+    public function testFoldrCurried()
+    {
+        $foldr = foldr();
+        $foldrConcat = $foldr(concat());
+        $foldrConcatStr = $foldrConcat('');
+        $this->assertEquals($foldr(concat(), '', ['a', 'b', 'c']), 'cba');
+        $this->assertEquals($foldrConcat('', ['a', 'b', 'c']), 'cba');
+        $this->assertEquals($foldrConcatStr(['a', 'b', 'c']), 'cba');
+    }
+
     public function testReduceRight()
     {
         $this->assertEquals(
             reduceRight(concat(), '', ['a', 'b', 'c']),
             'cba'
         );
+    }
+
+    public function testReduceRightCurried()
+    {
+        $foldr = reduceRight();
+        $foldrConcat = $foldr(concat());
+        $foldrConcatStr = $foldrConcat('');
+        $this->assertEquals($foldr(concat(), '', ['a', 'b', 'c']), 'cba');
+        $this->assertEquals($foldrConcat('', ['a', 'b', 'c']), 'cba');
+        $this->assertEquals($foldrConcatStr(['a', 'b', 'c']), 'cba');
     }
 
     public function testFoldrWithObjectWithReduceRightMethod()
@@ -1064,5 +1353,22 @@ class FunctionsTest extends TestCase
             bimap($left, $right, $a),
             new Left(2)
         );
+    }
+
+    public function testBimapCurried()
+    {
+        $a = Either::of(1);
+        $bimap = bimap();
+        $f = function ($x) {
+            return $x + 1;
+        };
+        $g = function ($x) {
+            return $x - 1;
+        };
+        $bimapF = $bimap($f);
+        $bimapFG = $bimap($f, $g);
+        $this->assertEquals($bimap($f, $g, $a), new Right(0));
+        $this->assertEquals($bimapF($g, $a), new Right(0));
+        $this->assertEquals($bimapFG($a), new Right(0));
     }
 }
