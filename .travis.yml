@@ -8,6 +8,7 @@ install:
   - composer install --prefer-source
 
 script:
+  - composer dump-autoload
   - mkdir -p build/logs
   - composer coverage
   - composer lint
