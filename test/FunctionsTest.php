@@ -25,6 +25,8 @@ use function Phantasy\Core\{
     reduce,
     chain,
     chainRec,
+    extend,
+    extract,
     mjoin,
     isTraversable,
     trace,
@@ -333,18 +335,36 @@ class FunctionsTest extends TestCase
 
     public function testExtend()
     {
+        $checkNum = function ($x) {
+            list($comp, $log) = $x;
+            return $comp > 10 ? $comp - 10 : $comp + 5;
+        };
+
+        $res = extend($checkNum, Writer::of(12))->run();
+        $this->assertEquals([2, []], $res);
     }
 
     public function testExtendCurried()
     {
+        $checkNum = function ($x) {
+            list($comp, $log) = $x;
+            return $comp > 10 ? $comp - 10 : $comp + 5;
+        };
+
+        $extendCheck = extend($checkNum);
+        $res = $extendCheck(Writer::of(12))->run();
+        $this->assertEquals([2, []], $res);
     }
 
     public function testExtract()
     {
+        $this->assertEquals(extract(Writer::of(1)), 1);
     }
 
     public function testExtractCurried()
     {
+        $extract = extract();
+        $this->assertEquals($extract(Writer::of(1)), 1);
     }
 
     public function testPromap()

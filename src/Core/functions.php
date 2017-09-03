@@ -400,7 +400,7 @@ function chainRec()
 function extend()
 {
     $extend = curry(function ($f, $w) {
-        if (is_object($w) && method_exists('extend')) {
+        if (is_object($w) && method_exists($w, 'extend')) {
             return $w->extend($f);
         }
         return null;

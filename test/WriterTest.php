@@ -132,4 +132,91 @@ class WriterTest extends TestCase
         $this->assertEquals($first, $second($i));
         $this->assertEquals($first->run(), $second($i)->run());
     }
+
+    public function testWriterExtend()
+    {
+        $sum = function ($x) {
+            return new class ($x) {
+                public $x;
+                public function __construct($x)
+                {
+                    $this->x = $x;
+                }
+
+                public function concat($a)
+                {
+                    return new static($this->x + $a->x);
+                }
+
+                public static function empty()
+                {
+                    return new static(0);
+                }
+            };
+        };
+
+        $exampleUser = [
+            'name' => 'Jerry',
+            'isHungry' => false
+        ];
+
+        $adventurer = function ($user, $monoid) {
+            return Writer(function () use ($user, $monoid) {
+                return [$user, $monoid];
+            });
+        };
+
+        $slayDragon = function ($user) use ($sum, $adventurer) {
+            return $adventurer($user, $sum(100));
+        };
+
+        $runFromDragon = function ($user) use ($sum, $adventurer) {
+            return $adventurer($user, $sum(50));
+        };
+
+        $eat = function ($user) use ($adventurer, $sum) {
+            return $user['isHungry']
+                ? $adventurer(array_merge($user, ['isHungry' => false]), $sum(-100))
+                : $adventurer($user, $sum(0));
+        };
+
+        $areWeHungry = function ($adv) {
+            list($user, $hunger) = $adv;
+            return $hunger->x > 200
+                ? array_merge($user, ['isHungry' => true])
+                : $user;
+        };
+
+        $battle1 = $slayDragon($exampleUser)->extend($areWeHungry)->chain($eat);
+        $this->assertEquals([
+            ['name' => 'Jerry', 'isHungry' => false],
+            $sum(100)
+        ], $battle1->run());
+
+        $battle2 = $battle1->chain($slayDragon)->extend($areWeHungry)->chain($eat);
+        $this->assertEquals([
+            ['name' => 'Jerry', 'isHungry' => false],
+            $sum(200)
+        ], $battle2->run());
+
+        $battle3 = $battle2->chain($runFromDragon)->extend($areWeHungry)->chain($eat);
+        $this->assertEquals([
+            ['name' => 'Jerry', 'isHungry' => false],
+            $sum(150)
+        ], $battle3->run());
+
+        $battle4 = $battle3->chain($slayDragon)->extend($areWeHungry);
+        $this->assertEquals([
+            ['name' => 'Jerry', 'isHungry' => true],
+            $sum(250)
+        ], $battle4->run());
+    }
+
+    public function testWriterExtract()
+    {
+        $this->assertEquals(
+            Writer::of(1)->extract(),
+            1
+        );
+    }
 }

@@ -94,6 +94,20 @@ final class Writer
         });
     }
 
+    private function extend(callable $f) : Writer
+    {
+        return new Writer(function () use ($f) {
+            $x = $this->run();
+            return [$f($x), $x[1]];
+        });
+    }
+
+    public function extract()
+    {
+        list($x, $_) = $this->run();
+        return $x;
+    }
+
     private function bind(callable $g) : Writer
     {
         return $this->chain($g);
