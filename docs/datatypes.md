@@ -11,7 +11,7 @@ use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 `Maybe` (called `Option` in some FP languages) is a type that consists of two subclasses: `Just` or `Nothing`.
 It is the simplest way to create null-safe code and can be used in computing with variables that can possibly be null, or in returning values that may or may not exist.
 ### Methods
-#### static of ($val)
+#### static of ($val) : Maybe
 Simply creates a `Just ($val)`. Good for lifting values into the `Maybe` context, so that you can map, apply or use other nice functions over it.
 ```php
 $appendBar = function($x) {
@@ -20,7 +20,7 @@ $appendBar = function($x) {
 Maybe::of('foo')->map($appendBar);
 // Equivalent to Just('foo')->map($appendBar);
 ```
-#### static fromNullable ($val)
+#### static fromNullable ($val) : Maybe
 Checks the value that is passed in. If it's null, it returns a `Nothing()`,
 otherwise it returns a `Just($val)`.
 ```php
@@ -29,7 +29,7 @@ $b = 12;
 Maybe::fromNullable($a); // Nothing()
 Maybe::fromNullable($b); // Just(12)
 ```
-#### static tryCatch ($f)
+#### static tryCatch ($f) : Maybe
 Performs a function that might throw an exception. If it succeeds,
 it stores the result in a `Just`, with the value of the result of the function. If it throws an exception, it returns a `Nothing()`.
 ```php
@@ -45,7 +45,7 @@ Maybe::tryCatch($connectToDB);
 // If an exception is thrown, it returns Nothing()
 // If no exception was thrown, returns Just($connection)
 ```
-#### static zero ()
+#### static zero () : Maybe
 Gives you the type-level empty instance for Maybe. You can think of this
 like an empty method such as `[]` for arrays, `''` for strings, but now
 we're dealing with the function level equivalent.
@@ -59,7 +59,7 @@ Maybe::zero()->map(function($x) {
 });
 // Nothing()
 ```
-#### map ($f)
+#### map (callable $f) : Maybe
 Used when you want to transform the value of your `Maybe` instance.
 If the instance is a `Just`, it performs the function `$f` on the value inside of our instance.
 ```php
@@ -75,7 +75,7 @@ Maybe::fromNullable(null)->map(function($x) {
 });
 // Nothing()
 ```
-#### ap (Maybe $m)
+#### ap (Maybe $m) : Maybe
 Used when you want to apply a function inside of a `Maybe` to a value inside of a `Maybe`.
 If the instance is a `Just`, then it takes the function inside `$m`, the parameter, and applies that function to our instance value.
 ```php
@@ -95,7 +95,7 @@ $b = Maybe::of(function($x) {
 $a->ap($b);
 // Nothing()
 ```
-#### chain ($f) (aliases: bind, flatMap)
+#### chain (callable $f) : Maybe (aliases: bind, flatMap)
 Used when you want to map with a function that also returns a `Maybe`.
 If the instance is a `Just`, then it simply returns the result of the function `$f`.
 ```php
@@ -127,7 +127,7 @@ If it's a `Nothing`, it simply returns the parameter `$d`.
 Maybe::fromNullable(null)->fold('foo');
 // 'foo'
 ```
-#### alt (Maybe $m)
+#### alt (Maybe $m) : Maybe
 Allows you to provide an alternative value as a fallback if the current
 instance computation fails. You can look at it as a type-level if/else
 statement, or as a computation with a contingency plan if something goes
@@ -149,7 +149,7 @@ Nothing()->alt(Just(1));
 Nothing()->alt(Nothing());
 // Nothing()
 ```
-#### reduce ($f, $acc)
+#### reduce (callable $f, $acc)
 Used to get the result of a function applied to an instance value.
 Pulls the computation out of the `Maybe` context and just returns the
 result.
@@ -168,7 +168,7 @@ Nothing()->reduce(function($carry, $val) {
 }, 2);
 // 2
 ```
-#### toEither ($val)
+#### toEither ($val) : Either
 Used to transform a `Maybe` into an `Either` context.
 If the instance is a `Just`, then it returns a `Right` containing that instance value.
 ```php
@@ -181,7 +181,7 @@ Maybe::fromNullable(null)->toEither(0);
 // Left(0)
 ```
 
-#### toValidation ($val)
+#### toValidation ($val) : Validation
 Used to transform a `Maybe` into a `Validation` context.
 If the instance is a `Just`, then it returns a `Success` containing that instance value.
 ```php
@@ -205,13 +205,13 @@ use Phantasy\DataTypes\Either\{Either, Left, Right};
 It is most often used on computations that may fail, but where you want information about how it failed.
 The key difference between `Either`  and `Maybe` is that `Left` can hold a value, whereas `Nothing` can't. This lets Either hold legitimate values for code branching, or contain information about failures.
 ### Methods
-#### static of ($val)
+#### static of ($val) : Either
 Creates a `Right($val)`;
 ```php
 Either::of(1);
 // Right(1)
 ```
-#### static fromNullable ($failVal, $val)
+#### static fromNullable ($failVal, $val) : Either
 If `$val` is null, it creates a `Left($failVal)`, otherwise it creates a `Right($val)`.
 ```php
 Either::fromNullable('left val', 'right val');
@@ -220,7 +220,7 @@ Either::fromNullable('left val', 'right val');
 Either::fromNullable('left val', null);
 // Left('left val')
 ```
-#### static tryCatch ($f)
+#### static tryCatch (callable $f) : Either
 Performs a function that might throw an exception. If it succeeds,
 it stores the result in a `Right($f())`, otherwise, it returns a `Left($exception)`.
 ```php
@@ -239,7 +239,7 @@ Either::tryCatch($connectToDB);
 
 // If no exception was thrown, returns Right($connection)
 ```
-#### static zero ()
+#### static zero () : Either
 Gives you the type-level empty instance for Either. You can think of this
 like an empty method such as `[]` for arrays, `''` for strings, but now
 we're dealing with the function level equivalent.
@@ -253,7 +253,7 @@ Either::zero()->map(function($x) {
 });
 // Left(null)
 ```
-#### map ($f)
+#### map (callable $f) : Either
 Used to transform the values inside of our Either instance.
 If the instance is a `Right`, it applies the function `$f` and returns a `Right` containing the result of the function.
 ```php
@@ -269,7 +269,7 @@ Either::fromNullable('Val is null!', null)->map(function($x) {
 });
 // Left('Val is null!')
 ```
-#### ap (Either $e)
+#### ap (Either $e) : Either
 Used when you want to apply a function inside of an `Either` to a value inside of an `Either`.
 If the instance is a `Right`, it applies the function inside of the parameter to the value inside of our instance.
 ```php
@@ -290,7 +290,7 @@ $b = Either::of(strtolower());
 $a->ap($b);
 // Left('Val is null!')
 ```
-#### chain ($f) (aliases: bind, flatMap)
+#### chain (callable $f) : Either (aliases: bind, flatMap)
 Used when you want to map over your value, but where the mapping function returns an `Either` context.
 If the instance is a `Right`, it simply returns the result of the function.
 ```php
@@ -306,7 +306,7 @@ $a = Either::fromNullable(0, null)->chain(function($x) {
 });
 // Left(0)
 ```
-#### fold (\$f, \$g) (aliases: cata)
+#### fold (callable $f, callable $g) (aliases: cata)
 Used to extract values out of an `Either` context.
 If the instance is a `Right`, it returns the result of the right function, `$g`.
 ```php
@@ -332,7 +332,7 @@ $a = Either::fromNullable(null, null)->fold(
 );
 // 'Error'
 ```
-#### bimap (\$f,  \$g)
+#### bimap (callable $f, callable $g) : Either
 Used to map over the value in our instance, dependent on if the instance is a `Right`, or a `Left`.
 If the instance is a `Right`, it calls the right function `$g`.
 ```php
@@ -352,7 +352,7 @@ $a = Left('foo')->bimap(function($x) {
 });
 // Left('foobaz')
 ```
-#### alt (Either $m)
+#### alt (Either $m) : Either
 Allows you to provide an alternative value as a fallback if the current
 instance computation fails. You can look at it as a type-level if/else
 statement, or as a computation with a contingency plan if something goes
@@ -374,7 +374,7 @@ Left(1)->alt(Right(2));
 Left(1)->alt(Left(2));
 // Left(2)
 ```
-#### reduce ($f, $acc)
+#### reduce (callable $f, $acc)
 Used to get the result of a function applied to an instance value.
 Pulls the computation out of the `Either` context and just returns the
 result.
@@ -393,7 +393,7 @@ Left(12)->reduce(function($carry, $val) {
 }, 2);
 // 2
 ```
-#### toMaybe ()
+#### toMaybe () : Maybe
 Converts an `Either` into a `Maybe` context.
 If the instance is a `Right`, it simply returns a `Just` with the same value.
 ```php
@@ -405,7 +405,7 @@ If the instance is a `Left`, it returns `Nothing`.
 Either::fromNullable(0, null)->toMaybe();
 // Nothing()
 ```
-#### toValidation ()
+#### toValidation () : Maybe
 Used to transform a `Either` into a `Validation` context.
 If the instance is a `Right`, then it returns a `Success` containing that instance value.
 ```php
@@ -429,14 +429,14 @@ use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 It is used when a certain computation can fail in multiple ways, and you need to be able to keep track of all of the things that failed. It differs from Either in the fact that you can compose Validation Failures into a single Validation Failure.
 
 ### Methods
-#### static of ($val)
+#### static of ($val) : Validation
 Creates a `Success($val)`.
 Useful for lifting values into the `Validation` context.
 ```php
 Validation::of(2);
 // Success(2)
 ```
-#### static fromNullable ($failVal, $val)
+#### static fromNullable ($failVal, $val) : Validation
 Checks the value that is passed in. If it's null, it returns a `Failure($failVal)`,
 otherwise it returns a `Success($val)`.
 ```php
@@ -445,7 +445,7 @@ $b = 12;
 Validation::fromNullable(0, $a); // Failure(0)
 Validation::fromNullable($b); // Success(12)
 ```
-#### static tryCatch ($f)
+#### static tryCatch (callable $f) : Validation
 Performs a function that might throw an exception. If it succeeds,
 it stores the result in a `Success`, with the value of the result of the function. If it throws an exception, it returns a `Failure` with the result of the exception.
 ```php
@@ -462,7 +462,7 @@ Validation::tryCatch($connectToDB);
 // or whatever exception.
 // If no exception was thrown, returns Success($connection).
 ```
-#### static zero ()
+#### static zero () : Validation
 Gives you the type-level empty instance for Validation. You can think of this
 like an empty method such as `[]` for arrays, `''` for strings, but now
 we're dealing with the function level equivalent.
@@ -479,7 +479,7 @@ Validation::zero()->map(function($x) {
 });
 // Failure([])
 ```
-#### map ($f)
+#### map (callable $f) : Validation
 Used to transform the value inside of our `Validation`.
 Applies the function `$f` to the value inside of our instance.
 If the instance is a `Success`, it returns a `Success` with the result of the function.
@@ -496,7 +496,7 @@ Failure('There was a problem')->map(function($x) {
 });
 // Failure('There was a problem')
 ```
-#### ap (Validation $v)
+#### ap (Validation $v) : Validation
 Used when you have a `Validation` with a function, and a `Validation` with a value, and we want to apply that function to our value.
 If the instance is a `Success` it applies the function inside of `$v` to our instance.
 ```php
@@ -516,7 +516,7 @@ $b = Validation::of(function($x) {
 $a->ap($b);
 // Failure('No val set!');
 ```
-#### fold (\$f, \$g) (aliases: cata)
+#### fold (callable $f, callable $g) (aliases: cata)
 Used to extract values from a `Validation` context.
 If the instance is a `Success`, it returns the result of the right function `$g`.
 ```php
@@ -539,7 +539,7 @@ Failure(['First problem'])->fold(
 );
 // ['First problem']
 ```
-#### bimap (\$f, \$g)
+#### bimap (callable $f, callable $g) : Validation
 Used to map over the value in our instance, dependent on if the instance is a `Success`, or a `Failure`.
 If the instance is a `Success`, it calls the right function `$g`.
 ```php
@@ -565,7 +565,7 @@ Failure(12)->bimap(
 );
 // Failure(11)
 ```
-#### concat (Validation $v)
+#### concat (Validation $v) : Validation
 Used as a way of composing Validations.
 If the instance is a `Success`, it just returns the parameter Validation.
 ```php
@@ -595,7 +595,7 @@ $b = Failure(['There was another problem.']);
 $c = $a->concat($b);
 // Failure(['There was a problem.', 'There was another problem.']);
 ```
-#### alt (Validation $m)
+#### alt (Validation $m) : Validation
 Allows you to provide an alternative value as a fallback if the current
 instance computation fails. You can look at it as a type-level if/else
 statement, or as a computation with a contingency plan if something goes
@@ -618,7 +618,7 @@ Failure(['Something went wrong!])->alt(Failure(['Something else went
 wrong!']);
 // Failure(['Something else went wrong!'])
 ```
-#### reduce ($f, $acc)
+#### reduce (callable $f, $acc)
 Used to get the result of a function applied to an instance value.
 Pulls the computation out of the `Validation` context and just returns the
 result.
@@ -637,7 +637,7 @@ Failure(12)->reduce(function($carry, $val) {
 }, 2);
 // 2
 ```
-#### toEither ()
+#### toEither () : Either
 Used to move from a `Validation` context to an `Either` context.
 If the instance is a `Success`, it returns a `Right` with the same value.
 ```php
@@ -649,7 +649,7 @@ If the instance is a `Failure`, it returns a `Left` with the same value.
 Failure('foobar')->toEither();
 // Left('foobar')
 ```
-#### toMaybe ()
+#### toMaybe () : Maybe
 Used to move from a `Validation` context to a `Maybe` context.
 If the instance is a `Success`, it returns a `Just` with the same value.
 ```php
@@ -673,7 +673,7 @@ each of the functions have access to some external state.
 It helps to think of the Reader type as just a wrapper that holds a function with some extra
 properties.
 ### Methods
-#### static of ($x)
+#### static of ($x) : Reader
 Creates a `Reader` with a function that just returns the parameter
 value `$x`. The difference between using `Reader::of` and just calling
 the helper function `Reader` is that `Reader::of` creates a function
@@ -686,7 +686,7 @@ Reader::of(12)->run([]);
 Simply runs the function that the `Reader` is holding with some state
 `$s`. This is the state that will be referenced during the computation
 that the `Reader` is performing.
-#### map ($g)
+#### map (callable $g) : Reader
 This is the simplest way of composing new functions with the function
 that is already stored inside the `Reader`. Simply composes the function
 inside the `Reader` and the parameter function `$g`.
@@ -699,7 +699,7 @@ Reader::of('hello')->map(function($x) {
 })->run([]);
 // 'Hello World!'
 ```
-#### ap (Reader $g)
+#### ap (Reader $g) : Reader
 Used when you want to apply a function inside of a `Reader` to a value
 inside of a `Reader`.
 ```php
@@ -708,7 +708,7 @@ Reader::of(12)->ap(Reader::of(function($x) {
 }))->run([]);
 // 13
 ```
-#### chain ($r) (aliases: bind, flatMap)
+#### chain (callable $f) : Reader (aliases: bind, flatMap)
 Used when you want to map with a function that also returns a `Reader`.
 The `Reader` inside of the chain method has access to the external state
 that was passed in.
@@ -740,7 +740,7 @@ use Phantasy\DataTypes\Writer\Writer;
 The `Writer` type, similar to the `Reader` type, also encapsulates function composition, but instead of reading from some environment state, it allows you to write to some state.
 The most common use case allows you to keep a log as you go through your function composition.
 ### Methods
-#### static of ($x, $m = [])
+#### static of ($x, $m = []) : Writer
 Creates a `Writer` with a function that just returns the parameter
 value `$x`. The difference between using `Writer::of` and just calling
 the helper function `Writer` is that `Writer::of` creates a function
@@ -763,7 +763,7 @@ Writer::of('foo')->run();
 Writer::of('foobar', 'test')->run();
 // ['foobar', '']
 ```
-#### map ($g)
+#### map (callable $g) : Writer
 Used to transform the value that will be returned by the `Writer`.
 Simply runs the parameter function `$g` on the current value inside the `Writer`. This does not affect the log value.
 ```php
@@ -772,7 +772,7 @@ Writer::of('foo')->map(function($x) {
 })->run();
 // ['foobar', []]
 ```
-#### ap (Reader $g)
+#### ap (Writer $g) : Writer
 Used when you have a `Writer` whose computation value is a function, and you want to apply that function to the value inside of a different `Writer`. It also concatenates the log values of the two `Writer` instances.
 ```php
 $a = Writer::of('foo');
@@ -783,7 +783,7 @@ $b = Writer::of(function($x) {
 $a->ap($b)->run();
 // ['foobar', []]
 ```
-#### chain ($r) (aliases: bind, flatMap)
+#### chain (callable $f) : Writer (aliases: bind, flatMap)
 Used when you want to map with a function that returns a `Writer`. The computation value becomes the result of the parameter function `$r`, while the log value is the result of combining the current instance with the returned `Writer`.
 ```php
 Writer::of('foo')->chain(function($x) {
@@ -803,7 +803,7 @@ use Phantasy\DataTypes\State\State;
 You can think of the `State` type as a combination of the `Reader` and `Writer` types. With `Reader`, we had a purely functional way to read from some state for a computation. With `Writer` we had a way of writing to some state during a computation. With `State`, we get both.
 The `State` holds 2 objects, the first being the value of the computation and the second being the current state the computation is managing.
 ### Methods
-#### static of ($x)
+#### static of ($x) : State
 ```php
 State::of('foo')->run('bar');
 // ['foo', 'bar']
@@ -821,7 +821,7 @@ State::of('foo')->run(['title' => 'Foo Bar']);
 State::of('foobar')->run(12);
 // ['foobar', 12]
 ```
-#### map ($g)
+#### map (callable $g) : State
 Used to transform the value that will be returned by the `State`.
 Simply runs the parameter function `$g` on the current value inside the `State`. This does not affect the state, just the value.
 ```php
@@ -830,7 +830,7 @@ State::of('foo')->map(function($x) {
 })->run([]);
 // ['foobar', []]
 ```
-#### ap (State $g)
+#### ap (State $g) : State
 Used when you have a `State` whose computation value is a function, and you want to apply that function to the value inside of a different `State`. This does not affect the state value.
 ```php
 $a = State::of('foo');
@@ -841,7 +841,7 @@ $b = State::of(function($x) {
 $a->ap($b)->run(15);
 // ['foobar', 15]
 ```
-#### chain ($r) (aliases: bind, flatMap)
+#### chain (callable $f) : State (aliases: bind, flatMap)
 Used when you want to map with a function that returns a `State`. The computation value becomes the result of the parameter function `$r`, while the state value is accessible to be read and changed.
 ```php
 State::of('foo')->chain(function($x) {
@@ -860,7 +860,7 @@ use Phantasy\DataTypes\LinkedList\{LinkedList, Cons, Nil};
 ### Description
 A purely functional linked list implementation.
 ### Methods
-#### static fromArray ($arr)
+#### static fromArray (array $arr) : LinkedList
 Used to convert a php array into a LinkedList, a List element whose
 only elements are the head of the list, and the tail which is another
 LinkedList.
@@ -868,19 +868,19 @@ LinkedList.
 LinkedList::fromArray([1, 2, 3]);
 // Cons(1, Cons(2, Cons(3, Nil)))
 ```
-#### static of ($x)
+#### static of ($x) : LinkedList
 Simply creates a `Cons($x, Nil())`, a LinkedList whose only element is `$x`.
 ```php
 LinkedList::of(1);
 // Cons(1, Nil)
 ```
-#### static empty ()
+#### static empty () : LinkedList
 Creates the empty element for a LinkedList, simply `Nil()`.
 ```php
 LinkedList::empty();
 // Nil()
 ```
-#### map ($f)
+#### map (callable $f) : LinkedList
 Used when you want to run a transformation over all of the values of
 your list.
 If the instance is a `Cons`, it keeps running the transformation down the list until
@@ -898,7 +898,7 @@ Nil()->map(function($x) {
 });
 // Nil
 ```
-### ap ($c)
+### ap (LinkedList $c) : LinkedList
 Used when you have a LinkedList of functions that you want to apply to a
 LinkedList of values.
 If the instance is a `Cons`, it runs each function in `$c` over each value
@@ -930,7 +930,7 @@ $b = LinkedList::fromArray([
 $a->ap($b);
 // Nil
 ```
-### chain ($f)
+### chain (callable $f) : LinkedList
 Used when you have a function that returns a LinkedList.
 If the instance is a `Cons`, it calls the
 function on each of the values in the current LinkedList and then
@@ -948,7 +948,7 @@ Nil()->chain(function($x) {
 });
 // Nil
 ```
-### concat ($c)
+### concat (LinkedList $c) : LinkedList
 Used to concatenate two linked lists together.
 ```php
 LinkedList::of(2)->concat(LinkedList::of(3));
@@ -957,7 +957,7 @@ LinkedList::of(2)->concat(LinkedList::of(3));
 Nil()->concat(LinkedList::of(3));
 // Cons(3, Nil)
 ```
-### reduce ($f, $acc)
+### reduce (callable $f, $acc)
 Similar to `array_reduce`, this takes in a transformation function `$f`,
 and an accumulator `$acc`, runs `$f` on each value in the list, starting
 with `$acc` and returns the accumulated result.
@@ -974,7 +974,7 @@ Nil()->reduce(function($acc, $x) {
 }, 12);
 // 12
 ```
-### join ()
+### join () : LinkedList
 Simply flattens a nested LinkedList one level.
 ```php
 LinkedList::of(LinkedList::of(2))->join();
@@ -985,7 +985,7 @@ If the instance was `Nil`, it just returns `Nil`.
 Nil()->join();
 // Nil
 ```
-### sequence ($of)
+### sequence (string $className)
 Used when you have types that you want to swap. For example, converting
 a `LinkedList` of `Maybe` to a `Maybe` of a `LinkedList`.
 If the instance is a `Cons`, then it simply swaps the types.
@@ -995,7 +995,7 @@ use function Phantasy\DataTypes\Either\Right;
 use function Phantasy\DataTypes\LinkedList\{Cons, Nil};
 
 $a = Cons(Right(1), Cons(Right(2), Nil()));
-$a->sequence(Either::of());
+$a->sequence(Either::class);
 // Right(Cons(1, Cons(2, Nil)))
 ```
 If the instance is a `Nil`, then it just wraps it in the result of `$of`.
@@ -1004,10 +1004,10 @@ use Phantasy\DataTypes\Either\Either;
 use function Phantasy\DataTypes\LinkedList\Nil;
 
 $a = Nil();
-$a->sequence(Either::of());
+$a->sequence(Either::class);
 // Right(Nil)
 ```
-### traverse ($of, $f)
+### traverse (string $className, callable $f)
 Used when you have types that you want to swap, but also apply a
 transformation function. For example, converting
 a `LinkedList` of `Maybe` to a `Maybe` of a `LinkedList`.
@@ -1023,7 +1023,7 @@ $toChar = function($n) {
         ? Left($n . ' is out of bounds!')
         : Right(chr(833 + $n));
 };
-$a->traverse(Either::of(), $toChar);
+$a->traverse(Either::class, $toChar);
 // Right(Cons('A', Cons('B', Cons('C', Cons('D', Nil)))))
 ```
 If the instance is a `Nil`, then it just wraps it in the result of `$of`.
@@ -1033,6 +1033,6 @@ use function Phantasy\DataTypes\LinkedList\Nil;
 use function Phantasy\Core\identity;
 
 $a = Nil();
-$a->traverse(Either::of(), identity());
+$a->traverse(Either::class, identity());
 // Right(Nil)
 ```
