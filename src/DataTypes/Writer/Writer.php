@@ -16,10 +16,49 @@ final class Writer
         $this->func = $f;
     }
 
-    private static function of($m, $val) : Writer
+    private static function of($val, $m = []) : Writer
     {
         return new Writer(function () use ($val, $m) {
             return [$val, mempty($m)];
+        });
+    }
+
+    private static function chainRec(callable $f, $i, $m = []) : Writer
+    {
+        $loopOrDone = function ($b) {
+            return function ($x) use ($b) {
+                return new class ($b, $x) {
+                    public $x;
+                    private $b;
+
+                    public function __construct($b, $x)
+                    {
+                        $this->b = $b;
+                        $this->x = $x;
+                    }
+
+                    public function isDone()
+                    {
+                        return $this->b;
+                    }
+                };
+            };
+        };
+
+        $loop = $loopOrDone(false);
+        $done = $loopOrDone(true);
+
+        $acc = mempty($m);
+        $currentVal = $loop($i);
+        $count = 0;
+        do {
+            list($val, $log) = $f($loop, $done, $currentVal->x)->run();
+            $acc = concat($acc, $log);
+            $currentVal = $val;
+        } while (!$currentVal->isDone());
+
+        return Writer(function () use ($acc, $currentVal) {
+            return [$currentVal->x, $acc];
         });
     }
 

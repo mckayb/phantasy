@@ -5,10 +5,10 @@ function curry(callable $callable)
 {
     $ref = new \ReflectionFunction($callable);
 
-    $recurseFunc = function () use ($ref, &$recurseFunc) {
+    $recurseFunc = function () use ($callable, $ref, &$recurseFunc) {
         $args = func_get_args();
         if (func_num_args() >= $ref->getNumberOfRequiredParameters()) {
-            return $ref->invokeArgs($args);
+            return call_user_func_array($callable, $args);
         } else {
             return function () use ($args, &$recurseFunc) {
                 return $recurseFunc(...array_merge($args, func_get_args()));
@@ -24,10 +24,10 @@ function curryN()
     $curryN = curry(function (int $n, callable $callable) {
         $ref = new \ReflectionFunction($callable);
 
-        $recurseFunc = function () use ($ref, &$recurseFunc, $n) {
+        $recurseFunc = function () use ($callable, $ref, &$recurseFunc, $n) {
             $args = func_get_args();
-            if (func_num_args() === $n) {
-                return $ref->invokeArgs($args);
+            if (func_num_args() >= $n) {
+                return call_user_func_array($callable, $args);
             } else {
                 return function () use ($args, &$recurseFunc) {
                     return $recurseFunc(...array_merge($args, func_get_args()));
@@ -375,9 +375,18 @@ function traverse()
 function chainRec()
 {
     $chainRec = curry(function (callable $f, $x, $m) {
-        if (is_object($m) && method_exists($m, 'chainRec')) {
-            return $m->chainRec($f, $x);
+        $methodExists = method_exists($m, 'chainRec');
+
+        if ($methodExists) {
+            if (is_string($m) && class_exists($m)) {
+                return $m::chainRec($f, $x);
+            }
+
+            if (is_object($m)) {
+                return $m->chainRec($f, $x);
+            }
         }
+
         return null;
     });
 

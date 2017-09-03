@@ -2,8 +2,8 @@
 
 namespace Phantasy\DataTypes\Either;
 
-use Phantasy\DataTypes\Maybe\Just;
-use Phantasy\DataTypes\Validation\Success;
+use Phantasy\DataTypes\Maybe\{Maybe, Just};
+use Phantasy\DataTypes\Validation\{Validation, Success};
 use Phantasy\Traits\CurryNonPublicMethods;
 use function Phantasy\Core\curry;
 
@@ -85,12 +85,12 @@ final class Right extends Either
     }
 
     // Conversions
-    private function toMaybe()
+    private function toMaybe() : Maybe
     {
         return new Just($this->value);
     }
 
-    private function toValidation()
+    private function toValidation() : Validation
     {
         return new Success($this->value);
     }

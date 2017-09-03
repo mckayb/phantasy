@@ -2,8 +2,8 @@
 
 namespace Phantasy\DataTypes\Either;
 
-use Phantasy\DataTypes\Maybe\Nothing;
-use Phantasy\DataTypes\Validation\Failure;
+use Phantasy\DataTypes\Maybe\{Maybe, Nothing};
+use Phantasy\DataTypes\Validation\{Validation, Failure};
 use Phantasy\Traits\CurryNonPublicMethods;
 use function Phantasy\Core\curry;
 
@@ -64,12 +64,12 @@ final class Left extends Either
     }
 
     // Aliases
-    private function bind(callable $f) : Left
+    private function bind(callable $f) : Either
     {
         return $this->chain($f);
     }
 
-    private function flatMap(callable $f) : Left
+    private function flatMap(callable $f) : Either
     {
         return $this->chain($f);
     }
@@ -80,12 +80,12 @@ final class Left extends Either
     }
 
     // Conversions
-    private function toMaybe()
+    private function toMaybe() : Maybe
     {
         return new Nothing();
     }
 
-    private function toValidation()
+    private function toValidation() : Validation
     {
         return new Failure($this->value);
     }

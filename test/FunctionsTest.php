@@ -4,6 +4,7 @@ use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\LinkedList\{LinkedList, Cons, Nil};
+use Phantasy\DataTypes\Writer\Writer;
 use function Phantasy\Core\{
     id,
     identity,
@@ -23,6 +24,7 @@ use function Phantasy\Core\{
     filter,
     reduce,
     chain,
+    chainRec,
     mjoin,
     isTraversable,
     trace,
@@ -304,10 +306,29 @@ class FunctionsTest extends TestCase
 
     public function testChainRec()
     {
+        $f = function ($next, $done, $v) {
+            return new Writer(function () use ($next, $done, $v) {
+                return [$v >= 100 ? $done($v) : $next($v + 1), [$v]];
+            });
+        };
+
+        list($val, $log) = chainRec($f, 0, Writer::class)->run();
+        $this->assertEquals(range(0, 100), $log);
+        $this->assertEquals($val, 100);
     }
 
     public function testChainRecCurried()
     {
+        $f = function ($next, $done, $v) {
+            return new Writer(function () use ($next, $done, $v) {
+                return [$v >= 100 ? $done($v) : $next($v + 1), [$v]];
+            });
+        };
+        $chainRecF = chainRec($f);
+        $chainRecFStartingAt0 = $chainRecF(0);
+        list($val, $log) = $chainRecFStartingAt0(Writer::class)->run();
+        $this->assertEquals(range(0, 100), $log);
+        $this->assertEquals($val, 100);
     }
 
     public function testExtend()
