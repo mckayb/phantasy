@@ -46,7 +46,9 @@ final class Nil extends LinkedList
     private function traverse(string $className, callable $f)
     {
         if (!class_exists($className) || !method_exists($className, 'of')) {
-            throw new InvalidArgumentException('Method must be a class name of an Applicative (must have an of method).');
+            throw new InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an of method).'
+            );
         }
 
         return $className::of(new Nil());
@@ -55,7 +57,9 @@ final class Nil extends LinkedList
     private function sequence(string $className)
     {
         if (!class_exists($className) || !method_exists($className, 'of')) {
-            throw new InvalidArgumentException('Method must be a class name of an Applicative (must have an of method).');
+            throw new InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an of method).'
+            );
         }
 
         return $className::of(new Nil());

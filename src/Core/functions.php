@@ -340,7 +340,9 @@ function sequence()
 {
     $sequence = curry(function (string $className, $x) {
         if (!class_exists($className) || !method_exists($className, 'of')) {
-            throw new InvalidArgumentException('Method must be a class name of an Applicative (must have an of method).');
+            throw new InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an of method).'
+            );
         }
 
         if (is_object($x)) {
@@ -360,7 +362,9 @@ function traverse()
 {
     $traverse = curry(function (string $className, callable $f, $x) {
         if (!class_exists($className) || !method_exists($className, 'of')) {
-            throw new InvalidArgumentException('Method must be a class name of an Applicative (must have an of method).');
+            throw new InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an of method).'
+            );
         }
 
         if (is_object($x) && method_exists($x, 'traverse')) {
