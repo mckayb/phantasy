@@ -3,7 +3,6 @@
 namespace Phantasy\Test;
 
 use PHPUnit\Framework\TestCase;
-use Phantasy\Test\Fixtures\TestVarClass;
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\LinkedList\{LinkedList, Cons, Nil};
@@ -50,6 +49,18 @@ use function Phantasy\Core\{
     reduceRight,
     bimap
 };
+
+class TestVarClass
+{
+    public $x = 'foo';
+    public static $x_ = 'foostatic';
+
+    protected $y = 'bar';
+    protected static $y_ = 'barstatic';
+
+    private $z = 'baz';
+    private static $z_ = 'baz';
+}
 
 class FunctionsTest extends TestCase
 {
