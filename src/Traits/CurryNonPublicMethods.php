@@ -18,7 +18,7 @@ trait CurryNonPublicMethods
             $returnType = (string)$ref->getReturnType();
             $self = $this;
             $func = curryN($numArgs, function (...$args2) use ($self, $method, $returnType) {
-                return $self->$method(...$args2);
+                return call_user_func_array([$self, $method], $args2);
             });
             return $func;
         }
@@ -37,7 +37,7 @@ trait CurryNonPublicMethods
             $returnType = (string)$ref->getReturnType();
             $self = $this;
             $func = curryN($numArgs, function (...$args2) use ($self, $method, $returnType) {
-                return $self->$method(...$args2);
+                return call_user_func_array([$self, $method], $args2);
             });
             return $func(...$args);
         }
@@ -63,8 +63,8 @@ trait CurryNonPublicMethods
         if ($methodIsToBeCurried) {
             $numArgs = $ref->getNumberOfRequiredParameters();
             $returnType = (string)$ref->getReturnType();
-            $func = curryN($numArgs, function (...$args2) use ($method, $returnType) {
-                return self::$method(...$args2);
+            $func = curryN($numArgs, function (...$args2) use ($calledClass, $method, $returnType) {
+                return call_user_func_array([$calledClass, $method], $args2);
             });
             return $func(...$args);
         }

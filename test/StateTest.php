@@ -1,5 +1,7 @@
 <?php
 
+namespace Phantasy\Test;
+
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\State\State;
 use function Phantasy\DataTypes\State\State;

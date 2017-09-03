@@ -1,5 +1,7 @@
 <?php
 
+namespace Phantasy\Test;
+
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Writer\Writer;
 use function Phantasy\Core\concat;

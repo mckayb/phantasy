@@ -18,7 +18,7 @@ final class Writer
 
     private static function of($val, $m = []) : Writer
     {
-        return new Writer(function () use ($val, $m) {
+        return new static(function () use ($val, $m) {
             return [$val, mempty($m)];
         });
     }
@@ -57,7 +57,7 @@ final class Writer
             $currentVal = $val;
         } while (!$currentVal->isDone());
 
-        return Writer(function () use ($acc, $currentVal) {
+        return new static(function () use ($acc, $currentVal) {
             return [$currentVal->x, $acc];
         });
     }
@@ -69,7 +69,7 @@ final class Writer
 
     private function map(callable $f) : Writer
     {
-        return new Writer(function () use ($f) {
+        return new static(function () use ($f) {
             list ($compVal, $logVal) = $this->run();
             return [$f($compVal), $logVal];
         });
@@ -77,7 +77,7 @@ final class Writer
 
     private function ap(Writer $w) : Writer
     {
-        return new Writer(function () use ($w) {
+        return new static(function () use ($w) {
             list ($compX, $logX) = $this->run();
             list ($compY, $logY) = $w->run();
 
@@ -87,7 +87,7 @@ final class Writer
 
     private function chain(callable $g) : Writer
     {
-        return new Writer(function () use ($g) {
+        return new static(function () use ($g) {
             list($compX, $logX) = $this->run();
             list($compY, $logY) = $g($compX)->run();
             return [$compY, concat($logY, $logX)];
@@ -96,7 +96,7 @@ final class Writer
 
     private function extend(callable $f) : Writer
     {
-        return new Writer(function () use ($f) {
+        return new static(function () use ($f) {
             $x = $this->run();
             return [$f($x), $x[1]];
         });

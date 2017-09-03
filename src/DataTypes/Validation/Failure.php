@@ -43,7 +43,7 @@ final class Failure extends Validation
         if ($v instanceof Success) {
             return $this;
         } else {
-            return new Failure(concat($this->value, $v->value));
+            return new static(concat($this->value, $v->value));
         }
     }
 
@@ -54,7 +54,7 @@ final class Failure extends Validation
 
     private function bimap(callable $f, callable $g) : Validation
     {
-        return new Failure($f($this->value));
+        return new static($f($this->value));
     }
 
     private function alt(Validation $v) : Validation

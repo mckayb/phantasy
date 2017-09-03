@@ -3,6 +3,7 @@
 namespace Phantasy\DataTypes\LinkedList;
 
 use Phantasy\Traits\CurryNonPublicMethods;
+use function Phantasy\Core\identity;
 
 final class Nil extends LinkedList
 {
@@ -15,17 +16,17 @@ final class Nil extends LinkedList
 
     private function map(callable $f) : LinkedList
     {
-        return new Nil();
+        return $this;
     }
 
     private function ap(LinkedList $c) : LinkedList
     {
-        return new Nil();
+        return $this;
     }
 
     private function chain(callable $f) : LinkedList
     {
-        return new Nil();
+        return $this;
     }
 
     private function concat(LinkedList $c) : LinkedList
@@ -40,29 +41,23 @@ final class Nil extends LinkedList
 
     private function join() : LinkedList
     {
-        return new Nil();
+        return $this;
     }
 
     private function traverse(string $className, callable $f)
     {
         if (!class_exists($className) || !method_exists($className, 'of')) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 'Method must be a class name of an Applicative (must have an of method).'
             );
         }
 
-        return $className::of(new Nil());
+        return call_user_func([$className, 'of'], new Nil());
     }
 
     private function sequence(string $className)
     {
-        if (!class_exists($className) || !method_exists($className, 'of')) {
-            throw new InvalidArgumentException(
-                'Method must be a class name of an Applicative (must have an of method).'
-            );
-        }
-
-        return $className::of(new Nil());
+        return $this->traverse($className, identity());
     }
 
     public function __toString()

@@ -30,7 +30,7 @@ final class Success extends Validation
 
     private function map(callable $f) : Validation
     {
-        return new Success($f($this->value));
+        return new static($f($this->value));
     }
 
     private function ap(Validation $validationWithFunc) : Validation
@@ -55,7 +55,7 @@ final class Success extends Validation
 
     private function bimap(callable $f, callable $g) : Validation
     {
-        return new Success($g($this->value));
+        return new static($g($this->value));
     }
 
     private function alt(Validation $v) : Validation

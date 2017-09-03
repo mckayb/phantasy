@@ -37,6 +37,11 @@
       "src/DataTypes/State/State.php"
     ]
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Phantasy\\Test\\": "test/"
+    }
+  },
   "scripts": {
     "test": "phpunit",
     "lint": "phpcs --standard=./ruleset.xml ./src ./test",

@@ -1,5 +1,7 @@
 <?php
 
+namespace Phantasy\Test;
+
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Either\{Either, Left, Right};

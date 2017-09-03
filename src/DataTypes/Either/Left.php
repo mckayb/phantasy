@@ -50,7 +50,7 @@ final class Left extends Either
 
     private function bimap(callable $f, callable $g) : Either
     {
-        return new Left($f($this->value));
+        return new static($f($this->value));
     }
 
     private function alt(Either $e) : Either
@@ -80,12 +80,12 @@ final class Left extends Either
     }
 
     // Conversions
-    private function toMaybe() : Maybe
+    public function toMaybe() : Maybe
     {
         return new Nothing();
     }
 
-    private function toValidation() : Validation
+    public function toValidation() : Validation
     {
         return new Failure($this->value);
     }

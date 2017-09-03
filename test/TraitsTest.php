@@ -1,6 +1,6 @@
 <?php
 
-namespace Phantasy\Tests;
+namespace Phantasy\Test;
 
 use PHPUnit\Framework\TestCase;
 use Phantasy\Traits\CurryNonPublicMethods;

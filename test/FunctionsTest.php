@@ -1,6 +1,9 @@
 <?php
 
+namespace Phantasy\Test;
+
 use PHPUnit\Framework\TestCase;
+use Phantasy\Test\Fixtures\TestVarClass;
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\LinkedList\{LinkedList, Cons, Nil};
@@ -28,6 +31,8 @@ use function Phantasy\Core\{
     extend,
     extract,
     mjoin,
+    sequence,
+    traverse,
     isTraversable,
     trace,
     liftA,
@@ -154,21 +159,25 @@ class FunctionsTest extends TestCase
     public function testOf()
     {
         $this->assertEquals(of(Either::class, 2), new Right(2));
-        $this->assertEquals(of(new Either(), 2), new Right(2));
     }
 
     public function testOfCurried()
     {
         $of = of();
         $ofEither = $of(Either::class);
-        $ofEither_ = $of(new Either());
         $this->assertEquals($ofEither(2), new Right(2));
-        $this->assertEquals($ofEither_(2), new Right(2));
     }
 
-    public function testOfReturnsNullOnFailure()
+    public function testOfNonStatic()
     {
-        $this->assertNull(of(1, 2));
+        $a = new class () {
+            public function of($x)
+            {
+                return $x . 'bar';
+            }
+        };
+
+        $this->assertEquals(of($a, 'foo'), 'foobar');
     }
 
     public function testCompose()
@@ -228,6 +237,13 @@ class FunctionsTest extends TestCase
         $this->assertEquals($altC($b), $c);
     }
 
+    public function testAltBools()
+    {
+        $a = true;
+        $b = false;
+        $this->assertTrue(alt($a, $b));
+    }
+
     public function testZero()
     {
         $this->assertEquals(zero(Maybe::class), new Nothing());
@@ -239,71 +255,97 @@ class FunctionsTest extends TestCase
         $this->assertEquals($zero(Maybe::class), new Nothing());
     }
 
-    public function testSequence()
+    public function testZeroNonStatic()
     {
-        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
-        $this->assertEquals(
-            $a->sequence(Either::class),
-            new Right(new Cons(1, new Cons(2, new Nil())))
-        );
+        $a = new class () {
+            public function zero()
+            {
+                return 'bar';
+            }
+        };
+
+        $this->assertEquals(zero($a), 'bar');
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testSequenceInvalidArgument()
+    {
+        $a = new Nil();
+        sequence($a, 'Foo');
+    }
+
+    public function testSequenceObjectWithSequenceMethod()
+    {
+        $a = new class () {
+            public function sequence($f)
+            {
+                return 'foo';
+            }
+        };
+
+        $this->assertEquals(sequence(LinkedList::class, $a), 'foo');
+    }
+
+    public function testSequenceObjectWithTraverseMethod()
+    {
+        $a = new class () {
+            public function traverse($clss, $f)
+            {
+                return 'foo';
+            }
+        };
+
+        $this->assertEquals(sequence(LinkedList::class, $a), 'foo');
     }
 
     public function testSequenceCurried()
     {
-        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
-        $sequence = $a->sequence;
-        $sequence_ = $a->sequence();
-        $sequence__ = $sequence();
-
-        $expected = new Right(new Cons(1, new Cons(2, new Nil())));
-        $this->assertEquals($sequence(Either::class), $expected);
-        $this->assertEquals($sequence_(Either::class), $expected);
-        $this->assertEquals($sequence__(Either::class), $expected);
+        $a = new Cons(new Right(1), new Nil());
+        $sequenceEither = sequence(Either::class);
+        $this->assertEquals($sequenceEither($a), new Right(new Cons(1, new Nil())));
     }
 
-    public function testTraverse()
+    public function testTraverseObjectWithTraverseMethod()
     {
-        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
-        $traverse = $a->traverse;
-        $traverse_ = $a->traverse();
-        $traverse__ = $traverse();
-
-        $f = function ($x) {
-            return $x->toMaybe()->map(function ($x) {
-                return $x + 1;
-            });
+        $a = new class () {
+            public function traverse($clss, $f)
+            {
+                return 'foo';
+            }
         };
 
-        $expected = new Just(new Cons(2, new Cons(3, new Nil())));
-        $this->assertEquals($traverse(Maybe::class, $f), $expected);
-        $this->assertEquals($traverse_(Maybe::class, $f), $expected);
-        $this->assertEquals($traverse__(Maybe::class, $f), $expected);
+        $this->assertEquals(traverse(LinkedList::class, function ($x) {
+            return $x + 1;
+        }, $a), 'foo');
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testTraverseInvalidArgument()
+    {
+        traverse('Foo', function ($x) {
+            return $x + 1;
+        }, null);
     }
 
     public function testTraverseCurried()
     {
-        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
-        $traverse = $a->traverse;
-        $traverse_ = $a->traverse();
-        $traverse__ = $traverse();
-
-        $traverseMaybe = $traverse(Maybe::class);
-        $traverseMaybe_ = $traverse_(Maybe::class);
-        $traverseMaybe__ = $traverse__(Maybe::class);
-
-        $f = function ($x) {
-            return $x->toMaybe()->map(function ($x) {
-                return $x + 1;
-            });
+        $a = new class () {
+            public function traverse($clss, $f)
+            {
+                return 'foo';
+            }
         };
 
-        $expected = new Just(new Cons(2, new Cons(3, new Nil())));
-        $this->assertEquals($traverse(Maybe::class, $f), $expected);
-        $this->assertEquals($traverse_(Maybe::class, $f), $expected);
-        $this->assertEquals($traverse__(Maybe::class, $f), $expected);
-        $this->assertEquals($traverseMaybe($f), $expected);
-        $this->assertEquals($traverseMaybe_($f), $expected);
-        $this->assertEquals($traverseMaybe__($f), $expected);
+        $traverseLinkedList = traverse(LinkedList::class);
+        $traverseLLAddOne = $traverseLinkedList(function ($x) {
+            return $x + 1;
+        });
+
+        $this->assertEquals($traverseLLAddOne($a), 'foo');
     }
 
     public function testChainRec()
@@ -365,22 +407,6 @@ class FunctionsTest extends TestCase
     {
         $extract = extract();
         $this->assertEquals($extract(Writer::of(1)), 1);
-    }
-
-    public function testPromap()
-    {
-    }
-
-    public function testPromapCurried()
-    {
-    }
-
-    public function testDimap()
-    {
-    }
-
-    public function testDimapCurried()
-    {
     }
 
     public function testCurry()
@@ -586,6 +612,11 @@ class FunctionsTest extends TestCase
         $f = [ "test" => "foo" ];
         $g = [ "test" => "bar" ];
         $this->assertEquals(array_map(prop('test'), [$f, $g]), ['foo', 'bar']);
+    }
+
+    public function testPropStaticProp()
+    {
+        $this->assertEquals(prop('x_', TestVarClass::class), 'foostatic');
     }
 
     public function testPropCurried()

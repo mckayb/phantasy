@@ -5,21 +5,21 @@ namespace Phantasy\DataTypes\Either;
 use function Phantasy\Core\curry;
 use Phantasy\Traits\CurryNonPublicMethods;
 
-class Either
+abstract class Either
 {
     use CurryNonPublicMethods;
 
-    final private static function of($val)
+    final private static function of($val) : Either
     {
         return new Right($val);
     }
 
-    final private static function fromNullable($failVal, $val)
+    final private static function fromNullable($failVal, $val) : Either
     {
         return is_null($val) ? new Left($failVal) : new Right($val);
     }
 
-    final private static function tryCatch(callable $f)
+    final private static function tryCatch(callable $f) : Either
     {
         try {
             return new Right($f());

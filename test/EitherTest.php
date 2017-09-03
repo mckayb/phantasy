@@ -1,9 +1,12 @@
 <?php
 
+namespace Phantasy\Test;
+
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
+use Phantasy\DataTypes\LinkedList\{Cons, Nil};
 use function Phantasy\DataTypes\Either\{Left, Right};
 
 class EitherTest extends TestCase
@@ -900,5 +903,72 @@ class EitherTest extends TestCase
         $vali = $e->toValidation();
         $this->assertInstanceOf(Failure::class, $vali);
         $this->assertEquals(new Failure('foobar'), $vali);
+    }
+
+    public function testSequence()
+    {
+        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
+        $this->assertEquals(
+            $a->sequence(Either::class),
+            new Right(new Cons(1, new Cons(2, new Nil())))
+        );
+    }
+
+    public function testSequenceCurried()
+    {
+        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
+        $sequence = $a->sequence;
+        $sequence_ = $a->sequence();
+        $sequence__ = $sequence();
+
+        $expected = new Right(new Cons(1, new Cons(2, new Nil())));
+        $this->assertEquals($sequence(Either::class), $expected);
+        $this->assertEquals($sequence_(Either::class), $expected);
+        $this->assertEquals($sequence__(Either::class), $expected);
+    }
+
+    public function testTraverse()
+    {
+        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
+        $traverse = $a->traverse;
+        $traverse_ = $a->traverse();
+        $traverse__ = $traverse();
+
+        $f = function ($x) {
+            return $x->toMaybe()->map(function ($x) {
+                return $x + 1;
+            });
+        };
+
+        $expected = new Just(new Cons(2, new Cons(3, new Nil())));
+        $this->assertEquals($traverse(Maybe::class, $f), $expected);
+        $this->assertEquals($traverse_(Maybe::class, $f), $expected);
+        $this->assertEquals($traverse__(Maybe::class, $f), $expected);
+    }
+
+    public function testTraverseCurried()
+    {
+        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
+        $traverse = $a->traverse;
+        $traverse_ = $a->traverse();
+        $traverse__ = $traverse();
+
+        $traverseMaybe = $traverse(Maybe::class);
+        $traverseMaybe_ = $traverse_(Maybe::class);
+        $traverseMaybe__ = $traverse__(Maybe::class);
+
+        $f = function ($x) {
+            return $x->toMaybe()->map(function ($x) {
+                return $x + 1;
+            });
+        };
+
+        $expected = new Just(new Cons(2, new Cons(3, new Nil())));
+        $this->assertEquals($traverse(Maybe::class, $f), $expected);
+        $this->assertEquals($traverse_(Maybe::class, $f), $expected);
+        $this->assertEquals($traverse__(Maybe::class, $f), $expected);
+        $this->assertEquals($traverseMaybe($f), $expected);
+        $this->assertEquals($traverseMaybe_($f), $expected);
+        $this->assertEquals($traverseMaybe__($f), $expected);
     }
 }

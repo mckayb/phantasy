@@ -1,5 +1,7 @@
 <?php
 
+namespace Phantasy\Test;
+
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\LinkedList\{LinkedList, Cons, Nil};
 use Phantasy\DataTypes\Either\{Either, Right};
@@ -434,6 +436,23 @@ class LinkedListTest extends TestCase
         $this->assertEquals($traverseMaybe($t), $expected);
         $this->assertEquals($traverseMaybe_($t), $expected);
         $this->assertEquals($traverseMaybe__($t), $expected);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testConsTraverseInvalidClass()
+    {
+        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
+        $a->traverse('Foo\Bar', Either::of());
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testNilTraverseInvalidClass()
+    {
+        Nil()->traverse('Foo\Bar', Either::of());
     }
 
     public function testNilTraverse()

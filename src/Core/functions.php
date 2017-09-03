@@ -1,4 +1,5 @@
 <?php
+
 namespace Phantasy\Core;
 
 function curry(callable $callable)
@@ -45,7 +46,7 @@ function compose(...$fns)
 {
     return array_reduce(
         $fns,
-        function ($f, $g) {
+        function (callable $f, callable $g) {
             return function ($x) use ($f, $g) {
                 return $f($g($x));
             };
@@ -79,8 +80,8 @@ function prop()
                 return $x->{$s};
             } elseif (is_array($x)) {
                 return $x[$s];
-            } else {
-                return null;
+            } elseif (is_string($x) && class_exists($x)) {
+                return $x::$$s;
             }
         }
     );
@@ -102,8 +103,8 @@ function trace()
 function equals()
 {
     $equals = curry(function ($a, $b) {
-        if (is_object($a) && method_exists($a, 'equals')) {
-            return $a->equals($b);
+        if (method_exists($a, 'equals')) {
+            return call_user_func([$a, 'equals'], $b);
         }
 
         return $a === $b;
@@ -116,8 +117,8 @@ function equals()
 function lte()
 {
     $lte = curry(function ($a, $b) {
-        if (is_object($a) && method_exists($a, 'lte')) {
-            return $a->lte($b);
+        if (method_exists($a, 'lte')) {
+            return call_user_func([$a, 'lte'], $b);
         }
 
         return $a <= $b;
@@ -131,12 +132,10 @@ function contramap()
 {
     $contramap = curry(
         function (callable $f, $x) {
-            if (is_object($x) && method_exists($x, 'contramap')) {
-                return $x->contramap($f);
-            } elseif (is_object($x) && method_exists($x, 'cmap')) {
-                return $x->cmap($f);
-            } else {
-                return null;
+            if (method_exists($x, 'contramap')) {
+                return call_user_func([$x, 'contramap'], $f);
+            } elseif (method_exists($x, 'cmap')) {
+                return call_user_func([$x, 'cmap'], $f);
             }
         }
     );
@@ -155,8 +154,8 @@ function map()
 {
     $map = curry(
         function (callable $f, $x) {
-            if (is_object($x) && method_exists($x, 'map')) {
-                return $x->map($f);
+            if (method_exists($x, 'map')) {
+                return call_user_func([$x, 'map'], $f);
             } else {
                 $res = [];
                 foreach ($x as $k => $y) {
@@ -180,8 +179,8 @@ function filter()
 {
     $filter = curry(
         function (callable $f, $x) {
-            if (is_object($x) && method_exists($x, 'filter')) {
-                return $x->filter($f);
+            if (method_exists($x, 'filter')) {
+                return call_user_func([$x, 'filter'], $f);
             } else {
                 $res = [];
                 foreach ($x as $y) {
@@ -200,7 +199,7 @@ function bimap()
 {
     $bimap = curry(
         function (callable $f, callable $g, $x) {
-            return $x->bimap($f, $g);
+            return call_user_func([$x, 'bimap'], $f, $g);
         }
     );
 
@@ -224,10 +223,10 @@ function reduce()
 {
     $reduce = curry(
         function (callable $f, $i, $x) {
-            if (is_object($x) && method_exists($x, 'reduce')) {
-                return $x->reduce($f, $i);
-            } elseif (is_object($x) && method_exists($x, 'foldl')) {
-                return $x->foldl($f, $i);
+            if (method_exists($x, 'reduce')) {
+                return call_user_func([$x, 'reduce'], $f, $i);
+            } elseif (method_exists($x, 'foldl')) {
+                return call_user_func([$x, 'foldl'], $f, $i);
             } else {
                 $acc = $i;
                 foreach ($x as $y) {
@@ -246,10 +245,10 @@ function reduceRight()
 {
     $reduceRight = curry(
         function (callable $f, $i, $x) {
-            if (is_object($x) && method_exists($x, 'reduceRight')) {
-                return $x->reduceRight($f, $i);
-            } elseif (is_object($x) && method_exists($x, 'foldr')) {
-                return $x->foldr($f, $i);
+            if (method_exists($x, 'reduceRight')) {
+                return call_user_func([$x, 'reduceRight'], $f, $i);
+            } elseif (method_exists($x, 'foldr')) {
+                return call_user_func([$x, 'foldr'], $f, $i);
             } else {
                 $c = count($x);
                 $acc = $i;
@@ -268,26 +267,17 @@ function reduceRight()
 function ap()
 {
     $ap = curry(function ($fa, $a) {
-        return $a->ap($fa);
+        return call_user_func([$a, 'ap'], $fa);
     });
 
     return $ap(...func_get_args());
 }
 
 // +of :: a -> b -> f b
-// Another weird workaround here
 function of()
 {
     $of = curry(function ($a, $x) {
-        if (is_string($a)) {
-            return $a::of($x);
-        }
-
-        if (method_exists($a, 'of')) {
-            return $a->of($x);
-        }
-
-        return null;
+        return call_user_func([$a, 'of'], $x);
     });
 
     return $of(...func_get_args());
@@ -297,7 +287,7 @@ function of()
 function chain()
 {
     $chain = curry(function (callable $f, $a) {
-        return $a->chain($f);
+        return call_user_func([$a, 'chain'], $f);
     });
 
     return $chain(...func_get_args());
@@ -307,8 +297,8 @@ function chain()
 function alt()
 {
     $alt = curry(function ($a, $b) {
-        if (is_object($a) && is_object($b) && method_exists($a, 'alt')) {
-            return $a->alt($b);
+        if (method_exists($a, 'alt')) {
+            return call_user_func([$a, 'alt'], $b);
         }
 
         return $a || $b;
@@ -318,19 +308,10 @@ function alt()
 }
 
 // +zero :: Plus f => a -> f b
-// Weird workaround here
 function zero()
 {
     $zero = curry(function ($a) {
-        if (is_string($a)) {
-            return $a::zero();
-        }
-
-        if (is_object($a) && method_exists($a, 'zero')) {
-            return $a->zero();
-        }
-
-        return null;
+        return call_user_func([$a, 'zero']);
     });
 
     return $zero(...func_get_args());
@@ -339,20 +320,17 @@ function zero()
 function sequence()
 {
     $sequence = curry(function (string $className, $x) {
-        if (!class_exists($className) || !method_exists($className, 'of')) {
-            throw new InvalidArgumentException(
+        if (!method_exists($className, 'of')) {
+            throw new \InvalidArgumentException(
                 'Method must be a class name of an Applicative (must have an of method).'
             );
         }
 
-        if (is_object($x)) {
-            if (method_exists($x, 'sequence')) {
-                return $x->sequence($className);
-            } elseif (method_exists($x, 'traverse')) {
-                return $x->traverse($className, identity());
-            }
+        if (method_exists($x, 'sequence')) {
+            return call_user_func([$x, 'sequence'], $className);
+        } elseif (method_exists($x, 'traverse')) {
+            return call_user_func([$x, 'traverse'], $className, identity());
         }
-        return null;
     });
 
     return $sequence(...func_get_args());
@@ -361,16 +339,13 @@ function sequence()
 function traverse()
 {
     $traverse = curry(function (string $className, callable $f, $x) {
-        if (!class_exists($className) || !method_exists($className, 'of')) {
-            throw new InvalidArgumentException(
+        if (!method_exists($className, 'of')) {
+            throw new \InvalidArgumentException(
                 'Method must be a class name of an Applicative (must have an of method).'
             );
         }
 
-        if (is_object($x) && method_exists($x, 'traverse')) {
-            return $x->traverse($className, $f);
-        }
-        return null;
+        return call_user_func([$x, 'traverse'], $className, $f);
     });
 
     return $traverse(...func_get_args());
@@ -379,19 +354,7 @@ function traverse()
 function chainRec()
 {
     $chainRec = curry(function (callable $f, $x, $m) {
-        $methodExists = method_exists($m, 'chainRec');
-
-        if ($methodExists) {
-            if (is_string($m) && class_exists($m)) {
-                return $m::chainRec($f, $x);
-            }
-
-            if (is_object($m)) {
-                return $m->chainRec($f, $x);
-            }
-        }
-
-        return null;
+        return call_user_func([$m, 'chainRec'], $f, $x);
     });
 
     return $chainRec(...func_get_args());
@@ -400,10 +363,7 @@ function chainRec()
 function extend()
 {
     $extend = curry(function ($f, $w) {
-        if (is_object($w) && method_exists($w, 'extend')) {
-            return $w->extend($f);
-        }
-        return null;
+        return call_user_func([$w, 'extend'], $f);
     });
 
     return $extend(...func_get_args());
@@ -412,35 +372,10 @@ function extend()
 function extract()
 {
     $extract = curry(function ($x) {
-        if (is_object($x) && method_exists($x, 'extract')) {
-            return $x->extract();
-        }
-
-        return null;
+        return call_user_func([$x, 'extract']);
     });
 
     return $extract(...func_get_args());
-}
-
-function promap()
-{
-    $promap = curry(function (callable $f, callable $g, $x) {
-        if (is_object($x)) {
-            if (method_exists($x, 'promap')) {
-                return $x->promap($f, $g);
-            } elseif (method_exists($x, 'dimap')) {
-                return $x->dimap($f, $g);
-            }
-        }
-        return null;
-    });
-
-    return $promap(...func_get_args());
-}
-
-function dimap()
-{
-    return promap(...func_get_args());
 }
 
 // +mjoin :: Monad m => m (m a) -> m a
@@ -448,11 +383,9 @@ function mjoin()
 {
     $mjoin = curry(function ($a) {
         if (method_exists($a, 'join')) {
-            return $a->join();
+            return call_user_func([$a, 'join']);
         } elseif (method_exists($a, 'mjoin')) {
-            return $a->mjoin();
-        } else {
-            return null;
+            return call_user_func([$a, 'mjoin']);
         }
     });
 
@@ -467,15 +400,13 @@ function semigroupConcat()
             return array_merge($x, $y);
         }
 
+        if (method_exists($x, 'concat')) {
+            return call_user_func([$x, 'concat'], $y);
+        }
+
         if (is_string($x) && is_string($y)) {
             return $x . $y;
         }
-
-        if (is_object($x) && is_object($y) && method_exists($x, 'concat')) {
-            return $x->concat($y);
-        }
-
-        return null;
     });
 
     return $semigroupConcat(...func_get_args());
@@ -488,7 +419,6 @@ function concat()
 }
 
 // +mempty :: Monoid a => a -> a
-// Little bit annoying limitation here.
 function mempty()
 {
     $mempty = curry(function ($x) {
@@ -496,18 +426,13 @@ function mempty()
             return [];
         }
 
-        $methodExists = method_exists($x, 'empty');
+        if (method_exists($x, 'empty')) {
+            return call_user_func([$x, 'empty']);
+        }
+
         if (is_string($x)) {
-            return $methodExists
-                ? $x::empty()
-                : '';
+            return '';
         }
-
-        if ($methodExists && is_object($x)) {
-            return $x->empty();
-        }
-
-        return null;
     });
 
     return $mempty(...func_get_args());
@@ -517,7 +442,7 @@ function mempty()
 function liftA()
 {
     $liftA = curry(function (callable $f, $a) {
-        return $a->map($f);
+        return call_user_func([$a, 'map'], $f);
     });
 
     return $liftA(...func_get_args());
@@ -527,7 +452,7 @@ function liftA()
 function liftA2()
 {
     $liftA2 = curry(function (callable $f, $a1, $a2) {
-        return $a2->ap($a1->map($f));
+        return call_user_func([$a2, 'ap'], call_user_func([$a1, 'map'], $f));
     });
 
     return $liftA2(...func_get_args());
@@ -537,7 +462,7 @@ function liftA2()
 function liftA3()
 {
     $liftA3 = curry(function (callable $f, $a1, $a2, $a3) {
-        return $a3->ap($a2->ap($a1->map($f)));
+        return call_user_func([$a3, 'ap'], call_user_func([$a2, 'ap'], call_user_func([$a1, 'map'], $f)));
     });
 
     return $liftA3(...func_get_args());
@@ -547,7 +472,19 @@ function liftA3()
 function liftA4()
 {
     $liftA4 = curry(function (callable $f, $a1, $a2, $a3, $a4) {
-        return $a4->ap($a3->ap($a2->ap($a1->map($f))));
+        return call_user_func(
+            [$a4, 'ap'],
+            call_user_func(
+                [$a3, 'ap'],
+                call_user_func(
+                    [$a2, 'ap'],
+                    call_user_func(
+                        [$a1, 'map'],
+                        $f
+                    )
+                )
+            )
+        );
     });
 
     return $liftA4(...func_get_args());
@@ -557,7 +494,22 @@ function liftA4()
 function liftA5()
 {
     $liftA5 = curry(function (callable $f, $a1, $a2, $a3, $a4, $a5) {
-        return $a5->ap($a4->ap($a3->ap($a2->ap($a1->map($f)))));
+        return call_user_func(
+            [$a5, 'ap'],
+            call_user_func(
+                [$a4, 'ap'],
+                call_user_func(
+                    [$a3, 'ap'],
+                    call_user_func(
+                        [$a2, 'ap'],
+                        call_user_func(
+                            [$a1, 'map'],
+                            $f
+                        )
+                    )
+                )
+            )
+        );
     });
 
     return $liftA5(...func_get_args());

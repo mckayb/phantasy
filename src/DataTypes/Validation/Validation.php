@@ -4,21 +4,21 @@ namespace Phantasy\DataTypes\Validation;
 
 use Phantasy\Traits\CurryNonPublicMethods;
 
-class Validation
+abstract class Validation
 {
     use CurryNonPublicMethods;
 
-    private static function of($x) : Validation
+    final private static function of($x) : Validation
     {
         return new Success($x);
     }
 
-    private static function fromNullable($failVal, $val) : Validation
+    final private static function fromNullable($failVal, $val) : Validation
     {
         return is_null($val) ? new Failure($failVal) : new Success($val);
     }
 
-    private static function tryCatch(callable $f) : Validation
+    final private static function tryCatch(callable $f) : Validation
     {
         try {
             return new Success($f());
@@ -27,7 +27,7 @@ class Validation
         }
     }
 
-    public static function zero() : Validation
+    final public static function zero() : Validation
     {
         return new Failure([]);
     }

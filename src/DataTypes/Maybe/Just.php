@@ -30,7 +30,7 @@ final class Just extends Maybe
 
     private function map(callable $f) : Maybe
     {
-        return new Just($f($this->value));
+        return new static($f($this->value));
     }
 
     private function ap(Maybe $maybeWithFunction) : Maybe

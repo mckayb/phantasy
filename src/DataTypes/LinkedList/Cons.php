@@ -35,7 +35,7 @@ final class Cons extends LinkedList
         })->join();
     }
 
-    private function chain(callable $f)
+    private function chain(callable $f) : LinkedList
     {
         return $this->map($f)->join();
     }
@@ -58,7 +58,7 @@ final class Cons extends LinkedList
     private function traverse(string $className, callable $f)
     {
         if (!class_exists($className) || !method_exists($className, 'of')) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 'Method must be a class name of an Applicative (must have an \'of\' method).'
             );
         }
@@ -67,17 +67,11 @@ final class Cons extends LinkedList
             return liftA2(curry(function ($a, $b) {
                 return $b->concat(Cons($a, Nil()));
             }), $f($x), $ys);
-        }, $className::of(new Nil()));
+        }, call_user_func([$className, 'of'], new Nil()));
     }
 
     private function sequence(string $className)
     {
-        if (!class_exists($className) || !method_exists($className, 'of')) {
-            throw new InvalidArgumentException(
-                'Method must be a class name of an Applicative (must have an \'of\' method).'
-            );
-        }
-
         return $this->traverse($className, identity());
     }
 

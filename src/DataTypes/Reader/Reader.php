@@ -23,28 +23,28 @@ final class Reader
 
     private static function of($x) : Reader
     {
-        return new Reader(function ($_) use ($x) {
+        return new static(function ($_) use ($x) {
             return $x;
         });
     }
 
     private function map(callable $g) : Reader
     {
-        return new Reader(function ($x) use ($g) {
+        return new static(function ($x) use ($g) {
             return $g($this->run($x));
         });
     }
 
     private function ap(Reader $g) : Reader
     {
-        return new Reader(function ($x) use ($g) {
+        return new static(function ($x) use ($g) {
             return $g->run($x)($this->run($x));
         });
     }
 
     private function chain(callable $r) : Reader
     {
-        return new Reader(function ($s) use ($r) {
+        return new static(function ($s) use ($r) {
             return $r($this->run($s))->run($s);
         });
     }

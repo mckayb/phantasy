@@ -30,7 +30,7 @@ final class Right extends Either
 
     private function map(callable $f) : Either
     {
-        return new Right($f($this->value));
+        return new static($f($this->value));
     }
 
     private function ap(Either $eitherWithFunction)
@@ -55,7 +55,7 @@ final class Right extends Either
 
     private function bimap($f, $g) : Either
     {
-        return new Right($g($this->value));
+        return new static($g($this->value));
     }
 
     private function alt(Either $e) : Either
@@ -85,12 +85,12 @@ final class Right extends Either
     }
 
     // Conversions
-    private function toMaybe() : Maybe
+    public function toMaybe() : Maybe
     {
         return new Just($this->value);
     }
 
-    private function toValidation() : Validation
+    public function toValidation() : Validation
     {
         return new Success($this->value);
     }
