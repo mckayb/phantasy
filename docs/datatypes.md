@@ -29,7 +29,7 @@ $b = 12;
 Maybe::fromNullable($a); // Nothing()
 Maybe::fromNullable($b); // Just(12)
 ```
-#### static tryCatch ($f) : Maybe
+#### static tryCatch (callable $f) : Maybe
 Performs a function that might throw an exception. If it succeeds,
 it stores the result in a `Just`, with the value of the result of the function. If it throws an exception, it returns a `Nothing()`.
 ```php
