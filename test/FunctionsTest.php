@@ -318,6 +318,19 @@ class FunctionsTest extends TestCase
         $this->assertEquals($sequenceEither($a), new Right(new Cons(1, new Nil())));
     }
 
+    public function testTraverse()
+    {
+        $a = new Cons(new Right(1), new Nil());
+        $f = function ($x) {
+            return $x->toMaybe();
+        };
+
+        $this->assertEquals(
+            traverse(Maybe::class, $f, $a),
+            new Just(new Cons(1, new Nil()))
+        );
+    }
+
     public function testTraverseObjectWithTraverseMethod()
     {
         $a = new class () {

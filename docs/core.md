@@ -447,9 +447,20 @@ use function Phantasy\Core\traverse;
 ```
 ### Description
 Simply calls the traverse function on `$x`, if it exists.
-This, like sequence, allows you to swap the types of a variable, but with the added condition that you can map the function `$f` before it returns.
+This, like sequence, allows you to swap the types of a variable, but with the added condition that you can map over result with the function `$f` before it returns.
 ### Examples
 ```php
+use function Phantasy\DataTypes\LinkedList\{Cons, Nil};
+use function Phantasy\DataTypes\Either\{Left, Right};
+use function Phantasy\DataTypes\Maybe\Maybe;
+
+$a = new Cons(new Right(1), new Nil());
+$f = function ($x) {
+    return $x->toMaybe();
+};
+
+traverse(Maybe::class, $f, $a);
+// Just(Cons(1, Nil()))
 ```
 
 ## chainRec (callable $f, $x, $m)
@@ -458,8 +469,24 @@ This, like sequence, allows you to swap the types of a variable, but with the ad
 use function Phantasy\Core\chainRec;
 ```
 ### Description
+Calls the chainRec function on our class, if it exists.
+This lets us handle a recursive style of calling, in a way
+that the stack doesn't explode.
 ### Examples
 ```php
+use Phantasy\DataTypes\Writer\Writer;
+use function Phantasy\DataTypes\Writer\Writer;
+use function Phantasy\Core\chainRec;
+
+$f = function ($next, $done, $v) {
+    return Writer(function () use ($next, $done, $v) {
+        return [$v >= 10000 ? $done($v) : $next($v + 1), [$v]];
+    });
+};
+
+list($val, $log) = chainRec($f, 0, Writer::class)->run();
+// $log = [0, 1, 2, ... , 10000]
+// $val = 10000 
 ```
 
 ## extend (callable $f, $w)
@@ -468,8 +495,19 @@ use function Phantasy\Core\chainRec;
 use function Phantasy\Core\extend;
 ```
 ### Description
+Simply calls the extend function on our object, if it exists.
+Returns null otherwise.
 ### Examples
 ```php
+use Phantasy\DataTypes\Writer\Writer;
+
+$checkNum = function ($x) {
+    list($comp, $log) = $x;
+    return $comp > 10 ? $comp - 10 : $comp + 5;
+};
+
+$res = extend($checkNum, Writer::of(12))->run();
+// [2, []];
 ```
 
 ## extract ($w)
@@ -478,8 +516,13 @@ use function Phantasy\Core\extend;
 use function Phantasy\Core\extract;
 ```
 ### Description
+Simply calls the extract function on our object, if it exists.
 ### Examples
 ```php
+use function Phantasy\Core\extract;
+use Phantasy\DataTypes\Writer\Writer;
+
+extract(Writer::of(1)); // 1
 ```
 
 ## mjoin
