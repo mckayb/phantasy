@@ -26,6 +26,8 @@ use function Phantasy\Core\{
     filter,
     reduce,
     chain,
+    bind,
+    flatMap,
     chainRec,
     extend,
     extract,
@@ -1142,6 +1144,36 @@ class FunctionsTest extends TestCase
         }, $a), 2);
     }
 
+    public function testChainObjectWithBindMethod()
+    {
+        $a = new class
+        {
+            public function bind($f)
+            {
+                return $f(1);
+            }
+        };
+
+        $this->assertEquals(chain(function ($x) {
+            return $x + 1;
+        }, $a), 2);
+    }
+
+    public function testChainObjectWithFlatMapMethod()
+    {
+        $a = new class
+        {
+            public function flatMap($f)
+            {
+                return $f(1);
+            }
+        };
+
+        $this->assertEquals(chain(function ($x) {
+            return $x + 1;
+        }, $a), 2);
+    }
+
     public function testChainCurried()
     {
         $a = Either::of(1);
@@ -1149,6 +1181,30 @@ class FunctionsTest extends TestCase
             return Either::of($x + 1);
         };
         $chain = chain();
+        $chainF = $chain($f);
+        $this->assertEquals($chain($f, $a), new Right(2));
+        $this->assertEquals($chainF($a), new Right(2));
+    }
+
+    public function testBind()
+    {
+        $a = Either::of(1);
+        $f = function ($x) {
+            return Either::of($x + 1);
+        };
+        $chain = bind();
+        $chainF = $chain($f);
+        $this->assertEquals($chain($f, $a), new Right(2));
+        $this->assertEquals($chainF($a), new Right(2));
+    }
+
+    public function testFlatMap()
+    {
+        $a = Either::of(1);
+        $f = function ($x) {
+            return Either::of($x + 1);
+        };
+        $chain = flatMap();
         $chainF = $chain($f);
         $this->assertEquals($chain($f, $a), new Right(2));
         $this->assertEquals($chainF($a), new Right(2));
