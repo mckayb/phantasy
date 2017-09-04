@@ -59,6 +59,17 @@ Maybe::zero()->map(function($x) {
 });
 // Nothing()
 ```
+#### equals (Maybe $m) : bool
+Used to compare two `Maybe`'s for equality.
+Two `Maybe`'s are equal if they are of the same type (Just or Nothing) and they contain the same value.
+```php
+use function Phantasy\DataTypes\Maybe\{Just, Nothing};
+
+Just(1)->equals(Just(2)); // false
+Just(1)->equals(Just(1)); // true
+Just(1)->equals(Nothing()); // false
+Nothing()->equals(Nothing()); // true
+```
 #### map (callable $f) : Maybe
 Used when you want to transform the value of your `Maybe` instance.
 If the instance is a `Just`, it performs the function `$f` on the value inside of our instance.
@@ -253,6 +264,17 @@ Either::zero()->map(function($x) {
 });
 // Left(null)
 ```
+#### equals (Either $e) : bool
+Used to compare two `Either`'s for equality.
+Two `Eithers`'s are equal if they are of the same type (Left or Right) and they contain the same value.
+```php
+use function Phantasy\DataTypes\Either\{Left, Right};
+
+Right(1)->equals(Right(2)); // false
+Right(1)->equals(Right(1)); // true
+Right(1)->equals(Left(1)); // false
+Left(1)->equals(Left(1)); // true
+```
 #### map (callable $f) : Either
 Used to transform the values inside of our Either instance.
 If the instance is a `Right`, it applies the function `$f` and returns a `Right` containing the result of the function.
@@ -352,6 +374,17 @@ $a = Left('foo')->bimap(function($x) {
 });
 // Left('foobaz')
 ```
+```php
+use Phantasy\DataTypes\Either\Either;
+use function Phantasy\Core\identity;
+
+Either::tryCatch(function() {
+    throw new Exception('Something went wrong!');
+})->bimap(function ($e) {
+    return $e->getMessage();
+}, identity();
+// 'Something went wrong!'
+```
 #### alt (Either $m) : Either
 Allows you to provide an alternative value as a fallback if the current
 instance computation fails. You can look at it as a type-level if/else
@@ -360,10 +393,10 @@ wrong.
 If the instance is already a `Right`, it just returns the current
 instance.
 ```php
-Either::of(1)->alt(Either::of(2));
+Right(1)->alt(Right(2));
 // Right(1);
 
-Either::of(1)->alt(Left(2));
+Right(1)->alt(Left(2));
 // Right(1);
 ```
 If the instance is a `Left`, it returns the parameter instance.
@@ -479,6 +512,17 @@ Validation::zero()->map(function($x) {
 });
 // Failure([])
 ```
+#### equals (Validation $v) : bool
+Used to compare two `Validation`'s for equality.
+Two `Validation`'s are equal if they are of the same type (Success or Failure) and they contain the same value.
+```php
+use function Phantasy\DataTypes\Validation\{Success, Failure};
+
+Success(1)->equals(Success(2)); // false
+Success(1)->equals(Success(1)); // true
+Success('foo')->equals(Failure('foo')); // false
+Failure('foo')->equals(Failure('foo')); // true
+```
 #### map (callable $f) : Validation
 Used to transform the value inside of our `Validation`.
 Applies the function `$f` to the value inside of our instance.
@@ -564,6 +608,17 @@ Failure(12)->bimap(
     }
 );
 // Failure(11)
+```
+```php
+use Phantasy\DataTypes\Validation\Validation;
+use function Phantasy\Core\identity;
+
+Validation::tryCatch(function() {
+    throw new Exception('Something went wrong!');
+})->bimap(function ($e) {
+    return $e->getMessage();
+}, identity();
+// 'Something went wrong!'
 ```
 #### concat (Validation $v) : Validation
 Used as a way of composing Validations.
@@ -753,6 +808,21 @@ Writer::of('foo')->run();
 Writer::of('foobar', 'test')->run();
 // ['foobar', '']
 ```
+#### static chainRec(callable $f, $i, $m = []) : Writer
+Used as an abstraction to get around exploding the call stack during complicated calculations.
+Takes a function which has three parameters, `$next`, `$done`, and `$val`. This lets us simulate recursion, but is implemented in a way that will not blow the stack.
+```php
+use function Phantasy\DataTypes\Writer\Writer;
+use Phantasy\DataTypes\Writer\Writer;
+
+list($val, $log) = Writer::chainRec(function ($next, $done, $x) {
+    return Writer(function () use ($next, $done, $x) {
+        return [$x >= 10000 ? $done($x) : $next($x + 1), [$x]];
+    });
+}, 0)->run();
+// $log = [0, 1, 2, ... , 10000]
+// $val = [0, 1, 2, ... , 10000]
+```
 #### run ($s)
 Runs the function that the current `Writer` instance is holding.
 This will return you an array with the first value as the result of the computation and the second value as the resulting log at the end of the computation.
@@ -792,6 +862,138 @@ Writer::of('foo')->chain(function($x) {
     });
 });
 // ['foobar', ['Bar Stuff']]
+```
+#### extend (callable $f) : Writer
+Extend is essentially a map-like function over your Writer type, but with read access to the log val as well!
+To emphasize this type, we're gonna create a small game.
+```php
+// Let's first define a Sum type to keep track
+// of our hero's hunger.
+ $Sum = function ($x) {
+    return new class ($x) {
+        public $x;
+        public function __construct($x)
+        {
+            $this->x = $x;
+        }
+
+        public function concat($a)
+        {
+            return new static($this->x + $a->x);
+        }
+
+        public static function empty()
+        {
+            return new static(0);
+        }
+    };
+};
+
+// We'll start with our hero Jerry.
+$exampleHero = [
+    'name' => 'Jerry',
+    'isHungry' => false
+];
+
+// An adventurer is just a hero, with
+// his/her associated hunger.
+$adventurer = function ($hero, $hunger) {
+    return Writer(function () use ($hero, $hunger) {
+        return [$hero, $hunger];
+    });
+};
+
+// Slaying a dragon is hard work, and
+// causes the hero's hunger to go up.
+$slayDragon = function ($hero) use ($Sum, $adventurer) {
+    return $adventurer($hero, $Sum(100));
+};
+
+// Running from the dragon also causes
+// the hunger to go up, but by less
+// than actually slaying it.
+$runFromDragon = function ($hero) use ($Sum, $adventurer) {
+    return $adventurer($hero, $Sum(50));
+};
+
+// Eating reduces our hunger!
+$eat = function ($hero) use ($adventurer, $Sum) {
+    return $hero['isHungry']
+        ? $adventurer(array_merge($hero, ['isHungry' => false]), $Sum(-100))
+        : $adventurer($hero, $Sum(0));
+};
+
+// This the function we care about.
+// It takes an adventurer, and checks it's
+// hunger val (the log val of our Writer)
+// and uses that to affect our hero
+// (the computation val of our Writer)
+$areWeHungry = function ($adv) {
+    list($hero, $hunger) = $adv;
+    return $hunger->x > 200
+        ? array_merge($hero, ['isHungry' => true])
+        : $hero;
+};
+
+// We start battling!
+// We first slay the dragon, then check
+// if we're hungry. We then eat.
+$battle1 = $slayDragon($exampleHero)->extend($areWeHungry)->chain($eat);
+/*
+$battle1->run();
+[
+    ['name' => 'Jerry', 'isHungry' => false],
+    $Sum(100)
+]
+*/
+
+// After the first battle, we slay another
+// dragon and eat.
+$battle2 = $battle1->chain($slayDragon)->extend($areWeHungry)->chain($eat);
+/*
+$battle2->run();
+[
+    ['name' => 'Jerry', 'isHungry' => false],
+    $Sum(200)
+]
+*/
+
+// After the second battle, we run from a
+// dragon and eat.
+$battle3 = $battle2->chain($runFromDragon)->extend($areWeHungry)->chain($eat);
+/*
+$battle3->run();
+[
+    ['name' => 'Jerry', 'isHungry' => false],
+    $Sum(150)
+]
+*/
+
+// Finally, after the third battle, we slay
+// another dragon, and check if we're hungry.
+$battle4 = $battle3->chain($slayDragon)->extend($areWeHungry);
+$this->assertEquals([
+    ['name' => 'Jerry', 'isHungry' => true],
+    $Sum(250)
+], $battle4->run());
+/*
+$battle4->run();
+[
+    ['name' => 'Jerry', 'isHungry' => true],
+    $Sum(250)
+]
+*/
+```
+#### extract ()
+Simply pulls the value out of the writer. It only pulls the computation value, not the log value.
+```php
+Writer::of(1)->extract();
+// 1
+
+Writer::of('foo')->map(function ($x) {
+    return $x . 'bar';
+})->extract();
+// 'foobar'
 ```
 ## State
 ### Usage
@@ -880,6 +1082,18 @@ Creates the empty element for a LinkedList, simply `Nil()`.
 LinkedList::empty();
 // Nil()
 ```
+#### equals (LinkedList $l) : bool
+Used to compare two `LinkedList`'s for equality.
+Two `LinkedList`'s are equal if they are of the same type (Cons or Nil) and they contain the same values.
+```php
+use function Phantasy\DataTypes\LinkedList\{Cons, Nil};
+
+Cons(1, Nil())->equals(Cons(2, Nil())); // false
+Cons(1, Nil())->equals(Cons(1, Nil())); // true
+Cons(1, Nil())->equals(Nil()); // false
+Nil()->equals(Nil()); // true
+```
+
 #### map (callable $f) : LinkedList
 Used when you want to run a transformation over all of the values of
 your list.

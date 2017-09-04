@@ -75,7 +75,7 @@ function id()
 function prop()
 {
     $prop = curry(
-        function ($s, $x) {
+        function (string $s, $x) {
             if (is_object($x)) {
                 return $x->{$s};
             } elseif (is_array($x)) {
@@ -287,10 +287,26 @@ function of()
 function chain()
 {
     $chain = curry(function (callable $f, $a) {
-        return call_user_func([$a, 'chain'], $f);
+        if (method_exists($a, 'chain')) {
+            return call_user_func([$a, 'chain'], $f);
+        } elseif (method_exists($a, 'flatMap')) {
+            return call_user_func([$a, 'flatMap'], $f);
+        } elseif (method_exists($a, 'bind')) {
+            return call_user_func([$a, 'bind'], $f);
+        }
     });
 
     return $chain(...func_get_args());
+}
+
+function bind()
+{
+    return chain(...func_get_args());
+}
+
+function flatMap()
+{
+    return chain(...func_get_args());
 }
 
 // +alt :: Alt f => f a -> f a -> f a
@@ -362,7 +378,7 @@ function chainRec()
 
 function extend()
 {
-    $extend = curry(function ($f, $w) {
+    $extend = curry(function (callable $f, $w) {
         return call_user_func([$w, 'extend'], $f);
     });
 

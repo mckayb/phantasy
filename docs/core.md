@@ -1,10 +1,10 @@
 # Core Functions
 Note: In these docs, you'll sometimes see functions included from `Phantasy\PHP`, these come from the [phantasy-php](https://github.com/mckayb/phantasy-php) package.
 
-## identity
+## identity ($x) (aliases: id)
 ### Usage
 ```php
-use function Phantasy\Core\identity;
+use function Phantasy\Core\{identity, id};
 ```
 
 ### Description
@@ -33,7 +33,7 @@ Either::fromNullable('baz', 'foo')
 // foobar
 ```
 
-## curry
+## curry (callable $f)
 ### Usage
 ```php
 use function Phantasy\Core\curry;
@@ -78,7 +78,7 @@ $fooCurried = $curried('foo');
 $fooCurried('bar');
 ```
 
-## curryN
+## curryN (int $n, callable $f)
 ### Usage
 ```php
 use function Phantasy\Core\curryN;
@@ -106,7 +106,7 @@ $result = $add1MoreNum(4);
 // 10
 ```
 
-## compose
+## compose (...$fns)
 ### Usage
 ```php
 use function Phantasy\Core\compose;
@@ -138,7 +138,7 @@ $getSnakeTitles($data);
 // [ "foo_bar", "foo_baz" ]
 ```
 
-## prop
+## prop (string $s, $x)
 ### Usage
 ```php
 use function Phantasy\Core\prop;
@@ -174,7 +174,60 @@ $getValues($data); // [15, 10]
 $getNames($data); // ["Foo", "Bar"]
 ```
 
-## map (aliases: fmap)
+## equals ($x, $y)
+### Usage
+```php
+use function Phantasy\Core\equals;
+```
+### Description
+Simply checks for equality between two variables.
+### Examples
+```php
+use function Phantasy\Core\equals;
+use function Phantasy\DataTypes\Maybe\{Just, Nothing};
+
+equals(1, 1); // true
+equals(true, false); // false
+equals(Just(1), Just(2)); // false
+equals(Just(1), Just(1)); // true
+equals('foo', 'bar'); // false
+```
+
+## lte ($a, $b)
+### Usage
+```php
+use function Phantasy\Core\lte;
+```
+### Description
+Simply checks if `$a` is less than or equal to `$b`.
+### Examples
+```php
+lte(1, 2); // true
+lte(2, 1); // false
+
+$lte2 = lte(2);
+$lte2(1); // false
+$lte2(3); // true
+```
+
+## of ($a, $x)
+### Usage
+```php
+use function Phantasy\Core\of;
+```
+### Description
+Calls the of function, assuming that function exists on `$a`.
+### Examples
+```php
+of(Maybe::class, 2);
+// Just(2)
+
+$ofMaybe = of(Maybe::class);
+$ofMaybe(2);
+// Just(2)
+```
+
+## map (callable $f, $x) (aliases: fmap)
 ### Usage
 ```php
 use function Phantasy\Core\map;
@@ -220,7 +273,7 @@ map($add, $box);
 // Box(2)
 ```
 
-## ap
+## ap ($fa, $a)
 ### Usage
 ```php
 use function Phantasy\Core\ap;
@@ -241,7 +294,7 @@ ap($mAdd, $m1);
 // Just(2)
 ```
 
-## chain
+## chain (callable $f, $a) (aliases: bind, flatMap)
 ### Usage
 ```php
 use function Phantasy\Core\chain;
@@ -258,7 +311,41 @@ chain(function ($x) {
 // Just(2)
 ```
 
-## contramap (aliases: cmap)
+## alt ($a, $b)
+### Usage
+```php
+use function Phantasy\Core\alt;
+```
+### Description
+Simply calls the alt function on `$a`.
+If it doesn't exist it just returns `$a` || `$b`.
+### Examples
+```php
+use function Phantasy\Core\alt;
+use function Phantasy\DataTypes\Maybe\{Just, Nothing};
+
+alt(false, true); // true
+alt(false, false); // false
+alt(Just(1), Nothing()); // Just(1)
+alt(Nothing(), Nothing()); // Nothing()
+alt(Nothing(), Just(2)); // Just(2)
+```
+
+## zero ($a)
+### Usage
+```php
+use function Phantasy\Core\zero;
+```
+### Description
+Simply calls the zero function on the class, if it exists.
+### Examples
+```php
+use Phantasy\DataTypes\Maybe\Maybe;
+
+zero(Maybe::class); // Nothing()
+```
+
+## contramap (callable $f, $x) (aliases: cmap)
 ### Usage
 ```php
 use function Phantasy\Core\contramap;
@@ -306,7 +393,7 @@ $html = $b->fold([ "title" => "Blue" ]),
 // "<html><body><div>Blue</div></body></html>"
 ```
 
-## bimap
+## bimap (callable $f, callable $g, $x)
 ### Usage
 ```php
 use function Phantasy\Core\bimap;
@@ -326,6 +413,73 @@ $right = function ($x) {
 $a = Either::of(1);
 bimap($left, $right, $a);
 // Right(0)
+```
+
+## sequence (string $className, $x)
+### Usage
+```php
+use function Phantasy\Core\sequence;
+```
+### Description
+Simply calls the sequence function if it exists.
+This lets you effectively swap types of a variable.
+For example, if `$a = A(B(1))`, `sequence(B::class, $a)`
+would return `B(A(1))`;
+### Examples
+```php
+use function Phantasy\Core\sequence;
+use Phantasy\DataTypes\Either\Either;
+
+$a = new Cons(new Right(1), new Nil());
+
+sequence(Either::class, $a);
+// Right(Cons(1, Nil()))
+
+$sequenceEither = sequence(Either::class);
+$sequenceEither($a);
+// Right(Cons(1, Nil()))
+```
+
+## traverse (string $className, callable $f, $x)
+### Usage
+```php
+use function Phantasy\Core\traverse;
+```
+### Description
+Simply calls the traverse function on `$x`, if it exists.
+This, like sequence, allows you to swap the types of a variable, but with the added condition that you can map the function `$f` before it returns.
+### Examples
+```php
+```
+
+## chainRec (callable $f, $x, $m)
+### Usage
+```php
+use function Phantasy\Core\chainRec;
+```
+### Description
+### Examples
+```php
+```
+
+## extend (callable $f, $w)
+### Usage
+```php
+use function Phantasy\Core\extend;
+```
+### Description
+### Examples
+```php
+```
+
+## extract ($w)
+### Usage
+```php
+use function Phantasy\Core\extract;
+```
+### Description
+### Examples
+```php
 ```
 
 ## mjoin
