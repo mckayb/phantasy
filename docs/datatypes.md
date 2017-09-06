@@ -873,7 +873,7 @@ $a->ap($b)->run();
 // ['foobar', []]
 ```
 #### chain (callable $f) : Writer (aliases: bind, flatMap)
-Used when you want to map with a function that returns a `Writer`. The computation value becomes the result of the parameter function `$r`, while the log value is the result of combining the current instance with the returned `Writer`.
+Used when you want to map with a function that returns a `Writer`. The computation value becomes the result of the parameter function `$f`, while the log value is the result of combining the current instance with the returned `Writer`.
 ```php
 Writer::of('foo')->chain(function($x) {
     return Writer(function() use ($x) {
@@ -1063,7 +1063,7 @@ $a->ap($b)->run(15);
 // ['foobar', 15]
 ```
 #### chain (callable $f) : State (aliases: bind, flatMap)
-Used when you want to map with a function that returns a `State`. The computation value becomes the result of the parameter function `$r`, while the state value is accessible to be read and changed.
+Used when you want to map with a function that returns a `State`. The computation value becomes the result of the parameter function `$f`, while the state value is accessible to be read and changed.
 ```php
 State::of('foo')->chain(function($x) {
     return State(function($s) use ($x) {
