@@ -562,6 +562,9 @@ class FunctionsTest extends TestCase
         $this->assertEquals($f('foobar'), $m);
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
     public function testSemigroupConcatNotAvailable()
     {
         $a = true;

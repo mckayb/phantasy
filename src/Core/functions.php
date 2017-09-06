@@ -423,6 +423,10 @@ function semigroupConcat()
         if (is_string($x) && is_string($y)) {
             return $x . $y;
         }
+
+        throw new \InvalidArgumentException(
+            'x and y must be Semigroups of the same type.'
+        );
     });
 
     return $semigroupConcat(...func_get_args());

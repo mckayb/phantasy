@@ -70,6 +70,25 @@ Just(1)->equals(Just(1)); // true
 Just(1)->equals(Nothing()); // false
 Nothing()->equals(Nothing()); // true
 ```
+#### concat (Maybe $m) : Maybe
+Used to concatencate two `Maybe`'s together.
+If the instance is a `Nothing`, it just returns the parameter `$m`.
+```php
+Nothing()->concat(Nothing()); // Nothing()
+Nothing()->concat(Just(1)); // Just(1)
+```
+If the instance is a `Just`, then it depends on the parameter `$m`.
+If `$m` is `Nothing`, it just returns the instance `Just`.
+```php
+Just(1)->concat(Nothing()); // Just(1)
+```
+If `$m` is a `Just`, then it returns a `Just`, whose value is the concatenation
+of each of the two `Just`'s values, assuming the concatenation makes sense.
+(They have to each contain Semigroup's of the same type).
+```php
+Just([1])->concat(Just([2])); // Just([1, 2])
+Just(true)->concat(Just(false)); // InvalidArgumentException is thrown
+```
 #### map (callable $f) : Maybe
 Used when you want to transform the value of your `Maybe` instance.
 If the instance is a `Just`, it performs the function `$f` on the value inside of our instance.
@@ -1112,7 +1131,7 @@ Nil()->map(function($x) {
 });
 // Nil
 ```
-### ap (LinkedList $c) : LinkedList
+#### ap (LinkedList $c) : LinkedList
 Used when you have a LinkedList of functions that you want to apply to a
 LinkedList of values.
 If the instance is a `Cons`, it runs each function in `$c` over each value
@@ -1144,7 +1163,7 @@ $b = LinkedList::fromArray([
 $a->ap($b);
 // Nil
 ```
-### chain (callable $f) : LinkedList
+#### chain (callable $f) : LinkedList
 Used when you have a function that returns a LinkedList.
 If the instance is a `Cons`, it calls the
 function on each of the values in the current LinkedList and then
@@ -1162,7 +1181,7 @@ Nil()->chain(function($x) {
 });
 // Nil
 ```
-### concat (LinkedList $c) : LinkedList
+#### concat (LinkedList $c) : LinkedList
 Used to concatenate two linked lists together.
 ```php
 LinkedList::of(2)->concat(LinkedList::of(3));
@@ -1171,7 +1190,7 @@ LinkedList::of(2)->concat(LinkedList::of(3));
 Nil()->concat(LinkedList::of(3));
 // Cons(3, Nil)
 ```
-### reduce (callable $f, $acc)
+#### reduce (callable $f, $acc)
 Similar to `array_reduce`, this takes in a transformation function `$f`,
 and an accumulator `$acc`, runs `$f` on each value in the list, starting
 with `$acc` and returns the accumulated result.
@@ -1188,7 +1207,7 @@ Nil()->reduce(function($acc, $x) {
 }, 12);
 // 12
 ```
-### join () : LinkedList
+#### join () : LinkedList
 Simply flattens a nested LinkedList one level.
 ```php
 LinkedList::of(LinkedList::of(2))->join();
@@ -1199,7 +1218,7 @@ If the instance was `Nil`, it just returns `Nil`.
 Nil()->join();
 // Nil
 ```
-### sequence (string $className)
+#### sequence (string $className)
 Used when you have types that you want to swap. For example, converting
 a `LinkedList` of `Maybe` to a `Maybe` of a `LinkedList`.
 If the instance is a `Cons`, then it simply swaps the types.
@@ -1221,7 +1240,7 @@ $a = Nil();
 $a->sequence(Either::class);
 // Right(Nil)
 ```
-### traverse (string $className, callable $f)
+#### traverse (string $className, callable $f)
 Used when you have types that you want to swap, but also apply a
 transformation function. For example, converting
 a `LinkedList` of `Maybe` to a `Maybe` of a `LinkedList`.

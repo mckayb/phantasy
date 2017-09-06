@@ -894,7 +894,8 @@ use function Phantasy\Core\concat;
 ```
 ### Description
 Simply concatenates two types together, if the concatenation makes sense,
-or the objects have a concat method.
+or the objects have a concat method. If the concatenation doesn't make sense,
+it will throw an InvalidArgumentException.
 ### Examples
 ```php
 use function Phantasy\Core\concat;
