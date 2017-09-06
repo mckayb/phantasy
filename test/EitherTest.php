@@ -167,9 +167,59 @@ class EitherTest extends TestCase
     public function testRightEqualsCurried()
     {
         $equals = Right(12)->equals;
-        $equals_ = $equals();
+        $equals_ = Right(12)->equals();
+        $equals__ = $equals();
         $this->assertTrue($equals(Right(12)));
         $this->assertTrue($equals_(Right(12)));
+        $this->assertTrue($equals__(Right(12)));
+        $this->assertFalse($equals(Right(11)));
+        $this->assertFalse($equals_(Right(11)));
+        $this->assertFalse($equals__(Right(11)));
+        $this->assertFalse($equals(Left(11)));
+        $this->assertFalse($equals_(Left(11)));
+        $this->assertFalse($equals__(Left(11)));
+    }
+
+    public function testRightConcat()
+    {
+        $this->assertEquals(Right(1)->concat(Right(2)), Right(1));
+        $this->assertEquals(Right(1)->concat(Left(2)), Right(1));
+    }
+
+    public function testRightConcatCurried()
+    {
+        $a = Right(1);
+        $concat = $a->concat;
+        $concat_ = $a->concat();
+        $concat__ = $concat();
+
+        $this->assertEquals($concat(Right(2)), $a);
+        $this->assertEquals($concat_(Right(2)), $a);
+        $this->assertEquals($concat__(Right(2)), $a);
+        $this->assertEquals($concat(Left(2)), $a);
+        $this->assertEquals($concat_(Left(2)), $a);
+        $this->assertEquals($concat__(Left(2)), $a);
+    }
+
+    public function testLeftConcat()
+    {
+        $this->assertEquals(Left(1)->concat(Right(2)), Right(2));
+        $this->assertEquals(Left(1)->concat(Left(2)), Left(2));
+    }
+
+    public function testLeftConcatCurred()
+    {
+        $a = Left(1);
+        $concat = $a->concat;
+        $concat_ = $a->concat();
+        $concat__ = $concat();
+
+        $this->assertEquals($concat(Right(2)), Right(2));
+        $this->assertEquals($concat_(Right(2)), Right(2));
+        $this->assertEquals($concat__(Right(2)), Right(2));
+        $this->assertEquals($concat(Left(2)), Left(2));
+        $this->assertEquals($concat_(Left(2)), Left(2));
+        $this->assertEquals($concat__(Left(2)), Left(2));
     }
 
     public function testRightMapCurried()
@@ -526,13 +576,17 @@ class EitherTest extends TestCase
     public function testLeftEqualsCurried()
     {
         $equals = Left(12)->equals;
-        $equals_ = $equals();
+        $equals_ = Left(12)->equals();
+        $equals__ = $equals();
         $this->assertTrue($equals(Left(12)));
         $this->assertTrue($equals_(Left(12)));
+        $this->assertTrue($equals__(Left(12)));
         $this->assertFalse($equals(Right(12)));
         $this->assertFalse($equals_(Right(12)));
+        $this->assertFalse($equals__(Right(12)));
         $this->assertFalse($equals(Left(13)));
         $this->assertFalse($equals_(Left(13)));
+        $this->assertFalse($equals__(Left(13)));
     }
 
     public function testLeftMap()

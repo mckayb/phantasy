@@ -28,6 +28,11 @@ final class Right extends Either
         return $this == $e;
     }
 
+    private function concat(Either $e) : Either
+    {
+        return $this;
+    }
+
     private function map(callable $f) : Either
     {
         return new static($f($this->value));

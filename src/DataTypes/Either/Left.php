@@ -23,9 +23,14 @@ final class Left extends Either
         return "Left(" . var_export($this->value, true) . ")";
     }
 
-    public function equals(Either $e) : bool
+    private function equals(Either $e) : bool
     {
         return $this == $e;
+    }
+
+    private function concat(Either $e) : Either
+    {
+        return $e;
     }
 
     private function map(callable $f) : Either

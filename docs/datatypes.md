@@ -294,6 +294,20 @@ Right(1)->equals(Right(1)); // true
 Right(1)->equals(Left(1)); // false
 Left(1)->equals(Left(1)); // true
 ```
+#### concat (Either $e) : Either
+Used to concatenate two `Either` values together.
+If the instance is a `Left`, it just returns the
+parameter instance `$e`.
+```php
+Left(2)->concat(Right(2)); // Right(2)
+Left(2)->concat(Left(1)); // Left(2)
+```
+If the instance is a `Right`, it just returns the
+current instance.
+```php
+Right(1)->concat(Left(1)); // Right(1)
+Right(2)->concat(Right(1)); // Right(2)
+```
 #### map (callable $f) : Either
 Used to transform the values inside of our Either instance.
 If the instance is a `Right`, it applies the function `$f` and returns a `Right` containing the result of the function.
