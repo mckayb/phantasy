@@ -5,7 +5,7 @@ namespace Phantasy\DataTypes\Maybe;
 use Phantasy\DataTypes\Either\{Either, Right};
 use Phantasy\DataTypes\Validation\{Validation, Success};
 use Phantasy\Traits\CurryNonPublicMethods;
-use function Phantasy\Core\curry;
+use function Phantasy\Core\{curry, concat};
 
 final class Just extends Maybe
 {
@@ -26,6 +26,13 @@ final class Just extends Maybe
     private function equals(Maybe $m) : bool
     {
         return $this == $m;
+    }
+
+    private function concat(Maybe $m) : Maybe
+    {
+        return $m instanceof Just
+            ? new static(concat($this->value, $m->getOrElse(null)))
+            : $this;
     }
 
     private function map(callable $f) : Maybe

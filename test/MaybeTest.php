@@ -175,6 +175,60 @@ class MaybeTest extends TestCase
         $this->assertFalse($equals_(Just(3)));
         $this->assertFalse($equals__(Just(3)));
     }
+    
+    public function testJustConcat()
+    {
+        $this->assertEquals(
+            Just([1])->concat(Just([2])),
+            Just([1, 2])
+        );
+
+        $this->assertEquals(
+            Just(1)->concat(Nothing()),
+            Just(1)
+        );
+    }
+
+    public function testJustConcatCurried()
+    {
+        $concat = Just([1])->concat();
+        $this->assertEquals(
+            $concat(Just([2])),
+            Just([1, 2])
+        );
+
+        $this->assertEquals(
+            $concat(Nothing()),
+            Just([1])
+        );
+    }
+
+    public function testNothingConcat()
+    {
+        $this->assertEquals(
+            Nothing()->concat(Just(1)),
+            Just(1)
+        );
+
+        $this->assertEquals(
+            Nothing()->concat(Nothing()),
+            Nothing()
+        );
+    }
+
+    public function testNothingConcatCurried()
+    {
+        $concat = Nothing()->concat();
+        $this->assertEquals(
+            $concat(Just(1)),
+            Just(1)
+        );
+
+        $this->assertEquals(
+            $concat(Nothing()),
+            Nothing()
+        );
+    }
 
     public function testJustAltCurried()
     {

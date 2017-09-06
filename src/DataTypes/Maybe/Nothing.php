@@ -20,6 +20,11 @@ final class Nothing extends Maybe
         return $this == $m;
     }
 
+    private function concat(Maybe $m) : Maybe
+    {
+        return $m;
+    }
+
     private function map(callable $f) : Maybe
     {
         return $this;
