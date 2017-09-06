@@ -2,7 +2,6 @@
 
 namespace Phantasy\DataTypes\Either;
 
-use function Phantasy\Core\curry;
 use Phantasy\Traits\CurryNonPublicMethods;
 
 abstract class Either
