@@ -6,13 +6,12 @@ function curry(callable $callable)
 {
     $ref = new \ReflectionFunction($callable);
 
-    $recurseFunc = function () use ($callable, $ref, &$recurseFunc) {
-        $args = func_get_args();
-        if (func_num_args() >= $ref->getNumberOfRequiredParameters()) {
+    $recurseFunc = function (...$args) use ($callable, $ref, &$recurseFunc) {
+        if (count($args) >= $ref->getNumberOfRequiredParameters()) {
             return call_user_func_array($callable, $args);
         } else {
-            return function () use ($args, &$recurseFunc) {
-                return $recurseFunc(...array_merge($args, func_get_args()));
+            return function (...$args2) use ($args, &$recurseFunc) {
+                return $recurseFunc(...array_merge($args, $args2));
             };
         }
     };
@@ -20,18 +19,17 @@ function curry(callable $callable)
     return $recurseFunc;
 }
 
-function curryN()
+function curryN(...$args)
 {
     $curryN = curry(function (int $n, callable $callable) {
         $ref = new \ReflectionFunction($callable);
 
-        $recurseFunc = function () use ($callable, $ref, &$recurseFunc, $n) {
-            $args = func_get_args();
-            if (func_num_args() >= $n) {
+        $recurseFunc = function (...$args) use ($callable, $ref, &$recurseFunc, $n) {
+            if (count($args) >= $n) {
                 return call_user_func_array($callable, $args);
             } else {
-                return function () use ($args, &$recurseFunc) {
-                    return $recurseFunc(...array_merge($args, func_get_args()));
+                return function (...$args2) use ($args, &$recurseFunc) {
+                    return $recurseFunc(...array_merge($args, $args2));
                 };
             }
         };
@@ -39,7 +37,7 @@ function curryN()
         return $recurseFunc;
     });
 
-    return $curryN(...func_get_args());
+    return $curryN(...$args);
 }
 
 function compose(...$fns)
@@ -56,23 +54,23 @@ function compose(...$fns)
 }
 
 // +identity :: a -> a
-function identity()
+function identity(...$args)
 {
     $id = curry(function ($x) {
         return $x;
     });
 
-    return $id(...func_get_args());
+    return $id(...$args);
 }
 
 // +id :: a -> a
-function id()
+function id(...$args)
 {
-    return identity(...func_get_args());
+    return identity(...$args);
 }
 
 // +prop :: String -> a -> b
-function prop()
+function prop(...$args)
 {
     $prop = curry(
         function (string $s, $x) {
@@ -85,22 +83,22 @@ function prop()
             }
         }
     );
-    return $prop(...func_get_args());
+    return $prop(...$args);
 }
 
 // +trace :: a -> IO a
-function trace()
+function trace(...$args)
 {
     $trace = curry(function ($x) {
         var_dump($x);
         return $x;
     });
 
-    return $trace(...func_get_args());
+    return $trace(...$args);
 }
 
 // +equals :: Setoid a => a -> a -> Bool
-function equals()
+function equals(...$args)
 {
     $equals = curry(function ($a, $b) {
         if (method_exists($a, 'equals')) {
@@ -110,11 +108,11 @@ function equals()
         return $a === $b;
     });
 
-    return $equals(...func_get_args());
+    return $equals(...$args);
 }
 
 // +lte :: Ord a => a -> a -> Bool
-function lte()
+function lte(...$args)
 {
     $lte = curry(function ($a, $b) {
         if (method_exists($a, 'lte')) {
@@ -124,11 +122,11 @@ function lte()
         return $a <= $b;
     });
 
-    return $lte(...func_get_args());
+    return $lte(...$args);
 }
 
 // +contramap :: Contravariant f => (b -> a) -> f a -> f b
-function contramap()
+function contramap(...$args)
 {
     $contramap = curry(
         function (callable $f, $x) {
@@ -140,17 +138,17 @@ function contramap()
         }
     );
 
-    return $contramap(...func_get_args());
+    return $contramap(...$args);
 }
 
 // +cmap :: Contravariant f => (b -> a) -> f a -> f b
-function cmap()
+function cmap(...$args)
 {
-    return contramap(...func_get_args());
+    return contramap(...$args);
 }
 
 // +map :: Functor f => (a -> b) -> f a -> f b
-function map()
+function map(...$args)
 {
     $map = curry(
         function (callable $f, $x) {
@@ -165,17 +163,17 @@ function map()
             }
         }
     );
-    return $map(...func_get_args());
+    return $map(...$args);
 }
 
 // +fmap :: Functor f => (a -> b) -> f a -> f b
-function fmap()
+function fmap(...$args)
 {
-    return map(...func_get_args());
+    return map(...$args);
 }
 
 // +filter :: (a -> Bool) -> [a] -> [a]
-function filter()
+function filter(...$args)
 {
     $filter = curry(
         function (callable $f, $x) {
@@ -192,10 +190,10 @@ function filter()
             }
         }
     );
-    return $filter(...func_get_args());
+    return $filter(...$args);
 }
 
-function bimap()
+function bimap(...$args)
 {
     $bimap = curry(
         function (callable $f, callable $g, $x) {
@@ -203,23 +201,23 @@ function bimap()
         }
     );
 
-    return $bimap(...func_get_args());
+    return $bimap(...$args);
 }
 
 // +foldl :: (a -> b -> a) -> a -> [b] -> a
-function foldl()
+function foldl(...$args)
 {
-    return reduce(...func_get_args());
+    return reduce(...$args);
 }
 
 // +foldr :: (a -> b -> b) -> b -> [a] -> b
-function foldr()
+function foldr(...$args)
 {
-    return reduceRight(...func_get_args());
+    return reduceRight(...$args);
 }
 
 // +reduce :: (a -> b -> a) -> a -> [b] -> a
-function reduce()
+function reduce(...$args)
 {
     $reduce = curry(
         function (callable $f, $i, $x) {
@@ -237,11 +235,11 @@ function reduce()
         }
     );
 
-    return $reduce(...func_get_args());
+    return $reduce(...$args);
 }
 
 // +reduceRight :: (a -> b -> b) -> b -> [a] -> b
-function reduceRight()
+function reduceRight(...$args)
 {
     $reduceRight = curry(
         function (callable $f, $i, $x) {
@@ -260,31 +258,31 @@ function reduceRight()
         }
     );
 
-    return $reduceRight(...func_get_args());
+    return $reduceRight(...$args);
 }
 
 // +ap :: Apply f => f (a -> b) -> f a -> f b
-function ap()
+function ap(...$args)
 {
     $ap = curry(function ($fa, $a) {
         return call_user_func([$a, 'ap'], $fa);
     });
 
-    return $ap(...func_get_args());
+    return $ap(...$args);
 }
 
 // +of :: a -> b -> f b
-function of()
+function of(...$args)
 {
     $of = curry(function ($a, $x) {
         return call_user_func([$a, 'of'], $x);
     });
 
-    return $of(...func_get_args());
+    return $of(...$args);
 }
 
 // +chain :: Chain m => (a -> m b) -> m a -> m b
-function chain()
+function chain(...$args)
 {
     $chain = curry(function (callable $f, $a) {
         if (method_exists($a, 'chain')) {
@@ -296,21 +294,21 @@ function chain()
         }
     });
 
-    return $chain(...func_get_args());
+    return $chain(...$args);
 }
 
-function bind()
+function bind(...$args)
 {
-    return chain(...func_get_args());
+    return chain(...$args);
 }
 
-function flatMap()
+function flatMap(...$args)
 {
-    return chain(...func_get_args());
+    return chain(...$args);
 }
 
 // +alt :: Alt f => f a -> f a -> f a
-function alt()
+function alt(...$args)
 {
     $alt = curry(function ($a, $b) {
         if (method_exists($a, 'alt')) {
@@ -320,20 +318,20 @@ function alt()
         return $a || $b;
     });
 
-    return $alt(...func_get_args());
+    return $alt(...$args);
 }
 
 // +zero :: Plus f => a -> f b
-function zero()
+function zero(...$args)
 {
     $zero = curry(function ($a) {
         return call_user_func([$a, 'zero']);
     });
 
-    return $zero(...func_get_args());
+    return $zero(...$args);
 }
 
-function sequence()
+function sequence(...$args)
 {
     $sequence = curry(function (string $className, $x) {
         if (!method_exists($className, 'of')) {
@@ -349,10 +347,10 @@ function sequence()
         }
     });
 
-    return $sequence(...func_get_args());
+    return $sequence(...$args);
 }
 
-function traverse()
+function traverse(...$args)
 {
     $traverse = curry(function (string $className, callable $f, $x) {
         if (!method_exists($className, 'of')) {
@@ -364,38 +362,38 @@ function traverse()
         return call_user_func([$x, 'traverse'], $className, $f);
     });
 
-    return $traverse(...func_get_args());
+    return $traverse(...$args);
 }
 
-function chainRec()
+function chainRec(...$args)
 {
     $chainRec = curry(function (callable $f, $x, $m) {
         return call_user_func([$m, 'chainRec'], $f, $x);
     });
 
-    return $chainRec(...func_get_args());
+    return $chainRec(...$args);
 }
 
-function extend()
+function extend(...$args)
 {
     $extend = curry(function (callable $f, $w) {
         return call_user_func([$w, 'extend'], $f);
     });
 
-    return $extend(...func_get_args());
+    return $extend(...$args);
 }
 
-function extract()
+function extract(...$args)
 {
     $extract = curry(function ($x) {
         return call_user_func([$x, 'extract']);
     });
 
-    return $extract(...func_get_args());
+    return $extract(...$args);
 }
 
 // +mjoin :: Monad m => m (m a) -> m a
-function mjoin()
+function mjoin(...$args)
 {
     $mjoin = curry(function ($a) {
         if (method_exists($a, 'join')) {
@@ -405,11 +403,16 @@ function mjoin()
         }
     });
 
-    return $mjoin(...func_get_args());
+    return $mjoin(...$args);
+}
+
+function join(...$args)
+{
+    return mjoin(...$args);
 }
 
 // +semigroupConcat :: Semigroup a => a -> a -> a
-function semigroupConcat()
+function semigroupConcat(...$args)
 {
     $semigroupConcat = curry(function ($x, $y) {
         if (is_array($x) && is_array($y)) {
@@ -429,17 +432,17 @@ function semigroupConcat()
         );
     });
 
-    return $semigroupConcat(...func_get_args());
+    return $semigroupConcat(...$args);
 }
 
 // +concat :: Semigroup a => a -> a -> a
-function concat()
+function concat(...$args)
 {
-    return semigroupConcat(...func_get_args());
+    return semigroupConcat(...$args);
 }
 
 // +mempty :: Monoid a => a -> a
-function mempty()
+function mempty(...$args)
 {
     $mempty = curry(function ($x) {
         if (is_array($x)) {
@@ -455,41 +458,41 @@ function mempty()
         }
     });
 
-    return $mempty(...func_get_args());
+    return $mempty(...$args);
 }
 
 // +liftA :: Functor f => (a -> b) -> f a -> f b
-function liftA()
+function liftA(...$args)
 {
     $liftA = curry(function (callable $f, $a) {
         return call_user_func([$a, 'map'], $f);
     });
 
-    return $liftA(...func_get_args());
+    return $liftA(...$args);
 }
 
 // +liftA2 :: Apply f => (a -> b -> c) -> f a -> f b -> f c
-function liftA2()
+function liftA2(...$args)
 {
     $liftA2 = curry(function (callable $f, $a1, $a2) {
         return call_user_func([$a2, 'ap'], call_user_func([$a1, 'map'], $f));
     });
 
-    return $liftA2(...func_get_args());
+    return $liftA2(...$args);
 }
 
 // +liftA3 :: Apply f => (a -> b -> c -> d) -> f a -> f b -> f c -> f d
-function liftA3()
+function liftA3(...$args)
 {
     $liftA3 = curry(function (callable $f, $a1, $a2, $a3) {
         return call_user_func([$a3, 'ap'], call_user_func([$a2, 'ap'], call_user_func([$a1, 'map'], $f)));
     });
 
-    return $liftA3(...func_get_args());
+    return $liftA3(...$args);
 }
 
 // +liftA4 :: Apply f => (a -> b -> c -> d -> e) -> f a -> f b -> f c -> f d -> f e
-function liftA4()
+function liftA4(...$args)
 {
     $liftA4 = curry(function (callable $f, $a1, $a2, $a3, $a4) {
         return call_user_func(
@@ -507,11 +510,11 @@ function liftA4()
         );
     });
 
-    return $liftA4(...func_get_args());
+    return $liftA4(...$args);
 }
 
 // +liftA5 :: Apply f => (a -> b -> c -> d -> e -> g) -> f a -> f b -> f c -> f d -> f e -> f g
-function liftA5()
+function liftA5(...$args)
 {
     $liftA5 = curry(function (callable $f, $a1, $a2, $a3, $a4, $a5) {
         return call_user_func(
@@ -532,15 +535,15 @@ function liftA5()
         );
     });
 
-    return $liftA5(...func_get_args());
+    return $liftA5(...$args);
 }
 
 // +isTraversable :: a -> Bool
-function isTraversable()
+function isTraversable(...$args)
 {
     $isTraversable = curry(function ($x) {
         return is_array($x) || $x instanceof \Traversable;
     });
 
-    return $isTraversable(...func_get_args());
+    return $isTraversable(...$args);
 }

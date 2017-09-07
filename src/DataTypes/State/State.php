@@ -64,9 +64,9 @@ final class State
     }
 }
 
-function State()
+function State(...$args)
 {
     return curry(function (callable $f) {
         return new State($f);
-    })(...func_get_args());
+    })(...$args);
 }

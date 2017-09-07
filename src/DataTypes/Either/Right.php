@@ -101,9 +101,9 @@ final class Right extends Either
     }
 }
 
-function Right()
+function Right(...$args)
 {
     return curry(function ($x) {
         return new Right($x);
-    })(...func_get_args());
+    })(...$args);
 }

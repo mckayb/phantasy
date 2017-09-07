@@ -119,9 +119,9 @@ final class Writer
     }
 }
 
-function Writer()
+function Writer(...$args)
 {
     return curry(function (callable $f) {
         return new Writer($f);
-    })(...func_get_args());
+    })(...$args);
 }

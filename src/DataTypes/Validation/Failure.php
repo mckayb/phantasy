@@ -85,9 +85,9 @@ final class Failure extends Validation
     }
 }
 
-function Failure()
+function Failure(...$args)
 {
     return curry(function ($x) {
         return new Failure($x);
-    })(...func_get_args());
+    })(...$args);
 }

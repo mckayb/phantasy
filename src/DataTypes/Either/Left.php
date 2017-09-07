@@ -96,9 +96,9 @@ final class Left extends Either
     }
 }
 
-function Left()
+function Left(...$args)
 {
     return curry(function ($x) {
         return new Left($x);
-    })(...func_get_args());
+    })(...$args);
 }

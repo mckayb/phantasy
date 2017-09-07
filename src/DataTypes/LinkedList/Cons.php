@@ -81,9 +81,9 @@ final class Cons extends LinkedList
     }
 }
 
-function Cons()
+function Cons(...$args)
 {
     return curry(function ($head, $tail) {
         return new Cons($head, $tail);
-    })(...func_get_args());
+    })(...$args);
 }

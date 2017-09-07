@@ -60,9 +60,9 @@ final class Reader
     }
 }
 
-function Reader()
+function Reader(...$args)
 {
     return curry(function (callable $f) {
         return new Reader($f);
-    })(...func_get_args());
+    })(...$args);
 }

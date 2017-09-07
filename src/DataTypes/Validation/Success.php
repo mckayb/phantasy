@@ -85,9 +85,9 @@ final class Success extends Validation
     }
 }
 
-function Success()
+function Success(...$args)
 {
     return curry(function ($x) {
         return new Success($x);
-    })(...func_get_args());
+    })(...$args);
 }

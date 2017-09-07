@@ -98,9 +98,9 @@ final class Just extends Maybe
     }
 }
 
-function Just()
+function Just(...$args)
 {
     return curry(function ($x) {
         return new Just($x);
-    })(...func_get_args());
+    })(...$args);
 }
