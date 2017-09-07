@@ -27,6 +27,11 @@ abstract class Maybe
         }
     }
 
+    final public static function empty() : Maybe
+    {
+        return new Nothing();
+    }
+
     final public static function zero() : Maybe
     {
         return new Nothing();

@@ -89,6 +89,23 @@ class MaybeTest extends TestCase
         }), Just(1));
     }
 
+    public function testMaybeEmpty()
+    {
+        $this->assertEquals(Maybe::empty(), new Nothing());
+    }
+
+    public function testMaybeMonoidRightIdentity()
+    {
+        $this->assertEquals(Just(1)->concat(Maybe::empty()), Just(1));
+        $this->assertEquals(Nothing()->concat(Maybe::empty()), Nothing());
+    }
+
+    public function testMaybeMonoidLeftIdentity()
+    {
+        $this->assertEquals(Maybe::empty()->concat(Just(1)), Just(1));
+        $this->assertEquals(Maybe::empty()->concat(Nothing()), Nothing());
+    }
+
     public function testMaybeZero()
     {
         $this->assertEquals(Maybe::zero(), new Nothing());
