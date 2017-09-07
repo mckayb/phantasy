@@ -203,6 +203,18 @@ class MaybeTest extends TestCase
         );
     }
 
+    public function testJustConcatAssociative()
+    {
+        $a = Just([1]);
+        $b = Just([2]);
+        $c = Just([3]);
+
+        $this->assertEquals(
+            $a->concat($b)->concat($c),
+            $a->concat($b->concat($c))
+        );
+    }
+
     public function testNothingConcat()
     {
         $this->assertEquals(
@@ -227,6 +239,18 @@ class MaybeTest extends TestCase
         $this->assertEquals(
             $concat(Nothing()),
             Nothing()
+        );
+    }
+
+    public function testNothingConcatAssociative()
+    {
+        $a = Nothing(1);
+        $b = Nothing(2);
+        $c = Nothing(3);
+
+        $this->assertEquals(
+            $a->concat($b)->concat($c),
+            $a->concat($b->concat($c))
         );
     }
 

@@ -180,6 +180,30 @@ class EitherTest extends TestCase
         $this->assertFalse($equals__(Left(11)));
     }
 
+    public function testLeftConcatAssociative()
+    {
+        $a = Left(1);
+        $b = Left(2);
+        $c = Left(3);
+
+        $this->assertEquals(
+            $a->concat($b)->concat($c),
+            $a->concat($b->concat($c))
+        );
+    }
+
+    public function testRightConcatAssociative()
+    {
+        $a = Right(1);
+        $b = Right(2);
+        $c = Right(3);
+
+        $this->assertEquals(
+            $a->concat($b)->concat($c),
+            $a->concat($b->concat($c))
+        );
+    }
+
     public function testRightConcat()
     {
         $this->assertEquals(Right(1)->concat(Right(2)), Right(1));
