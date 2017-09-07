@@ -32,6 +32,7 @@ use function Phantasy\Core\{
     extend,
     extract,
     mjoin,
+    join,
     sequence,
     traverse,
     isTraversable,
@@ -1099,6 +1100,7 @@ class FunctionsTest extends TestCase
         };
 
         $this->assertEquals(mjoin($a), 1);
+        $this->assertEquals(join($a), 1);
     }
 
     public function testMJoinObjWithMJoin()
@@ -1112,16 +1114,19 @@ class FunctionsTest extends TestCase
         };
 
         $this->assertEquals(mjoin($a), 1);
+        $this->assertEquals(join($a), 1);
     }
 
     public function testMJoinReturnsNullOnFailure()
     {
         $this->assertNull(mjoin(12));
+        $this->assertNull(join(12));
     }
 
     public function testMJoinCurried()
     {
         $mjoin = mjoin();
+        $join = join();
         $a = new class
         {
             public function mjoin()
@@ -1130,6 +1135,7 @@ class FunctionsTest extends TestCase
             }
         };
         $this->assertEquals($mjoin($a), 1);
+        $this->assertEquals($join($a), 1);
     }
 
     public function testChain()
