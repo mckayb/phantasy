@@ -55,6 +55,11 @@ final class Just extends Maybe
         return $f($this->value);
     }
 
+    private function extend(callable $f) : Maybe
+    {
+        return new static($f($this));
+    }
+
     private function alt(Maybe $m) : Maybe
     {
         return $this;
@@ -74,7 +79,7 @@ final class Just extends Maybe
         }
 
         return map(function ($x) {
-            return new Just($x);
+            return new static($x);
         }, $f($this->value));
     }
 
@@ -82,7 +87,6 @@ final class Just extends Maybe
     {
         return $this->traverse($className, identity());
     }
-
 
     private function getOrElse($d)
     {

@@ -53,6 +53,11 @@ final class Right extends Either
         return $f($this->value);
     }
 
+    private function extend(callable $f) : Either
+    {
+        return new static($f($this));
+    }
+
     private function fold($f, $g)
     {
         return $g($this->value);

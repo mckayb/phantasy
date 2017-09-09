@@ -9,6 +9,7 @@ use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 use Phantasy\DataTypes\LinkedList\{Cons, Nil};
 use function Phantasy\DataTypes\Either\{Left, Right};
 use function Phantasy\DataTypes\Maybe\{Nothing, Just};
+use function Phantasy\Core\identity;
 
 class EitherTest extends TestCase
 {
@@ -428,6 +429,113 @@ class EitherTest extends TestCase
         $this->assertEquals(new Right(62), $a);
     }
 
+    public function testRightExtend()
+    {
+        $this->assertEquals(
+            Right(1)->extend(function ($x) {
+                return $x->map(function ($y) {
+                    return $y + 1;
+                })->fold(identity(), identity());
+            }),
+            Right(2)
+        );
+    }
+
+    public function testRightExtendCurried()
+    {
+        $a = Right(1);
+        $extend = $a->extend;
+        $extend_ = $a->extend();
+        $extend__ = $extend();
+
+        $f = function ($x) {
+            return $x->map(function ($y) {
+                return $y + 1;
+            })->fold(identity(), identity());
+        };
+        $expected = Right(2);
+
+        $this->assertEquals($extend($f), $expected);
+        $this->assertEquals($extend_($f), $expected);
+        $this->assertEquals($extend__($f), $expected);
+    }
+
+    public function testJustExtendLaws()
+    {
+        $f = function ($x) {
+            return $x->map(function ($y) {
+                return $y % 2;
+            })->fold(identity(), identity());
+        };
+
+        $g = function ($x) {
+            return $x->map(function ($y) {
+                return $y / 5;
+            })->fold(identity(), identity());
+        };
+
+        $a = Right(1);
+
+        $this->assertEquals(
+            $a->extend($g)->extend($f),
+            $a->extend(function ($w) use ($f, $g) {
+                return $f($w->extend($g));
+            })
+        );
+    }
+
+    public function testLeftExtend()
+    {
+        $this->assertEquals(
+            Left('foo')->extend(function ($x) {
+                return $x->map(function ($y) {
+                    return $y + 1;
+                })->getOrElse(null);
+            }),
+            Left('foo')
+        );
+    }
+
+    public function testLeftExtendCurried()
+    {
+        $a = Left('foo');
+        $extend = $a->extend;
+        $extend_ = $a->extend();
+        $extend__ = $extend();
+
+        $f = function ($x) {
+            return $x->map(function ($y) {
+                return $y + 1;
+            })->fold(identity(), identity());
+        };
+        $expected = Left('foo');
+
+        $this->assertEquals($extend($f), $expected);
+        $this->assertEquals($extend_($f), $expected);
+        $this->assertEquals($extend__($f), $expected);
+    }
+
+    public function testLeftExtendLaws()
+    {
+        $f = function ($x) {
+            return $x->map(function ($y) {
+                return $y % 2;
+            })->fold(identity(), identity());
+        };
+
+        $g = function ($x) {
+            return $x->map(function ($y) {
+                return $y / 5;
+            })->fold(identity(), identity());
+        };
+
+        $this->assertEquals(
+            Left('foo')->extend($g)->extend($f),
+            Left('foo')->extend(function ($w) use ($f, $g) {
+                return $f($w->extend($g));
+            })
+        );
+    }
     public function testRightBind()
     {
         $a = Either::of(123)
@@ -571,6 +679,30 @@ class EitherTest extends TestCase
         $this->assertEquals($trav__(Maybe::class, $f), $expected);
     }
 
+    public function testRightTraverseIdentity()
+    {
+        $a = Right(Just(1));
+
+        $this->assertEquals(
+            $a->traverse(Maybe::class, Maybe::of()),
+            Maybe::of($a)
+        );
+    }
+
+    public function testRightTraverseNaturality()
+    {
+        $u = Right(Just(1));
+        $t = function (Maybe $m) : Validation {
+            return $m->toValidation(null);
+        };
+        $F = Maybe::class;
+        $G = Validation::class;
+        $this->assertEquals(
+            $t($u->traverse($F, identity())),
+            $u->traverse($G, $t)
+        );
+    }
+
     /**
      * @expectedException InvalidArgumentException
      */
@@ -638,6 +770,29 @@ class EitherTest extends TestCase
         $this->assertEquals($trav__(Maybe::class, $f), $expected);
     }
 
+    public function testLeftTraverseIdentity()
+    {
+        $a = Left('Failed');
+
+        $this->assertEquals(
+            $a->traverse(Maybe::class, Maybe::of()),
+            Maybe::of($a)
+        );
+    }
+
+    public function testLeftTraverseNaturality()
+    {
+        $u = Left('Failed');
+        $t = function (Maybe $m) : Validation {
+            return $m->toValidation(10);
+        };
+        $F = Maybe::class;
+        $G = Validation::class;
+        $this->assertEquals(
+            $t($u->traverse($F, identity())),
+            $u->traverse($G, $t)
+        );
+    }
     /**
      * @expectedException InvalidArgumentException
      */

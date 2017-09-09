@@ -145,6 +145,31 @@ Maybe::fromNullable(null)->chain(function($x) {
 });
 // Nothing()
 ```
+#### extend (callable $f) : Maybe
+Very similar to map, it's used to extend the computation
+instead of passing the value through. So the callable `$f` actually takes in the current instance, rather than the value of the instance.
+
+If the instance is a `Just`, it simply calls the
+function `$f`, passing the current instance as the
+parameter.
+```php
+Just(1)->extend(function ($x) {
+    return $x->map(function ($y) {
+        return $y + 1;
+    })->getOrElse('Error');
+});
+// Just(2)
+```
+If the instance is `Nothing`, it just returns `Nothing`,
+without calling the function `$f`.
+```php
+Nothing()->extend(function ($x) {
+    return $x->map(function ($y) {
+        return $y + 1;
+    })->getOrElse('Error');
+});
+// Nothing()
+```
 #### fold ($d) (aliases: getOrElse)
 Used to extract the value out of the `Maybe` context.
 If it's a `Just`, it returns the value of our instance.
@@ -395,6 +420,30 @@ $a = Either::fromNullable(0, null)->chain(function($x) {
     return $x >= 1 ? Right($x) : Left(1);
 });
 // Left(0)
+```
+#### extend (callable $f) : Either
+Very similar to map, it's used to extend the computation
+instead of passing the value through. So the callable `$f` actually takes in the current instance, rather than the value of the instance.
+
+If the instance is a `Right`, it simply calls the
+function `$f`, passing the current instance as the
+parameter.
+```php
+Right(1)->extend(function ($x) {
+    return $x->map(function ($y) {
+        return $y + 1;
+    })->fold(identity(), identity());
+});
+// Right(2)
+```
+If the instance is a `Left`, it just returns the current instance without calling the function `$f`.
+```php
+Left('Request failed!')->extend(function ($x) {
+    return $x->map(function ($y) {
+        return $y + 1;
+    })->fold(identity(), identity());
+});
+// Left('Request failed!')
 ```
 #### fold (callable $f, callable $g) (aliases: cata)
 Used to extract values out of an `Either` context.

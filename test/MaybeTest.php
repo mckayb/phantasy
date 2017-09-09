@@ -8,6 +8,7 @@ use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 use function Phantasy\DataTypes\Either\Right;
+use function Phantasy\Core\identity;
 
 class MaybeTest extends TestCase
 {
@@ -310,6 +311,30 @@ class MaybeTest extends TestCase
         $this->assertEquals($trav__(Either::class, $f), $expected);
     }
 
+    public function testJustTraverseIdentity()
+    {
+        $a = Just(Right(1));
+
+        $this->assertEquals(
+            $a->traverse(Either::class, Either::of()),
+            Either::of($a)
+        );
+    }
+
+    public function testJustTraverseNaturality()
+    {
+        $u = Just(Right(1));
+        $t = function (Either $m) : Validation {
+            return $m->toValidation();
+        };
+        $F = Either::class;
+        $G = Validation::class;
+        $this->assertEquals(
+            $t($u->traverse($F, identity())),
+            $u->traverse($G, $t)
+        );
+    }
+
     /**
      * @expectedException InvalidArgumentException
      */
@@ -375,6 +400,31 @@ class MaybeTest extends TestCase
         $this->assertEquals($trav(Either::class, $f), $expected);
         $this->assertEquals($trav_(Either::class, $f), $expected);
         $this->assertEquals($trav__(Either::class, $f), $expected);
+    }
+
+    public function testNothingTraverseIdentity()
+    {
+        $a = Nothing();
+
+        $this->assertEquals(
+            $a->traverse(Either::class, Either::of()),
+            Either::of($a)
+        );
+    }
+
+    public function testNothingTraverseNaturality()
+    {
+        $u = Nothing();
+        $t = function ($m) {
+            return $m->toValidation();
+        };
+        $F = Either::class;
+        $G = Validation::class;
+
+        $this->assertEquals(
+            $t($u->traverse($F, identity())),
+            $u->traverse($G, $t)
+        );
     }
 
     /**
@@ -577,6 +627,114 @@ class MaybeTest extends TestCase
         $this->assertEquals($chain($f), $expected);
         $this->assertEquals($chain_($f), $expected);
         $this->assertEquals($chain__($f), $expected);
+    }
+
+    public function testJustExtend()
+    {
+        $this->assertEquals(
+            Just(1)->extend(function ($x) {
+                return $x->map(function ($y) {
+                    return $y + 1;
+                })->getOrElse(null);
+            }),
+            Just(2)
+        );
+    }
+
+    public function testJustExtendCurried()
+    {
+        $a = Just(1);
+        $extend = $a->extend;
+        $extend_ = $a->extend();
+        $extend__ = $extend();
+
+        $f = function ($x) {
+            return $x->map(function ($y) {
+                return $y + 1;
+            })->getOrElse(null);
+        };
+        $expected = Just(2);
+
+        $this->assertEquals($extend($f), $expected);
+        $this->assertEquals($extend_($f), $expected);
+        $this->assertEquals($extend__($f), $expected);
+    }
+
+    public function testJustExtendLaws()
+    {
+        $f = function ($x) {
+            return $x->map(function ($y) {
+                return $y % 2;
+            })->getOrElse(null);
+        };
+
+        $g = function ($x) {
+            return $x->map(function ($y) {
+                return $y / 5;
+            })->getOrElse(null);
+        };
+
+        $a = Just(1);
+
+        $this->assertEquals(
+            $a->extend($g)->extend($f),
+            $a->extend(function ($w) use ($f, $g) {
+                return $f($w->extend($g));
+            })
+        );
+    }
+
+    public function testNothingExtend()
+    {
+        $this->assertEquals(
+            Nothing()->extend(function ($x) {
+                return $x->map(function ($y) {
+                    return $y + 1;
+                })->getOrElse(null);
+            }),
+            Nothing()
+        );
+    }
+
+    public function testNothingExtendCurried()
+    {
+        $a = Nothing();
+        $extend = $a->extend;
+        $extend_ = $a->extend();
+        $extend__ = $extend();
+
+        $f = function ($x) {
+            return $x->map(function ($y) {
+                return $y + 1;
+            })->getOrElse(null);
+        };
+        $expected = Nothing();
+
+        $this->assertEquals($extend($f), $expected);
+        $this->assertEquals($extend_($f), $expected);
+        $this->assertEquals($extend__($f), $expected);
+    }
+
+    public function testNothingExtendLaws()
+    {
+        $f = function ($x) {
+            return $x->map(function ($y) {
+                return $y % 2;
+            })->getOrElse(null);
+        };
+
+        $g = function ($x) {
+            return $x->map(function ($y) {
+                return $y / 5;
+            })->getOrElse(null);
+        };
+
+        $this->assertEquals(
+            Nothing()->extend($g)->extend($f),
+            Nothing()->extend(function ($w) use ($f, $g) {
+                return $f($w->extend($g));
+            })
+        );
     }
 
     public function testJustBind()

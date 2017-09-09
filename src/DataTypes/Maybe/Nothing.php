@@ -41,6 +41,11 @@ final class Nothing extends Maybe
         return $this;
     }
 
+    private function extend(callable $f) : Maybe
+    {
+        return $this;
+    }
+
     private function alt(Maybe $m) : Maybe
     {
         return $m;

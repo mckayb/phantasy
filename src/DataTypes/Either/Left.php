@@ -48,6 +48,11 @@ final class Left extends Either
         return $this;
     }
 
+    private function extend(callable $f) : Either
+    {
+        return $this;
+    }
+
     private function fold(callable $f, callable $g)
     {
         return $f($this->value);
