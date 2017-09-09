@@ -405,7 +405,7 @@ class FunctionsTest extends TestCase
     public function testExtend()
     {
         $checkNum = function ($x) {
-            list($comp, $log) = $x;
+            list($comp, $log) = $x->run();
             return $comp > 10 ? $comp - 10 : $comp + 5;
         };
 
@@ -416,7 +416,7 @@ class FunctionsTest extends TestCase
     public function testExtendCurried()
     {
         $checkNum = function ($x) {
-            list($comp, $log) = $x;
+            list($comp, $log) = $x->run();
             return $comp > 10 ? $comp - 10 : $comp + 5;
         };
 

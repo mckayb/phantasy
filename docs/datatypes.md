@@ -938,6 +938,31 @@ $r->run([ 'ENVIRONMENT' => 'production' ]);
 $r->run([ 'ENVIRONMENT' => 'development' ]);
 // Hello Dev!'
 ```
+#### extend (callable $f) : Reader
+Essentially let's you run the reader with an alternate
+or slightly modifed state in the middle of your computation.
+```php
+Reader::of('The name is ')
+    ->chain(function ($x) {
+        return Reader(function ($s) use ($x) {
+            return concat($x, $s['name']);
+        });
+    })
+    ->extend(function (Reader $r) {
+        return $r->run([ 'name' => 'Jim' ]);
+    })
+    ->run([ 'name' => 'Joe' ]);
+// The name is Jim
+```
+#### extract ($m = [])
+Runs the `Reader` monad with the empty method
+of our environment. This defaults to an empty array,
+but you can pass in a different Monoid if you'd like,
+as long as it has an empty method that makes sense.
+```php
+Reader::of('foo')->extract();
+// foo
+```
 ## Writer
 ### Usage
 ```php
@@ -1082,7 +1107,7 @@ $eat = function ($hero) use ($adventurer, $Sum) {
 // and uses that to affect our hero
 // (the computation val of our Writer)
 $areWeHungry = function ($adv) {
-    list($hero, $hunger) = $adv;
+    list($hero, $hunger) = $adv->run();
     return $hunger->x > 200
         ? array_merge($hero, ['isHungry' => true])
         : $hero;
@@ -1125,10 +1150,6 @@ $battle3->run();
 // Finally, after the third battle, we slay
 // another dragon, and check if we're hungry.
 $battle4 = $battle3->chain($slayDragon)->extend($areWeHungry);
-$this->assertEquals([
-    ['name' => 'Jerry', 'isHungry' => true],
-    $Sum(250)
-], $battle4->run());
 /*
 $battle4->run();
 [

@@ -98,7 +98,7 @@ final class Writer
     {
         return new static(function () use ($f) {
             $x = $this->run();
-            return [$f($x), $x[1]];
+            return [$f($this), $x[1]];
         });
     }
 

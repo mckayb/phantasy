@@ -3,7 +3,7 @@
 namespace Phantasy\DataTypes\Reader;
 
 use Phantasy\Traits\CurryNonPublicMethods;
-use function Phantasy\Core\curry;
+use function Phantasy\Core\{mempty, curry};
 
 final class Reader
 {
@@ -47,6 +47,18 @@ final class Reader
         return new static(function ($s) use ($r) {
             return $r($this->run($s))->run($s);
         });
+    }
+
+    private function extend(callable $f) : Reader
+    {
+        return new static(function ($s) use ($f) {
+            return $f($this);
+        });
+    }
+
+    public function extract($m = [])
+    {
+        return $this->run(mempty($m));
     }
 
     private function bind(callable $r) : Reader

@@ -162,28 +162,28 @@ class WriterTest extends TestCase
             'isHungry' => false
         ];
 
-        $adventurer = function ($user, $monoid) {
+        $adventurer = function (array $user, $monoid) : Writer {
             return Writer(function () use ($user, $monoid) {
                 return [$user, $monoid];
             });
         };
 
-        $slayDragon = function ($user) use ($sum, $adventurer) {
+        $slayDragon = function (array $user) use ($sum, $adventurer) : Writer {
             return $adventurer($user, $sum(100));
         };
 
-        $runFromDragon = function ($user) use ($sum, $adventurer) {
+        $runFromDragon = function (array $user) use ($sum, $adventurer) : Writer {
             return $adventurer($user, $sum(50));
         };
 
-        $eat = function ($user) use ($adventurer, $sum) {
+        $eat = function (array $user) use ($adventurer, $sum) : Writer {
             return $user['isHungry']
                 ? $adventurer(array_merge($user, ['isHungry' => false]), $sum(-100))
                 : $adventurer($user, $sum(0));
         };
 
-        $areWeHungry = function ($adv) {
-            list($user, $hunger) = $adv;
+        $areWeHungry = function (Writer $adv) : array {
+            list($user, $hunger) = $adv->run();
             return $hunger->x > 200
                 ? array_merge($user, ['isHungry' => true])
                 : $user;
@@ -212,6 +212,28 @@ class WriterTest extends TestCase
             ['name' => 'Jerry', 'isHungry' => true],
             $sum(250)
         ], $battle4->run());
+    }
+
+    public function testWriterExtendLaws()
+    {
+        $f = function (Writer $x) : int {
+            list($comp, $log) = $x->run();
+            return $comp / 3;
+        };
+
+        $g = function (Writer $x) : int {
+            list($comp, $log) = $x->run();
+            return $comp - 5;
+        };
+
+        $w = Writer::of(20);
+
+        $this->assertEquals(
+            $w->extend($g)->extend($f)->run(),
+            $w->extend(function ($w_) use ($f, $g) {
+                return $f($w_->extend($g));
+            })->run()
+        );
     }
 
     public function testWriterExtract()
