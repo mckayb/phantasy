@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\Test;
 
@@ -1068,7 +1068,7 @@ class FunctionsTest extends TestCase
 
     public function testTrace()
     {
-        ini_set('xdebug.overload_var_dump', 0);
+        ini_set('xdebug.overload_var_dump', '0');
         ob_start();
         $a = trace('Hello!');
         $b = ob_get_contents();
@@ -1080,7 +1080,7 @@ class FunctionsTest extends TestCase
     public function testTraceCurried()
     {
         $trace = trace();
-        ini_set('xdebug.overload_var_dump', 0);
+        ini_set('xdebug.overload_var_dump', '0');
         ob_start();
         $a = $trace('Hello!');
         $b = ob_get_contents();

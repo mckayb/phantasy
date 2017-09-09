@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\Test;
 
@@ -8,6 +8,7 @@ use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 use Phantasy\DataTypes\LinkedList\{Cons, Nil};
 use function Phantasy\DataTypes\Either\{Left, Right};
+use function Phantasy\DataTypes\Maybe\{Nothing, Just};
 
 class EitherTest extends TestCase
 {
@@ -231,7 +232,7 @@ class EitherTest extends TestCase
         $this->assertEquals(Left(1)->concat(Left(2)), Left(2));
     }
 
-    public function testLeftConcatCurred()
+    public function testLeftConcatCurried()
     {
         $a = Left(1);
         $concat = $a->concat;
@@ -530,6 +531,140 @@ class EitherTest extends TestCase
         $this->assertEquals(Either::of(2)->reduce(function ($prev, $curr) {
             return $prev + $curr;
         }, 2), 4);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testRightTraverseInvalidClass()
+    {
+        Right(1)->traverse('FOO', function ($x) {
+            return $x . 'bar';
+        });
+    }
+
+    public function testRightTraverse()
+    {
+        $this->assertEquals(
+            Right(1)->traverse(Maybe::class, function ($x) {
+                return Just($x + 1);
+            }),
+            Just(Right(2))
+        );
+    }
+
+    public function testRightTraverseCurried()
+    {
+        $a = Right(1);
+        $trav = $a->traverse;
+        $trav_ = $a->traverse();
+        $trav__ = $trav();
+
+        $f = function ($x) {
+            return Just($x + 1);
+        };
+
+        $expected = Just(Right(2));
+
+        $this->assertEquals($trav(Maybe::class, $f), $expected);
+        $this->assertEquals($trav_(Maybe::class, $f), $expected);
+        $this->assertEquals($trav__(Maybe::class, $f), $expected);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testRightSequenceInvalidClass()
+    {
+        Right(1)->sequence('FOO');
+    }
+
+    public function testRightSequence()
+    {
+        $this->assertEquals(
+            Right(Just(1))->sequence(Maybe::class),
+            Just(Right(1))
+        );
+    }
+
+    public function testRightSequenceCurried()
+    {
+        $a = Right(Just(1));
+        $seq = $a->sequence;
+        $seq_ = $a->sequence();
+        $seq__ = $seq();
+
+        $expected = Just(Right(1));
+        $this->assertEquals($seq(Maybe::class), $expected);
+        $this->assertEquals($seq_(Maybe::class), $expected);
+        $this->assertEquals($seq__(Maybe::class), $expected);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testLeftTraverseInvalidClass()
+    {
+        Left('foo')->traverse('FOO', function ($x) {
+            return $x . 'bar';
+        });
+    }
+
+    public function testLeftTraverse()
+    {
+        $this->assertEquals(
+            Left('foo')->traverse(Maybe::class, function ($x) {
+                return $x . 'bar';
+            }),
+            Just(Left('foo'))
+        );
+    }
+
+    public function testLeftTraverseCurried()
+    {
+        $a = Left(2);
+        $trav = $a->traverse;
+        $trav_ = $a->traverse();
+        $trav__ = $trav();
+
+        $f = function ($x) {
+            return Just($x + 1);
+        };
+
+        $expected = Just(Left(2));
+
+        $this->assertEquals($trav(Maybe::class, $f), $expected);
+        $this->assertEquals($trav_(Maybe::class, $f), $expected);
+        $this->assertEquals($trav__(Maybe::class, $f), $expected);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testLeftSequenceInvalidClass()
+    {
+        Left(1)->sequence('FOO');
+    }
+
+    public function testLeftSequence()
+    {
+        $this->assertEquals(
+            Left('Request Failed')->sequence(Maybe::class),
+            Just(Left('Request Failed'))
+        );
+    }
+
+    public function testLeftSequenceCurried()
+    {
+        $a = Left('Request Failed');
+        $seq = $a->sequence;
+        $seq_ = $a->sequence();
+        $seq__ = $seq();
+
+        $expected = Just(Left('Request Failed'));
+        $this->assertEquals($seq(Maybe::class), $expected);
+        $this->assertEquals($seq_(Maybe::class), $expected);
+        $this->assertEquals($seq__(Maybe::class), $expected);
     }
 
     public function testRightToString()

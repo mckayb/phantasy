@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\DataTypes\Maybe;
 
 use Phantasy\DataTypes\Either\{Either, Right};
 use Phantasy\DataTypes\Validation\{Validation, Success};
 use Phantasy\Traits\CurryNonPublicMethods;
-use function Phantasy\Core\{curry, concat};
+use function Phantasy\Core\{curry, concat, map, identity};
 
 final class Just extends Maybe
 {
@@ -64,6 +64,25 @@ final class Just extends Maybe
     {
         return $f($acc, $this->value);
     }
+
+    private function traverse(string $className, callable $f)
+    {
+        if (!class_exists($className) || !method_exists($className, 'of')) {
+            throw new \InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an \'of\' method).'
+            );
+        }
+
+        return map(function ($x) {
+            return new Just($x);
+        }, $f($this->value));
+    }
+
+    private function sequence(string $className)
+    {
+        return $this->traverse($className, identity());
+    }
+
 
     private function getOrElse($d)
     {

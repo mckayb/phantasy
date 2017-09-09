@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\Test;
 
@@ -7,6 +7,7 @@ use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 use function Phantasy\DataTypes\Maybe\{Just, Nothing};
+use function Phantasy\DataTypes\Either\Right;
 
 class MaybeTest extends TestCase
 {
@@ -269,6 +270,140 @@ class MaybeTest extends TestCase
             $a->concat($b)->concat($c),
             $a->concat($b->concat($c))
         );
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testJustTraverseInvalidClass()
+    {
+        Just(1)->traverse('FOO', function ($x) {
+            return $x . 'bar';
+        });
+    }
+
+    public function testJustTraverse()
+    {
+        $this->assertEquals(
+            Just(1)->traverse(Either::class, function ($x) {
+                return Right($x + 1);
+            }),
+            Right(Just(2))
+        );
+    }
+
+    public function testJustTraverseCurried()
+    {
+        $a = Just(1);
+        $trav = $a->traverse;
+        $trav_ = $a->traverse();
+        $trav__ = $trav();
+
+        $f = function ($x) {
+            return Right($x + 1);
+        };
+
+        $expected = Right(Just(2));
+
+        $this->assertEquals($trav(Either::class, $f), $expected);
+        $this->assertEquals($trav_(Either::class, $f), $expected);
+        $this->assertEquals($trav__(Either::class, $f), $expected);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testJustSequenceInvalidClass()
+    {
+        Just(1)->sequence('FOO');
+    }
+
+    public function testJustSequence()
+    {
+        $this->assertEquals(
+            Just(Right(1))->sequence(Either::class),
+            Right(Just(1))
+        );
+    }
+
+    public function testJustSequenceCurried()
+    {
+        $a = Just(Right(1));
+        $seq = $a->sequence;
+        $seq_ = $a->sequence();
+        $seq__ = $seq();
+
+        $expected = Right(Just(1));
+        $this->assertEquals($seq(Either::class), $expected);
+        $this->assertEquals($seq_(Either::class), $expected);
+        $this->assertEquals($seq__(Either::class), $expected);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testNothingTraverseInvalidClass()
+    {
+        Nothing()->traverse('FOO', function ($x) {
+            return $x . 'bar';
+        });
+    }
+
+    public function testNothingTraverse()
+    {
+        $this->assertEquals(
+            Nothing()->traverse(Either::class, function ($x) {
+                return Right($x + 1);
+            }),
+            Right(Nothing())
+        );
+    }
+
+    public function testNothingTraverseCurried()
+    {
+        $a = Nothing();
+        $trav = $a->traverse;
+        $trav_ = $a->traverse();
+        $trav__ = $trav();
+
+        $f = function ($x) {
+            return Right($x + 1);
+        };
+
+        $expected = Right(Nothing());
+
+        $this->assertEquals($trav(Either::class, $f), $expected);
+        $this->assertEquals($trav_(Either::class, $f), $expected);
+        $this->assertEquals($trav__(Either::class, $f), $expected);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testNothingSequenceInvalidClass()
+    {
+        Nothing()->sequence('FOO');
+    }
+
+    public function testNothingSequence()
+    {
+        $this->assertEquals(
+            Nothing()->sequence(Either::class),
+            Right(Nothing())
+        );
+    }
+
+    public function testNothingSequenceCurried()
+    {
+        $a = Nothing();
+        $seq = $a->sequence;
+        $seq_ = $a->sequence();
+        $seq__ = $seq();
+
+        $expected = Right(Nothing());
+        $this->assertEquals($seq(Either::class), $expected);
+        $this->assertEquals($seq_(Either::class), $expected);
+        $this->assertEquals($seq__(Either::class), $expected);
     }
 
     public function testJustAltCurried()

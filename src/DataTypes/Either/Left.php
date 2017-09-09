@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\DataTypes\Either;
 
 use Phantasy\DataTypes\Maybe\{Maybe, Nothing};
 use Phantasy\DataTypes\Validation\{Validation, Failure};
 use Phantasy\Traits\CurryNonPublicMethods;
-use function Phantasy\Core\curry;
+use function Phantasy\Core\{curry, identity};
 
 final class Left extends Either
 {
@@ -66,6 +66,22 @@ final class Left extends Either
     private function reduce(callable $f, $acc)
     {
         return $acc;
+    }
+
+    private function traverse(string $className, callable $f)
+    {
+        if (!class_exists($className) || !method_exists($className, 'of')) {
+            throw new \InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an \'of\' method).'
+            );
+        }
+
+        return call_user_func([$className, 'of'], new static($this->value));
+    }
+
+    private function sequence(string $className)
+    {
+        return $this->traverse($className, identity());
     }
 
     // Aliases

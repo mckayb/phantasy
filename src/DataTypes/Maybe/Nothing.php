@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\DataTypes\Maybe;
 
 use Phantasy\DataTypes\Either\{Either, Left};
 use Phantasy\DataTypes\Validation\{Validation, Failure};
 use Phantasy\Traits\CurryNonPublicMethods;
+use function Phantasy\Core\identity;
 
 final class Nothing extends Maybe
 {
@@ -49,6 +50,23 @@ final class Nothing extends Maybe
     {
         return $acc;
     }
+
+    private function traverse(string $className, callable $f)
+    {
+        if (!class_exists($className) || !method_exists($className, 'of')) {
+            throw new \InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an \'of\' method).'
+            );
+        }
+
+        return call_user_func([$className, 'of'], new static());
+    }
+
+    private function sequence(string $className)
+    {
+        return $this->traverse($className, identity());
+    }
+
 
     private function getOrElse($d)
     {
