@@ -52,7 +52,16 @@ use function Phantasy\Core\{
     foldl,
     foldr,
     reduceRight,
-    bimap
+    bimap,
+    head,
+    tail,
+    cata,
+    ana,
+    fold,
+    foldMap,
+    unfold,
+    hylo,
+    refold
 };
 
 class TestVarClass
@@ -1739,5 +1748,306 @@ class FunctionsTest extends TestCase
         $this->assertEquals($getStateCode([]), new Nothing());
         $this->assertEquals($getStateCode(['user' => null]), new Nothing());
         $this->assertEquals($getStateCode(['user' => ['address' => ['state' => null]]]), new Nothing());
+    }
+
+    public function testFoldMap()
+    {
+        $Sum = function ($x) {
+            return new class ($x) {
+                public $val = null;
+
+                public function __construct($x)
+                {
+                    $this->val = $x;
+                }
+
+                public function concat($x)
+                {
+                    return new static($this->val + $x->val);
+                }
+
+                public function empty()
+                {
+                    return new static(0);
+                }
+            };
+        };
+
+        $this->assertEquals(foldMap($Sum, [1, 2, 3])->val, 6);
+    }
+
+    public function testFoldMapCurried()
+    {
+        $Sum = function ($x) {
+            return new class ($x) {
+                public $val = null;
+
+                public function __construct($x)
+                {
+                    $this->val = $x;
+                }
+
+                public function concat($x)
+                {
+                    return new static($this->val + $x->val);
+                }
+
+                public function empty()
+                {
+                    return new static(0);
+                }
+            };
+        };
+
+        $foldMap = foldMap();
+        $foldMapSum = foldMap($Sum);
+        $foldMapSum_ = $foldMap($Sum);
+
+        $this->assertEquals($foldMap($Sum, [1, 2, 3])->val, 6);
+        $this->assertEquals($foldMapSum([1, 2, 3])->val, 6);
+        $this->assertEquals($foldMapSum_([1, 2, 3])->val, 6);
+    }
+
+    public function testFold()
+    {
+        $Sum = function ($x) {
+            return new class ($x) {
+                public $val = null;
+
+                public function __construct($x)
+                {
+                    $this->val = $x;
+                }
+
+                public function concat($x)
+                {
+                    return new static($this->val + $x->val);
+                }
+
+                public function empty()
+                {
+                    return new static(0);
+                }
+            };
+        };
+
+        $this->assertEquals(fold([$Sum(1), $Sum(3), $Sum(5)]), $Sum(9));
+    }
+
+    public function testCata()
+    {
+        $Cons = function ($head, $tail) {
+            return new class ($head, $tail) {
+                public $head = null;
+                public $tail = [];
+
+                public function __construct($head, $tail)
+                {
+                    $this->head = $head;
+                    $this->tail = $tail;
+                }
+
+                public function map(callable $f)
+                {
+                    return new static($this->head, $f($this->tail));
+                }
+            };
+        };
+
+        $Nil = function () {
+            return new class () {
+                public function map(callable $f)
+                {
+                    return new static();
+                }
+            };
+        };
+
+        $list = $Cons(1, $Cons(2, $Cons(5, $Nil())));
+        $sum = function ($x) use ($Nil) {
+            return $x == $Nil() ? 0 : $x->head + $x->tail;
+        };
+
+        $this->assertEquals(cata($sum, $list), 8);
+    }
+
+    public function testAna()
+    {
+        $Cons = function ($head, $tail) {
+            return new class ($head, $tail) {
+                public $head = null;
+                public $tail = [];
+
+                public function __construct($head, $tail)
+                {
+                    $this->head = $head;
+                    $this->tail = $tail;
+                }
+
+                public function map(callable $f)
+                {
+                    return new static($this->head, $f($this->tail));
+                }
+            };
+        };
+
+        $Nil = function () {
+            return new class () {
+                public function map(callable $f)
+                {
+                    return new static();
+                }
+            };
+        };
+
+        $arrToList = function ($xs) use ($Cons, $Nil) {
+            return count($xs) === 0 ? $Nil() : $Cons(head($xs), tail($xs));
+        };
+
+        $this->assertEquals(ana($arrToList, [1, 2, 3, 4, 5]), $Cons(1, $Cons(2, $Cons(3, $Cons(4, $Cons(5, $Nil()))))));
+    }
+
+    public function testAnaCurried()
+    {
+        $Cons = function ($head, $tail) {
+            return new class ($head, $tail) {
+                public $head = null;
+                public $tail = [];
+
+                public function __construct($head, $tail)
+                {
+                    $this->head = $head;
+                    $this->tail = $tail;
+                }
+
+                public function map(callable $f)
+                {
+                    return new static($this->head, $f($this->tail));
+                }
+            };
+        };
+
+        $Nil = function () {
+            return new class () {
+                public function map(callable $f)
+                {
+                    return new static();
+                }
+            };
+        };
+
+        $arrToList = function ($xs) use ($Cons, $Nil) {
+            return count($xs) === 0 ? $Nil() : $Cons(head($xs), tail($xs));
+        };
+
+        $ana = ana();
+        $anaF = ana($arrToList);
+        $anaF_ = $ana($arrToList);
+
+        $this->assertEquals($ana($arrToList, [1, 2, 3, 4, 5]), $Cons(1, $Cons(2, $Cons(3, $Cons(4, $Cons(5, $Nil()))))));
+        $this->assertEquals($anaF([1, 2, 3, 4, 5]), $Cons(1, $Cons(2, $Cons(3, $Cons(4, $Cons(5, $Nil()))))));
+        $this->assertEquals($anaF_([1, 2, 3, 4, 5]), $Cons(1, $Cons(2, $Cons(3, $Cons(4, $Cons(5, $Nil()))))));
+    }
+
+    public function testUnfold()
+    {
+        $f = function ($x) {
+            return $x <= 0 ? null : [$x, $x - 1];
+        };
+        $this->assertEquals(unfold($f, 10), [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
+    }
+
+    public function testUnfoldCurried()
+    {
+        $f = function ($x) {
+            return $x <= 0 ? null : [$x, $x - 1];
+        };
+
+        $ana = unfold();
+        $anaF = unfold($f);
+        $anaF_ = $ana($f);
+        $this->assertEquals($ana($f, 10), [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
+        $this->assertEquals($anaF(10), [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
+        $this->assertEquals($anaF_(10), [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
+    }
+
+    public function testHylo()
+    {
+        $sum = function ($xs) {
+            return reduce(function ($acc, $x) {
+                return $acc + $x;
+            }, 0, $xs);
+        };
+
+        $countDown = function ($limit) {
+            return unfold(function ($n) {
+                return $n <= 0 ? null : [$n, $n - 1];
+            }, $limit);
+        };
+
+        $this->assertEquals(hylo($sum, $countDown, 5), 15);
+    }
+
+    public function testHyloCurried()
+    {
+        $sum = function ($xs) {
+            return reduce(function ($acc, $x) {
+                return $acc + $x;
+            }, 0, $xs);
+        };
+
+        $countDown = function ($limit) {
+            return unfold(function ($n) {
+                return $n <= 0 ? null : [$n, $n - 1];
+            }, $limit);
+        };
+
+        $hylo = hylo();
+        $hyloSum = hylo($sum);
+        $hyloSum_ = $hylo($sum);
+        $hyloBoth = $hyloSum($countDown);
+        $hyloBoth_ = $hyloSum_($countDown);
+        $this->assertEquals($hyloBoth(5), 15);
+        $this->assertEquals($hyloBoth_(5), 15);
+    }
+
+    public function testRefold()
+    {
+        $sum = function ($xs) {
+            return reduce(function ($acc, $x) {
+                return $acc + $x;
+            }, 0, $xs);
+        };
+
+        $countDown = function ($limit) {
+            return unfold(function ($n) {
+                return $n <= 0 ? null : [$n, $n - 1];
+            }, $limit);
+        };
+
+        $this->assertEquals(refold($sum, $countDown, 5), 15);
+    }
+
+    public function testRefoldCurried()
+    {
+        $sum = function ($xs) {
+            return reduce(function ($acc, $x) {
+                return $acc + $x;
+            }, 0, $xs);
+        };
+
+        $countDown = function ($limit) {
+            return unfold(function ($n) {
+                return $n <= 0 ? null : [$n, $n - 1];
+            }, $limit);
+        };
+
+        $hylo = refold();
+        $hyloSum = refold($sum);
+        $hyloSum_ = $hylo($sum);
+        $hyloBoth = $hyloSum($countDown);
+        $hyloBoth_ = $hyloSum_($countDown);
+        $this->assertEquals($hyloBoth(5), 15);
+        $this->assertEquals($hyloBoth_(5), 15);
     }
 }

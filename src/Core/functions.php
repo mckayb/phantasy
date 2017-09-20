@@ -568,6 +568,30 @@ function isTraversable(...$args)
     return $isTraversable(...$args);
 }
 
+function head(...$args)
+{
+    $head = curry(function ($xs) {
+        if (is_array($xs)) {
+            return $xs[0];
+        } elseif (is_object($xs)) {
+            return $xs->head ?? null;
+        }
+    });
+    return $head(...$args);
+}
+
+function tail(...$args)
+{
+    $tail = curry(function ($xs) {
+        if (is_array($xs)) {
+            return array_slice($xs, 1);
+        } elseif (is_object($xs)) {
+            return $xs->tail ?? null;
+        }
+    });
+    return $tail(...$args);
+}
+
 function composeK(callable ...$fns)
 {
     return array_reduce($fns, function ($f, $g) {
@@ -579,37 +603,75 @@ function composeK(callable ...$fns)
     }, null);
 }
 
-function fold(callable $f, $x)
+function foldMap(...$args)
 {
-    return cata($f, $x);
+    $foldMap = curry(function (callable $f, $xs) {
+        return compose(fold(), map($f))($xs);
+    });
+
+    return $foldMap(...$args);
 }
 
-function cata(callable $f, $xs)
+function fold(...$args)
 {
-    return $f(map(function ($ys) use ($f) {
-        return cata($f, $ys);
-    }, $xs));
+    $fold = curry(function ($xs) {
+        return reduce(function ($prev, $curr) {
+            return is_null($prev)
+                ? concat(mempty($curr), $curr)
+                : concat($prev, $curr);
+        }, null, $xs);
+    });
+
+    return $fold(...$args);
 }
 
-function ana($t)
+function unfold(...$args)
 {
-    return function (callable $g, $x) {
+    $go = function (callable $f, $seed, $acc) use (&$go) {
+        list($val, $nextSeed) = $f($seed);
+        return $val ? $go($f, $nextSeed, concat($acc, [$val])) : $acc;
     };
+
+    $unfold = curry(function (callable $f, $seed) use ($go) {
+        return $go($f, $seed, []);
+    });
+
+    return $unfold(...$args);
+}
+
+function cata(...$args)
+{
+    $cata = curry(function (callable $f, $xs) {
+        return $f(map(function ($ys) use ($f) {
+            return cata($f, $ys);
+        }, $xs));
+    });
+
+    return $cata(...$args);
+}
+
+function ana(...$args)
+{
+    $ana = curry(function ($f, $x) {
+        return map(function ($y) use ($f) {
+            return ana($f, $y);
+        }, $f($x));
+    });
+
+    return $ana(...$args);
 }
 
 // +hylo :: Functor f => (f b -> b) -> (a -> f a) -> a -> b
-function hylo(callable $f, callable $g, $t)
+function hylo(...$args)
 {
-    return $f(map(function ($x) {
-        return hylo($f, $g, $x);
-    }, $g($t)));
+    $hylo = curry(function (callable $f, callable $g, $xs) {
+        return $f($g($xs));
+    });
+
+    return $hylo(...$args);
 }
 
-function para(callable $f, $acc, $xs)
+function refold(...$args)
 {
-    if (count($xs) === 0) {
-        return $acc;
-    }
-
-    return para($f, $f($acc, head($xs), $xs), tail($xs));
+    return hylo(...$args);
 }
