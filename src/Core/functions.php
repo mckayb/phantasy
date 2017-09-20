@@ -664,8 +664,8 @@ function ana(...$args)
 // +hylo :: Functor f => (f b -> b) -> (a -> f a) -> a -> b
 function hylo(...$args)
 {
-    $hylo = curry(function (callable $f, callable $g, $xs) {
-        return $f($g($xs));
+    $hylo = curry(function (callable $f, callable $g, $x) {
+        return $f($g($x));
     });
 
     return $hylo(...$args);

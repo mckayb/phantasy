@@ -1944,7 +1944,10 @@ class FunctionsTest extends TestCase
         $anaF = ana($arrToList);
         $anaF_ = $ana($arrToList);
 
-        $this->assertEquals($ana($arrToList, [1, 2, 3, 4, 5]), $Cons(1, $Cons(2, $Cons(3, $Cons(4, $Cons(5, $Nil()))))));
+        $this->assertEquals(
+            $ana($arrToList, [1, 2, 3, 4, 5]),
+            $Cons(1, $Cons(2, $Cons(3, $Cons(4, $Cons(5, $Nil())))))
+        );
         $this->assertEquals($anaF([1, 2, 3, 4, 5]), $Cons(1, $Cons(2, $Cons(3, $Cons(4, $Cons(5, $Nil()))))));
         $this->assertEquals($anaF_([1, 2, 3, 4, 5]), $Cons(1, $Cons(2, $Cons(3, $Cons(4, $Cons(5, $Nil()))))));
     }
