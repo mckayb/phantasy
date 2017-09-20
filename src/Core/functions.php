@@ -572,7 +572,7 @@ function head(...$args)
 {
     $head = curry(function ($xs) {
         if (is_array($xs)) {
-            return $xs[0];
+            return $xs[0] ?? null;
         } elseif (is_object($xs)) {
             return $xs->head ?? null;
         }

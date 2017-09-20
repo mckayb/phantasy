@@ -1727,6 +1727,20 @@ class FunctionsTest extends TestCase
         $this->assertEquals(maybeProp('foo', 'bar'), new Nothing());
     }
 
+    public function testHead()
+    {
+        $this->assertEquals(head([]), null);
+        $this->assertEquals(head([1]), 1);
+        $this->assertEquals(head(['foo', 'bar']), 'foo');
+    }
+
+    public function testTail()
+    {
+        $this->assertEquals(tail([]), []);
+        $this->assertEquals(tail([1]), []);
+        $this->assertEquals(tail(['foo', 'bar']), ['bar']);
+    }
+
     public function testComposeK()
     {
         $get = curry(function ($propName, $obj) {
