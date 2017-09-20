@@ -14,9 +14,11 @@ use function Phantasy\Core\{
     lte,
     of,
     compose,
+    composeK,
     curry,
     curryN,
     prop,
+    maybeProp,
     map,
     fmap,
     ap,
@@ -1686,5 +1688,56 @@ class FunctionsTest extends TestCase
         $this->assertEquals($bimap($f, $g, $a), new Right(0));
         $this->assertEquals($bimapF($g, $a), new Right(0));
         $this->assertEquals($bimapFG($a), new Right(0));
+    }
+
+    public function testMaybePropObject()
+    {
+        $a = new class () {
+            public $foo = 'bar';
+        };
+
+        $this->assertEquals(maybeProp('foo', $a), new Just('bar'));
+        $this->assertEquals(maybeProp('bar', $a), new Nothing());
+    }
+
+    public function testMaybePropArray()
+    {
+        $a = ['foo' => 'bar'];
+        $this->assertEquals(maybeProp('foo', $a), new Just('bar'));
+        $this->assertEquals(maybeProp('bar', $a), new Nothing());
+    }
+
+    public function testMaybePropStatic()
+    {
+        $this->assertEquals(maybeProp('x_', TestVarClass::class), new Just('foostatic'));
+        $this->assertEquals(maybeProp('blue_', TestVarClass::class), new Nothing());
+    }
+
+    public function testMaybePropInvalid()
+    {
+        $this->assertEquals(maybeProp('foo', 'bar'), new Nothing());
+    }
+
+    public function testComposeK()
+    {
+        $get = curry(function ($propName, $obj) {
+            return Maybe::fromNullable($obj[$propName] ?? null);
+        });
+
+        $toUpper = curry(function ($x) {
+            return strtoupper($x);
+        });
+
+        $getStateCode = composeK(
+            compose(Maybe::of(), $toUpper),
+            $get('state'),
+            $get('address'),
+            $get('user')
+        );
+
+        $this->assertEquals($getStateCode(['user' => ['address' => ['state' => 'ny']]]), new Just('NY'));
+        $this->assertEquals($getStateCode([]), new Nothing());
+        $this->assertEquals($getStateCode(['user' => null]), new Nothing());
+        $this->assertEquals($getStateCode(['user' => ['address' => ['state' => null]]]), new Nothing());
     }
 }

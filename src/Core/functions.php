@@ -2,6 +2,9 @@
 
 namespace Phantasy\Core;
 
+use Phantasy\DataTypes\Maybe\Maybe;
+use function Phantasy\DataTypes\Maybe\Nothing;
+
 function curry(callable $callable)
 {
     $ref = new \ReflectionFunction($callable);
@@ -40,7 +43,7 @@ function curryN(...$args)
     return $curryN(...$args);
 }
 
-function compose(...$fns)
+function compose(callable ...$fns)
 {
     return array_reduce(
         $fns,
@@ -84,6 +87,23 @@ function prop(...$args)
         }
     );
     return $prop(...$args);
+}
+
+// +maybeProp :: String -> a -> Maybe b
+function maybeProp(...$args)
+{
+    $maybeProp = curry(function (string $s, $x) {
+        if (is_object($x)) {
+            return Maybe::fromNullable($x->{$s} ?? null);
+        } elseif (is_array($x)) {
+            return Maybe::fromNullable($x[$s] ?? null);
+        } elseif (is_string($x) && class_exists($x)) {
+            return Maybe::fromNullable($x::$$s ?? null);
+        } else {
+            return Nothing();
+        }
+    });
+    return $maybeProp(...$args);
 }
 
 // +trace :: a -> IO a
@@ -546,4 +566,50 @@ function isTraversable(...$args)
     });
 
     return $isTraversable(...$args);
+}
+
+function composeK(callable ...$fns)
+{
+    return array_reduce($fns, function ($f, $g) {
+        return is_null($f)
+            ? $g
+            : function (...$args) use ($f, $g) {
+                return $g(...$args)->chain($f);
+            };
+    }, null);
+}
+
+function fold(callable $f, $x)
+{
+    return cata($f, $x);
+}
+
+function cata(callable $f, $xs)
+{
+    return $f(map(function ($ys) use ($f) {
+        return cata($f, $ys);
+    }, $xs));
+}
+
+function ana($t)
+{
+    return function (callable $g, $x) {
+    };
+}
+
+// +hylo :: Functor f => (f b -> b) -> (a -> f a) -> a -> b
+function hylo(callable $f, callable $g, $t)
+{
+    return $f(map(function ($x) {
+        return hylo($f, $g, $x);
+    }, $g($t)));
+}
+
+function para(callable $f, $acc, $xs)
+{
+    if (count($xs) === 0) {
+        return $acc;
+    }
+
+    return para($f, $f($acc, head($xs), $xs), tail($xs));
 }
