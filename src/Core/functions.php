@@ -642,9 +642,7 @@ function unfold(...$args)
 function cata(...$args)
 {
     $cata = curry(function (callable $f, $xs) {
-        return $f(map(function ($ys) use ($f) {
-            return cata($f, $ys);
-        }, $xs));
+        return $f(map(cata($f), $xs));
     });
 
     return $cata(...$args);
@@ -653,9 +651,7 @@ function cata(...$args)
 function ana(...$args)
 {
     $ana = curry(function ($f, $x) {
-        return map(function ($y) use ($f) {
-            return ana($f, $y);
-        }, $f($x));
+        return map(ana($f), $f($x));
     });
 
     return $ana(...$args);
@@ -665,7 +661,7 @@ function ana(...$args)
 function hylo(...$args)
 {
     $hylo = curry(function (callable $f, callable $g, $x) {
-        return $f($g($x));
+        return $f(map(hylo($f, $g), $g($x)));
     });
 
     return $hylo(...$args);
@@ -673,5 +669,9 @@ function hylo(...$args)
 
 function refold(...$args)
 {
-    return hylo(...$args);
+    $refold = curry(function (callable $f, callable $g, $x) {
+        return $f($g($x));
+    });
+
+    return $refold(...$args);
 }

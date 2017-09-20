@@ -1976,42 +1976,88 @@ class FunctionsTest extends TestCase
 
     public function testHylo()
     {
-        $sum = function ($xs) {
-            return reduce(function ($acc, $x) {
-                return $acc + $x;
-            }, 0, $xs);
+        $Cons = function ($head, $tail) {
+            return new class ($head, $tail) {
+                public $head = null;
+                public $tail = [];
+
+                public function __construct($head, $tail)
+                {
+                    $this->head = $head;
+                    $this->tail = $tail;
+                }
+
+                public function map(callable $f)
+                {
+                    return new static($this->head, $f($this->tail));
+                }
+            };
         };
 
-        $countDown = function ($limit) {
-            return unfold(function ($n) {
-                return $n <= 0 ? null : [$n, $n - 1];
-            }, $limit);
+        $Nil = function () {
+            return new class () {
+                public function map(callable $f)
+                {
+                    return new static();
+                }
+            };
         };
 
-        $this->assertEquals(hylo($sum, $countDown, 5), 15);
+        $sum = function ($x) use ($Nil) {
+            return $x == $Nil() ? 0 : $x->head + $x->tail;
+        };
+
+        $arrToList = function ($xs) use ($Cons, $Nil) {
+            return count($xs) === 0 ? $Nil() : $Cons(head($xs), tail($xs));
+        };
+
+        $this->assertEquals(hylo($sum, $arrToList, [1, 2, 3, 4, 5]), 15);
     }
 
     public function testHyloCurried()
     {
-        $sum = function ($xs) {
-            return reduce(function ($acc, $x) {
-                return $acc + $x;
-            }, 0, $xs);
+        $Cons = function ($head, $tail) {
+            return new class ($head, $tail) {
+                public $head = null;
+                public $tail = [];
+
+                public function __construct($head, $tail)
+                {
+                    $this->head = $head;
+                    $this->tail = $tail;
+                }
+
+                public function map(callable $f)
+                {
+                    return new static($this->head, $f($this->tail));
+                }
+            };
         };
 
-        $countDown = function ($limit) {
-            return unfold(function ($n) {
-                return $n <= 0 ? null : [$n, $n - 1];
-            }, $limit);
+        $Nil = function () {
+            return new class () {
+                public function map(callable $f)
+                {
+                    return new static();
+                }
+            };
+        };
+
+        $sum = function ($x) use ($Nil) {
+            return $x == $Nil() ? 0 : $x->head + $x->tail;
+        };
+
+        $arrToList = function ($xs) use ($Cons, $Nil) {
+            return count($xs) === 0 ? $Nil() : $Cons(head($xs), tail($xs));
         };
 
         $hylo = hylo();
         $hyloSum = hylo($sum);
         $hyloSum_ = $hylo($sum);
-        $hyloBoth = $hyloSum($countDown);
-        $hyloBoth_ = $hyloSum_($countDown);
-        $this->assertEquals($hyloBoth(5), 15);
-        $this->assertEquals($hyloBoth_(5), 15);
+        $hyloBoth = $hyloSum($arrToList);
+        $hyloBoth_ = $hyloSum_($arrToList);
+        $this->assertEquals($hyloBoth([1, 2, 3, 4, 5]), 15);
+        $this->assertEquals($hyloBoth_([1, 2, 3, 4, 5]), 15);
     }
 
     public function testRefold()
