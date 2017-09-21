@@ -295,10 +295,22 @@ function ap(...$args)
 function of(...$args)
 {
     $of = curry(function ($a, $x) {
-        return call_user_func([$a, 'of'], $x);
+        if (method_exists($a, 'of')) {
+            return call_user_func([$a, 'of'], $x);
+        } elseif (method_exists($a, 'pure')) {
+            return call_user_func([$a, 'pure'], $x);
+        } elseif (method_exists($a, 'return')) {
+            return call_user_func([$a, 'return'], $x);
+        }
     });
 
     return $of(...$args);
+}
+
+// +pure :: a -> b -> f b
+function pure(...$args)
+{
+    return of(...$args);
 }
 
 // +chain :: Chain m => (a -> m b) -> m a -> m b
