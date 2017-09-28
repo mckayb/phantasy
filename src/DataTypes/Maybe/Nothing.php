@@ -58,7 +58,7 @@ final class Nothing extends Maybe
 
     private function traverse(string $className, callable $f)
     {
-        if (!class_exists($className) || !method_exists($className, 'of')) {
+        if (!class_exists($className) || !is_callable([$className, 'of'])) {
             throw new \InvalidArgumentException(
                 'Method must be a class name of an Applicative (must have an \'of\' method).'
             );
