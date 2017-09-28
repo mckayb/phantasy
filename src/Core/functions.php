@@ -3,6 +3,7 @@
 namespace Phantasy\Core;
 
 use Phantasy\DataTypes\Maybe\Maybe;
+use Phantasy\DataTypes\Either\Either;
 use function Phantasy\DataTypes\Maybe\Nothing;
 
 function curry(callable $callable)
@@ -56,6 +57,68 @@ function compose(callable ...$fns)
     );
 }
 
+// +bars :: (a -> c) -> (b -> c) -> Either a b -> c
+function bars(...$args)
+{
+    $bars = curry(function (callable $f, callable $g, Either $e) {
+        return $e->fold($f, $g);
+    });
+
+    return $bars(...$args);
+}
+
+// +ampersands :: (a -> b) -> (a -> c) -> a -> (b, c)
+function ampersands(...$args)
+{
+    $ampersands = curry(function (callable $f, callable $g, $x) {
+        return [$f($x), $g($x)];
+    });
+
+    return $ampersands(...$args);
+}
+
+// +stars :: (a -> b) -> (a' -> b') -> (a, a') -> (b, b')
+function stars(...$args)
+{
+    $stars = curry(function (callable $f, callable $g, array $pair) {
+        list($x, $y) = $pair;
+        return [$f($x), $g($y)];
+    });
+
+    return $stars(...$args);
+}
+
+// +funzip :: Functor f => f (a, b) -> (f a, f b)
+function funzip(...$args)
+{
+    $funzip = ampersands(map(fst()), map(snd()));
+    return $funzip(...$args);
+}
+
+function fst(...$args)
+{
+    $fst = curry(function ($x) {
+        if (is_array($x)) {
+            list($y, $_) = $x;
+            return $y;
+        }
+    });
+
+    return $fst(...$args);
+}
+
+function snd(...$args)
+{
+    $snd = curry(function ($x) {
+        if (is_array($x)) {
+            list($_, $y) = $x;
+            return $y;
+        }
+    });
+
+    return $snd(...$args);
+}
+
 // +identity :: a -> a
 function identity(...$args)
 {
@@ -87,23 +150,6 @@ function prop(...$args)
         }
     );
     return $prop(...$args);
-}
-
-// +maybeProp :: String -> a -> Maybe b
-function maybeProp(...$args)
-{
-    $maybeProp = curry(function (string $s, $x) {
-        if (is_object($x)) {
-            return Maybe::fromNullable($x->{$s} ?? null);
-        } elseif (is_array($x)) {
-            return Maybe::fromNullable($x[$s] ?? null);
-        } elseif (is_string($x) && class_exists($x)) {
-            return Maybe::fromNullable($x::$$s ?? null);
-        } else {
-            return Nothing();
-        }
-    });
-    return $maybeProp(...$args);
 }
 
 // +trace :: a -> IO a
@@ -649,41 +695,4 @@ function unfold(...$args)
     });
 
     return $unfold(...$args);
-}
-
-function cata(...$args)
-{
-    $cata = curry(function (callable $f, $xs) {
-        return $f(map(cata($f), $xs));
-    });
-
-    return $cata(...$args);
-}
-
-function ana(...$args)
-{
-    $ana = curry(function ($f, $x) {
-        return map(ana($f), $f($x));
-    });
-
-    return $ana(...$args);
-}
-
-// +hylo :: Functor f => (f b -> b) -> (a -> f a) -> a -> b
-function hylo(...$args)
-{
-    $hylo = curry(function (callable $f, callable $g, $x) {
-        return $f(map(hylo($f, $g), $g($x)));
-    });
-
-    return $hylo(...$args);
-}
-
-function refold(...$args)
-{
-    $refold = curry(function (callable $f, callable $g, $x) {
-        return $f($g($x));
-    });
-
-    return $refold(...$args);
 }
