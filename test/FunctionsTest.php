@@ -13,6 +13,7 @@ use function Phantasy\Core\{
     equals,
     lte,
     of,
+    constant,
     compose,
     composeK,
     curry,
@@ -56,7 +57,8 @@ use function Phantasy\Core\{
     tail,
     fold,
     foldMap,
-    unfold
+    unfold,
+    mDo
 };
 
 class TestVarClass
@@ -1835,5 +1837,16 @@ class FunctionsTest extends TestCase
         $this->assertEquals($ana($f, 10), [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
         $this->assertEquals($anaF(10), [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
         $this->assertEquals($anaF_(10), [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
+    }
+
+    public function testMDo()
+    {
+        $a = mDo(function () {
+            $foo = yield Maybe::of('foo');
+            $bar = yield Maybe::of($foo . 'bar');
+            $baz = yield Maybe::of($bar . 'baz');
+            return $baz;
+        });
+        $this->assertEquals(new Just('foobarbaz'), $a);
     }
 }

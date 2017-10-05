@@ -57,6 +57,14 @@ function compose(callable ...$fns)
     );
 }
 
+// +constant :: a -> (b -> a)
+function constant($x)
+{
+    return function ($y) {
+        return $x;
+    };
+}
+
 // +bars :: (a -> c) -> (b -> c) -> Either a b -> c
 function bars(...$args)
 {
@@ -696,3 +704,32 @@ function unfold(...$args)
 
     return $unfold(...$args);
 }
+
+function mDo(callable $generatorFunc)
+{
+    $gen = $generatorFunc();
+
+    while ($gen->valid()) {
+        $a = $gen->current();
+        $gen->send($a->value);
+    }
+
+    $par = get_parent_class($a);
+    if ($par === false) {
+        return of($a, $gen->getReturn());
+    } else {
+        return of($par, $gen->getReturn());
+    }
+}
+/* Do = function(generatorFunction) {
+  const generator = generatorFunction()
+
+  return function next(error, v) {
+    const res = generator.next(v)
+
+    if (res.done)
+      return res.value
+    else
+      return res.value.chain((v) => next(null, v) || res.value.of(v))
+  }()
+} */
