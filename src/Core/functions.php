@@ -58,11 +58,14 @@ function compose(callable ...$fns)
 }
 
 // +constant :: a -> (b -> a)
-function constant($x)
+function constant(...$args)
 {
-    return function ($y) {
-        return $x;
-    };
+    $constant = curry(function ($x) {
+        return curry(function ($y) use ($x) {
+            return $x;
+        });
+    });
+    return $constant(...$args);
 }
 
 // +bars :: (a -> c) -> (b -> c) -> Either a b -> c
@@ -640,7 +643,11 @@ function head(...$args)
         if (is_array($xs)) {
             return $xs[0] ?? null;
         } elseif (is_object($xs)) {
-            return $xs->head ?? null;
+            if (property_exists($xs, 'head')) {
+                return $xs->head ?? null;
+            } elseif (is_callable([$xs, 'head'])) {
+                return call_user_func([$xs, 'head']) ?? null;
+            }
         }
     });
     return $head(...$args);
@@ -652,7 +659,11 @@ function tail(...$args)
         if (is_array($xs)) {
             return array_slice($xs, 1);
         } elseif (is_object($xs)) {
-            return $xs->tail ?? null;
+            if (property_exists($xs, 'tail')) {
+                return $xs->tail ?? null;
+            } elseif (is_callable([$xs, 'tail'])) {
+                return call_user_func([$xs, 'tail']) ?? null;
+            }
         }
     });
     return $tail(...$args);
@@ -718,26 +729,13 @@ function mDo(callable $generatorFunc)
         if (!$generator->valid()) {
             return $curr;
         }
-        $res = $curr->chain(function ($x) use (&$handleGen, $generator, $getOfObj, $curr) {
+        return $curr->chain(function ($x) use (&$handleGen, $generator, $getOfObj, $curr) {
             $generator->send($x);
             $val = $handleGen($generator);
             return $val ?? of($getOfObj($curr), $x);
         });
-        return $res;
     };
 
     $gen = $generatorFunc();
     return of($getOfObj($handleGen($gen)), $gen->getReturn());
 }
-/* Do = function(generatorFunction) {
-  const generator = generatorFunction()
-
-  return function next(error, v) {
-    const res = generator.next(v)
-
-    if (res.done)
-      return res.value
-    else
-      return res.value.chain((v) => next(null, v) || res.value.of(v))
-  }()
-} */

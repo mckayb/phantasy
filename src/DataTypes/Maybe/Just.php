@@ -11,7 +11,7 @@ final class Just extends Maybe
 {
     use CurryNonPublicMethods;
 
-    public $value = null;
+    private $value = null;
 
     public function __construct($val)
     {

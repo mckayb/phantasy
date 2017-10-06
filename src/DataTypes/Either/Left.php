@@ -11,7 +11,7 @@ final class Left extends Either
 {
     use CurryNonPublicMethods;
 
-    private $value = null;
+    public $value = null;
 
     public function __construct($val)
     {

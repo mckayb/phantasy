@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\LinkedList\{LinkedList, Cons, Nil};
+use Phantasy\DataTypes\Validation\Validation;
 use Phantasy\DataTypes\Writer\Writer;
 use function Phantasy\Core\{
     id,
@@ -13,6 +14,7 @@ use function Phantasy\Core\{
     equals,
     lte,
     of,
+    pure,
     constant,
     compose,
     composeK,
@@ -200,6 +202,42 @@ class FunctionsTest extends TestCase
         };
 
         $this->assertEquals(of($a, 'foo'), 'foobar');
+    }
+
+    public function testOfObjectWithPure()
+    {
+        $a = new class () {
+            public function pure($x)
+            {
+                return $x . 'bar';
+            }
+        };
+
+        $this->assertEquals(of($a, 'foo'), 'foobar');
+    }
+
+    public function testOfObjectWithReturn()
+    {
+        $a = new class () {
+            public function return($x)
+            {
+                return $x . 'bar';
+            }
+        };
+
+        $this->assertEquals(of($a, 'foo'), 'foobar');
+    }
+
+    public function testPure()
+    {
+        $a = new class () {
+            public function return($x)
+            {
+                return $x . 'bar';
+            }
+        };
+
+        $this->assertEquals(pure($a, 'foo'), 'foobar');
     }
 
     public function testCompose()
@@ -1703,11 +1741,53 @@ class FunctionsTest extends TestCase
         $this->assertEquals(head(['foo', 'bar']), 'foo');
     }
 
+    public function testHeadProp()
+    {
+        $a = new class () {
+            public $head = 'blue';
+        };
+
+        $this->assertEquals(head($a), 'blue');
+    }
+
+    public function testHeadMethod()
+    {
+        $a = new class () {
+            public function head()
+            {
+                return 'blue';
+            }
+        };
+
+        $this->assertEquals(head($a), 'blue');
+    }
+
     public function testTail()
     {
         $this->assertEquals(tail([]), []);
         $this->assertEquals(tail([1]), []);
         $this->assertEquals(tail(['foo', 'bar']), ['bar']);
+    }
+
+    public function testTailProp()
+    {
+        $a = new class () {
+            public $tail = 'blue';
+        };
+
+        $this->assertEquals(tail($a), 'blue');
+    }
+
+    public function testTailMethod()
+    {
+        $a = new class () {
+            public function tail()
+            {
+                return 'blue';
+            }
+        };
+
+        $this->assertEquals(tail($a), 'blue');
     }
 
     public function testComposeK()
@@ -1839,14 +1919,82 @@ class FunctionsTest extends TestCase
         $this->assertEquals($anaF_(10), [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
     }
 
-    public function testMDo()
+    public function testConstant()
+    {
+        $a = constant('foo');
+        $this->assertEquals($a('bar'), 'foo');
+    }
+
+    public function testConstantCurried()
+    {
+        $c = constant();
+        $this->assertEquals($c('foo')('bar'), 'foo');
+    }
+
+    public function testMDoSimpleMaybe()
     {
         $a = mDo(function () {
             $foo = yield Maybe::of('foo');
             $bar = yield Maybe::of($foo . 'bar');
             $baz = yield Maybe::of($bar . 'baz');
+            $this->assertEquals($foo, 'foo');
+            $this->assertEquals($bar, 'foobar');
+            $this->assertEquals($baz, 'foobarbaz');
             return $baz;
         });
         $this->assertEquals(new Just('foobarbaz'), $a);
     }
+
+    public function testMDoSimpleEither()
+    {
+        $a = mDo(function () {
+            $foo = yield Either::of('foo');
+            $bar = yield Either::of($foo . 'bar');
+            $baz = yield Either::of($bar . 'baz');
+            $this->assertEquals($foo, 'foo');
+            $this->assertEquals($bar, 'foobar');
+            $this->assertEquals($baz, 'foobarbaz');
+            return $baz;
+        });
+        $this->assertEquals(new Right('foobarbaz'), $a);
+    }
+
+    /**
+     * @expectedException TypeError
+     */
+    public function testMDoFailsWithMultipleMonads()
+    {
+        mDo(function () {
+            $foo = yield Either::of('foo');
+            $bar = yield Maybe::of($foo . 'bar');
+            return $bar;
+        });
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testMDoFailsIfNotAMonad()
+    {
+        mDo(function () {
+            $foo = yield Validation::of('foo');
+            $bar = yield Validation::of('bar');
+            return $foo;
+        });
+    }
+
+    /*
+    Might have to adjust to get these working
+    public function testMDoSimpleReader()
+    {
+    }
+
+    public function testMDoSimpleWriter()
+    {
+    }
+
+    public function testMDoSimpleState()
+    {
+    }
+    */
 }
