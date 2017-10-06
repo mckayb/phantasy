@@ -707,19 +707,27 @@ function unfold(...$args)
 
 function mDo(callable $generatorFunc)
 {
+    $getOfObj = function ($x) {
+        $par = get_parent_class($x);
+        return $par === false ? $x : $par;
+    };
+
+    $handleGen = function (&$generator) use (&$handleGen, $getOfObj) {
+        $curr = $generator->current();
+
+        if (!$generator->valid()) {
+            return $curr;
+        }
+        $res = $curr->chain(function ($x) use (&$handleGen, $generator, $getOfObj, $curr) {
+            $generator->send($x);
+            $val = $handleGen($generator);
+            return $val ?? of($getOfObj($curr), $x);
+        });
+        return $res;
+    };
+
     $gen = $generatorFunc();
-
-    while ($gen->valid()) {
-        $a = $gen->current();
-        $gen->send($a->value);
-    }
-
-    $par = get_parent_class($a);
-    if ($par === false) {
-        return of($a, $gen->getReturn());
-    } else {
-        return of($par, $gen->getReturn());
-    }
+    return of($getOfObj($handleGen($gen)), $gen->getReturn());
 }
 /* Do = function(generatorFunction) {
   const generator = generatorFunction()
