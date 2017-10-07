@@ -6,11 +6,9 @@ Note: In these docs, you'll sometimes see functions included from `Phantasy\PHP`
 ```php
 use function Phantasy\Core\{identity, id};
 ```
-
 ### Description
 Simply returns whatever you pass into it. Useful when you need
 to lift a value into a function, or when you just want to return the value without modifying it.
-
 ### Examples
 ```php
 use Phantasy\DataTypes\Either\Either;
@@ -33,18 +31,29 @@ Either::fromNullable('baz', 'foo')
 // foobar
 ```
 
+## constant ($x)
+### Usage
+```php
+use function Phantasy\Core\constant;
+```
+### Description
+Simply returns a function returning the parameter.
+Useful when you need a function returning some constant value.
+### Examples
+```php
+use function Phantasy\Core\constant;
+use Phantasy\DataTypes\
+```
+
 ## curry (callable $f)
 ### Usage
 ```php
 use function Phantasy\Core\curry;
 ```
-
 ### Description
 Currying is when you call a function with a number of arguments less than the number of required arguments.
 It lets you create new functions by fixing parameters of already defined functions.
 All of the functions in `Phantasy\Core` have been curried for you, eg. `map`, `filter`, `prop`, etc.
-
-
 ### Examples
 ```php
 use function Phantasy\Core\curry;
@@ -83,12 +92,10 @@ $fooCurried('bar');
 ```php
 use function Phantasy\Core\curryN;
 ```
-
 ### Description
 Used when you want to curry a function, but it has variadic arguments,
 or it has optional parameters that you want to be included in the
 currying.
-
 ### Examples
 ```php
 use function Phantasy\Core\curryN;
@@ -106,16 +113,14 @@ $result = $add1MoreNum(4);
 // 10
 ```
 
-## compose (...$fns)
+## compose (callable ...$fns)
 ### Usage
 ```php
 use function Phantasy\Core\compose;
 ```
-
 ### Description
 Composition lets you chain results of multiple functions into a single function.
 It helps you to manage nesting and, when combined with currying, helps you create more complex functions by using simple functions as building blocks.
-
 ### Examples
 ```php
 use function Phantasy\Core\{compose, prop, map, curry};
@@ -138,15 +143,43 @@ $getSnakeTitles($data);
 // [ "foo_bar", "foo_baz" ]
 ```
 
+## composeK (callable ...$fns)
+### Usage
+```php
+use function Phantasy\Core\composeK;
+```
+### Description
+Kleisli Composition lets you compose functions that return monads. It's essentially just sugar around using the `chain` method from a Monad.
+### Examples
+```php
+use function Phantasy\PHP\strtoupper;
+use function Phantasy\Core\{composeK, curry};
+use Phantasy\DataTypes\Maybe\Maybe;
+
+$get = curry(function ($propName, $obj) {
+    return Maybe::fromNullable($obj[$propName] ?? null);
+});
+
+$getStateCode = composeK(
+    compose(Maybe::of(), strtoupper()),
+    $get('state'),
+    $get('address'),
+    $get('user')
+);
+
+$getStateCode(['user' => ['address' => ['state' => 'ny']]]); // new Just('NY'));
+$getStateCode([]); // Nothing();
+$getStateCode(['user' => null]); // Nothing();
+$getStateCode(['user' => ['address' => ['state' => null]]]); // Nothing()
+```
+
 ## prop (string $s, $x)
 ### Usage
 ```php
 use function Phantasy\Core\prop;
 ```
-
 ### Description
 A helper function for extracting named values out of an array or object.
-
 ### Examples
 ```php
 use function Phantasy\Core\{map, prop};
@@ -210,7 +243,7 @@ $lte2(1); // false
 $lte2(3); // true
 ```
 
-## of ($a, $x)
+## of ($a, $x) (aliases: pure)
 ### Usage
 ```php
 use function Phantasy\Core\of;
@@ -525,7 +558,7 @@ use Phantasy\DataTypes\Writer\Writer;
 extract(Writer::of(1)); // 1
 ```
 
-## mjoin
+## mjoin ($m) (aliases: join)
 ### Usage
 ```php
 use function Phantasy\Core\mjoin;
@@ -534,6 +567,7 @@ use function Phantasy\Core\mjoin;
 A simple wrapper around the join or mjoin method.
 If you have an object that has either of those defined, it will simply
 call those functions on that object.
+This is usually used to flatten a Monad.
 ### Examples
 ```php
 $a = LinkedList::of(LinkedList::of(2));
@@ -541,7 +575,7 @@ mjoin($a);
 // Cons(2, Nil)
 ```
 
-## filter
+## filter (callable $f, $x)
 ### Usage
 ```php
 use function Phantasy\Core\filter;
@@ -589,13 +623,13 @@ filter($isEven, $box);
 // Box([2]);
 ```
 
-## reduce (aliases: foldl)
+## reduce (callable $f, $i, $x) (aliases: foldl)
 ### Usage
 ```php
 use function Phantasy\Core\reduce;
 ```
 ### Description
-A simple wrapper around the filter method. If the data passed in has a reduce method, it just calls that. Otherwise, it just iterates over the data and returns an array.
+A simple wrapper around the reduce method. If the data passed in has a reduce method, it just calls that. Otherwise, it just iterates over the data and returns an array.
 ### Examples
 ```php
 use function Phantasy\Core\reduce;
@@ -643,7 +677,7 @@ reduce($oddSum, 0, $box);
 // Box([2]);
 ```
 
-## reduceRight (aliases: foldr)
+## reduceRight (callable $f, $i, $x) (aliases: foldr)
 ### Usage
 ```php
 use function Phantasy\Core\reduceRight;
@@ -661,7 +695,7 @@ reduceRight(function ($prev, $curr) {
 // 6
 ```
 
-## liftA
+## liftA ($callable $f, $a1)
 ### Usage
 ```php
 use function Phantasy\Core\liftA;
@@ -678,7 +712,7 @@ liftA(strtolower(), Maybe::of('Foo Bar'));
 // Just('foo bar');
 ```
 
-## liftA2
+## liftA2 (callable $f, $a1, $a2)
 ### Usage
 ```php
 use function Phantasy\Core\liftA2;
@@ -701,7 +735,7 @@ liftA2(curry($add), Either::of(2), Either::fromNullable(null, null));
 // Left(null)
 ```
 
-## liftA3
+## liftA3 (callable $f, $a1, $a2, $a3)
 ### Usage
 ```php
 use function Phantasy\Core\liftA3;
@@ -741,7 +775,7 @@ liftA3(
 // Failure(null)
 ```
 
-## liftA4
+## liftA4 ($callable $f, $a1, $a2, $a3, $a4)
 ### Usage
 ```
 use function Phantasy\Core\liftA4;
@@ -786,7 +820,7 @@ liftA4(
 ```
 
 
-## liftA5
+## liftA5 (callable $f, $a1, $a2, $a3, $a4, $a5)
 ### Usage
 ```php
 use function Phantasy\Core\liftA5;
@@ -832,7 +866,7 @@ $add5Applicatives(
 // Nothing()
 ```
 
-## trace
+## trace ($x)
 ### Usage
 ```php
 use function Phantasy\Core\trace;
@@ -887,7 +921,7 @@ echo $titleCase('foo bar');
 // 'FooBar'
 ```
 
-## concat (aliases: semigroupConcat)
+## concat ($s) (aliases: semigroupConcat)
 ### Usage
 ```php
 use function Phantasy\Core\concat;
@@ -927,7 +961,7 @@ concat($a, $b);
 // Any(true);
 ```
 
-## mempty
+## mempty ($x)
 ### Usage
 ```php
 use function Phantasy\Core\mempty;
@@ -950,7 +984,8 @@ $obj = new class() {
 mempty($obj);
 // 'test'
 ```
-## isTraversable
+
+## isTraversable ($x)
 ### Usage
 ```php
 use function Phantasy\Core\isTraversable;
@@ -964,4 +999,161 @@ isTraversable(true);
 
 isTraversable([1, 2, 3]);
 // true
+```
+
+## head ($xs)
+### Usage
+```php
+use function Phantasy\Core\head;
+```
+### Description
+Returns the head of the given array or object.
+If the head is empty, it returns null.
+### Examples
+```php
+head([]);
+// null
+
+head([1]);
+// 1
+
+$a = Cons('foo', Cons('bar', Nil()));
+head($a);
+// 'foo'
+```
+
+## tail ($xs)
+### Usage
+```php
+use function Phantasy\Core\tail;
+```
+### Description
+Returns the tail of the given array or object.
+### Examples
+```php
+tail([]);
+// []
+
+tail([1, 2, 3]);
+// [2, 3]
+
+tail(Cons(1, Cons(2, Cons(3, Nil()))));
+// Cons(2, Cons(3, Nil()))
+```
+
+## foldMap (callable $f, $xs)
+### Usage
+```php
+use function Phantasy\Core\foldMap;
+```
+### Description
+Simply a composition of `fold` and `map`.
+Maps the function over each element.
+The function should return a `Monoid`
+(something with a concat and an empty method)
+which is used to fold down the structure.
+### Examples
+```php
+$sum = function ($x) {
+    return new class ($x) {
+        public $val = null;
+        public function __construct($x) {
+            $this->val = $x;
+        }
+        public function concat($x) {
+            return new static($this->val + $x->val);
+        }
+        public function empty() {
+            return new static(0);
+        }
+    };
+};
+
+foldMap($sum, [1, 2, 3, 4]);
+// 10
+```
+```php
+$toLinkedList = function ($x) {
+    return Cons($x, Nil());
+};
+
+foldMap($toLinkedList, [1, 2, 3]);
+// Cons(1, Cons(2, Cons(3, Nil())));
+```
+
+## fold ($xs)
+### Usage
+```php
+use function Phantasy\Core\fold;
+```
+### Description
+Used to fold down a Monoidal structure.
+It starts with the empty method and concats every
+element until it reaches the final structure.
+### Examples
+```php
+$sum = function ($x) {
+    return new class ($x) {
+        public $val = null;
+        public function __construct($x) {
+            $this->val = $x;
+        }
+        public function concat($x) {
+            return new static($this->val + $x->val);
+        }
+        public function empty() {
+            return new static(0);
+        }
+    };
+};
+fold([$sum(1), $sum(2), $sum(3)]);
+// $sum(6)
+```
+
+## unfold (callable $f, $seed)
+### Usage
+```php
+use function Phantasy\Core\unfold;
+```
+### Description
+Used to build up a monoidal structure.
+It should be function that takes a single value
+and return an array holding the next value and
+a seed value. When the function returns null, it
+stops.
+### Examples
+```php
+$countDown = function ($x) {
+    return $x <= 0 ? null : [$x, $x - 1];
+};
+unfold($countDown, 10);
+// [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+```
+
+## mDo (callable $generatorFunc)
+### Usage
+```php
+use function Phantasy\Core\mDo;
+```
+### Description
+A way of using `do` syntax like found in
+functional languages such as Haskell or Purescript.
+The callable function should be a generator
+function. Every yield statement should return
+a monad of the same type. However, the result of
+the yield extracts the value from the monad.
+The return type will automatically lift
+the value into the monad that is being returned.
+It's basically equivalent to chaining a long
+string of monads, while allowing it to look
+like an imperative language.
+### Examples
+```php
+$val = mDo(function () {
+    $a = yield Maybe::of(1);
+    $b = yield Maybe::of($a + 2);
+    $c = yield Maybe::of($b + 3);
+    return $c;
+});
+// Just(6)
 ```

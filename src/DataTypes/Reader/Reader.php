@@ -16,40 +16,40 @@ final class Reader
         $this->f = $f;
     }
 
-    private function run($x)
+    protected function run($x)
     {
         return call_user_func($this->f, $x);
     }
 
-    private static function of($x) : Reader
+    protected static function of($x) : Reader
     {
         return new static(function ($_) use ($x) {
             return $x;
         });
     }
 
-    private function map(callable $g) : Reader
+    protected function map(callable $g) : Reader
     {
         return new static(function ($x) use ($g) {
             return $g($this->run($x));
         });
     }
 
-    private function ap(Reader $g) : Reader
+    protected function ap(Reader $g) : Reader
     {
         return new static(function ($x) use ($g) {
             return $g->run($x)($this->run($x));
         });
     }
 
-    private function chain(callable $r) : Reader
+    protected function chain(callable $r) : Reader
     {
         return new static(function ($s) use ($r) {
             return $r($this->run($s))->run($s);
         });
     }
 
-    private function extend(callable $f) : Reader
+    protected function extend(callable $f) : Reader
     {
         return new static(function ($s) use ($f) {
             return $f($this);
@@ -61,12 +61,12 @@ final class Reader
         return $this->run(mempty($m));
     }
 
-    private function bind(callable $r) : Reader
+    protected function bind(callable $r) : Reader
     {
         return $this->chain($r);
     }
 
-    private function flatMap(callable $r) : Reader
+    protected function flatMap(callable $r) : Reader
     {
         return $this->chain($r);
     }

@@ -2,11 +2,31 @@
 
 namespace Phantasy\DataTypes\Maybe;
 
+use Phantasy\DataTypes\Either\Either;
+use Phantasy\DataTypes\Validation\Validation;
 use Phantasy\Traits\CurryNonPublicMethods;
 
 abstract class Maybe
 {
     use CurryNonPublicMethods;
+    abstract protected function getOrElse($x);
+    abstract protected function equals(Maybe $e) : bool;
+    abstract protected function concat(Maybe $e) : Maybe;
+    abstract protected function map(callable $f) : Maybe;
+    abstract protected function ap(Maybe $eitherWithFunction) : Maybe;
+    abstract protected function chain(callable $f) : Maybe;
+    abstract protected function bind(callable $f) : Maybe;
+    abstract protected function flatMap(callable $f) : Maybe;
+    abstract protected function extend(callable $f) : Maybe;
+    abstract protected function fold(callable $f, callable $g);
+    abstract protected function cata(callable $f, callable $g);
+    abstract protected function alt(Maybe $m) : Maybe;
+    abstract protected function reduce(callable $f, $acc);
+    abstract protected function traverse(string $className, callable $f);
+    abstract protected function sequence(string $className);
+    abstract protected function toEither($failVal) : Either;
+    abstract protected function toValidation($failVal) : Validation;
+    abstract public function __toString() : string;
 
     final private static function of($val) : Maybe
     {

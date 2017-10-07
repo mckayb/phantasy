@@ -89,7 +89,7 @@ $b = LinkedList::fromArray([
 $a->ap($b);
 // Nil
 ```
-#### chain (callable $f) : LinkedList
+#### chain (callable $f) : LinkedList (aliases: bind, flatMap)
 Used when you have a function that returns a LinkedList.
 If the instance is a `Cons`, it calls the
 function on each of the values in the current LinkedList and then

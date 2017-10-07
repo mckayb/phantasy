@@ -277,6 +277,54 @@ class LinkedListTest extends TestCase
         $this->assertEquals($chain__($f), Cons(3, Nil()));
     }
 
+    public function testConsBind()
+    {
+        $a = LinkedList::of(2);
+        $this->assertEquals($a->bind(function ($x) {
+            return LinkedList::of(3);
+        }), new Cons(3, new Nil()));
+    }
+
+    public function testConsBindCurried()
+    {
+        $a = LinkedList::of(2);
+        $chain = $a->bind;
+        $chain_ = $a->bind();
+        $chain__ = $chain();
+
+        $f = function ($x) {
+            return LinkedList::of($x + 1);
+        };
+
+        $this->assertEquals($chain($f), Cons(3, Nil()));
+        $this->assertEquals($chain_($f), Cons(3, Nil()));
+        $this->assertEquals($chain__($f), Cons(3, Nil()));
+    }
+
+    public function testConsFlatMap()
+    {
+        $a = LinkedList::of(2);
+        $this->assertEquals($a->flatMap(function ($x) {
+            return LinkedList::of(3);
+        }), new Cons(3, new Nil()));
+    }
+
+    public function testConsFlatMapCurried()
+    {
+        $a = LinkedList::of(2);
+        $chain = $a->flatMap;
+        $chain_ = $a->flatMap();
+        $chain__ = $chain();
+
+        $f = function ($x) {
+            return LinkedList::of($x + 1);
+        };
+
+        $this->assertEquals($chain($f), Cons(3, Nil()));
+        $this->assertEquals($chain_($f), Cons(3, Nil()));
+        $this->assertEquals($chain__($f), Cons(3, Nil()));
+    }
+
     public function testNilChain()
     {
         $a = new Nil();
@@ -290,6 +338,54 @@ class LinkedListTest extends TestCase
         $a = Nil();
         $chain = $a->chain;
         $chain_ = $a->chain();
+        $chain__ = $chain();
+
+        $f = function ($x) {
+            return LinkedList::of($x + 1);
+        };
+
+        $this->assertEquals($chain($f), Nil());
+        $this->assertEquals($chain_($f), Nil());
+        $this->assertEquals($chain__($f), Nil());
+    }
+
+    public function testNilBind()
+    {
+        $a = new Nil();
+        $this->assertEquals($a->bind(function ($x) {
+            return LinkedList::of(3);
+        }), new Nil());
+    }
+
+    public function testNilBindCurried()
+    {
+        $a = Nil();
+        $chain = $a->bind;
+        $chain_ = $a->bind();
+        $chain__ = $chain();
+
+        $f = function ($x) {
+            return LinkedList::of($x + 1);
+        };
+
+        $this->assertEquals($chain($f), Nil());
+        $this->assertEquals($chain_($f), Nil());
+        $this->assertEquals($chain__($f), Nil());
+    }
+
+    public function testNilFlatMap()
+    {
+        $a = new Nil();
+        $this->assertEquals($a->flatMap(function ($x) {
+            return LinkedList::of(3);
+        }), new Nil());
+    }
+
+    public function testNilFlatMapCurried()
+    {
+        $a = Nil();
+        $chain = $a->flatMap;
+        $chain_ = $a->flatMap();
         $chain__ = $chain();
 
         $f = function ($x) {

@@ -11,69 +11,69 @@ final class Left extends Either
 {
     use CurryNonPublicMethods;
 
-    public $value = null;
+    private $value = null;
 
     public function __construct($val)
     {
         $this->value = $val;
     }
 
-    public function __toString()
+    public function __toString() : string
     {
         return "Left(" . var_export($this->value, true) . ")";
     }
 
-    private function equals(Either $e) : bool
+    protected function equals(Either $e) : bool
     {
         return $this == $e;
     }
 
-    private function concat(Either $e) : Either
+    protected function concat(Either $e) : Either
     {
         return $e;
     }
 
-    private function map(callable $f) : Either
+    protected function map(callable $f) : Either
     {
         return $this;
     }
 
-    private function ap(Either $eitherWithFunction) : Either
+    protected function ap(Either $eitherWithFunction) : Either
     {
         return $this;
     }
 
-    private function chain(callable $f) : Either
+    protected function chain(callable $f) : Either
     {
         return $this;
     }
 
-    private function extend(callable $f) : Either
+    protected function extend(callable $f) : Either
     {
         return $this;
     }
 
-    private function fold(callable $f, callable $g)
+    protected function fold(callable $f, callable $g)
     {
         return $f($this->value);
     }
 
-    private function bimap(callable $f, callable $g) : Either
+    protected function bimap(callable $f, callable $g) : Either
     {
         return new static($f($this->value));
     }
 
-    private function alt(Either $e) : Either
+    protected function alt(Either $e) : Either
     {
         return $e;
     }
 
-    private function reduce(callable $f, $acc)
+    protected function reduce(callable $f, $acc)
     {
         return $acc;
     }
 
-    private function traverse(string $className, callable $f)
+    protected function traverse(string $className, callable $f)
     {
         if (!class_exists($className) || !is_callable([$className, 'of'])) {
             throw new \InvalidArgumentException(
@@ -84,23 +84,23 @@ final class Left extends Either
         return call_user_func([$className, 'of'], new static($this->value));
     }
 
-    private function sequence(string $className)
+    protected function sequence(string $className)
     {
         return $this->traverse($className, identity());
     }
 
     // Aliases
-    private function bind(callable $f) : Either
+    protected function bind(callable $f) : Either
     {
         return $this->chain($f);
     }
 
-    private function flatMap(callable $f) : Either
+    protected function flatMap(callable $f) : Either
     {
         return $this->chain($f);
     }
 
-    private function cata($f, $g)
+    protected function cata(callable $f, callable $g)
     {
         return $this->fold($f, $g);
     }

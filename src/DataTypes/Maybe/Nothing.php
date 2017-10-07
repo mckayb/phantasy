@@ -11,52 +11,52 @@ final class Nothing extends Maybe
 {
     use CurryNonPublicMethods;
 
-    public function __toString()
+    public function __toString() : string
     {
         return "Nothing()";
     }
 
-    private function equals(Maybe $m) : bool
+    protected function equals(Maybe $m) : bool
     {
         return $this == $m;
     }
 
-    private function concat(Maybe $m) : Maybe
+    protected function concat(Maybe $m) : Maybe
     {
         return $m;
     }
 
-    private function map(callable $f) : Maybe
+    protected function map(callable $f) : Maybe
     {
         return $this;
     }
 
-    private function ap(Maybe $maybeWithFunction) : Maybe
+    protected function ap(Maybe $maybeWithFunction) : Maybe
     {
         return $this;
     }
 
-    private function chain(callable $f) : Maybe
+    protected function chain(callable $f) : Maybe
     {
         return $this;
     }
 
-    private function extend(callable $f) : Maybe
+    protected function extend(callable $f) : Maybe
     {
         return $this;
     }
 
-    private function alt(Maybe $m) : Maybe
+    protected function alt(Maybe $m) : Maybe
     {
         return $m;
     }
 
-    private function reduce(callable $f, $acc)
+    protected function reduce(callable $f, $acc)
     {
         return $acc;
     }
 
-    private function traverse(string $className, callable $f)
+    protected function traverse(string $className, callable $f)
     {
         if (!class_exists($className) || !is_callable([$className, 'of'])) {
             throw new \InvalidArgumentException(
@@ -67,40 +67,45 @@ final class Nothing extends Maybe
         return call_user_func([$className, 'of'], new static());
     }
 
-    private function sequence(string $className)
+    protected function sequence(string $className)
     {
         return $this->traverse($className, identity());
     }
 
 
-    private function getOrElse($d)
+    protected function getOrElse($d)
     {
         return $d;
     }
 
     // Aliases
-    private function bind(callable $f) : Maybe
+    protected function bind(callable $f) : Maybe
     {
         return $this->chain($f);
     }
 
-    private function flatMap(callable $f) : Maybe
+    protected function flatMap(callable $f) : Maybe
     {
         return $this->chain($f);
     }
 
-    private function fold($d)
+    protected function fold(callable $f, callable $g)
     {
-        return $this->getOrElse($d);
+        return $f();
+    }
+
+    protected function cata(callable $f, callable $g)
+    {
+        return $this->fold($f, $g);
     }
 
     // Conversions
-    private function toEither($val) : Either
+    protected function toEither($val) : Either
     {
         return new Left($val);
     }
 
-    private function toValidation($val) : Validation
+    protected function toValidation($val) : Validation
     {
         return new Failure($val);
     }

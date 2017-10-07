@@ -15,6 +15,7 @@ Creates a `Right($val)`;
 Either::of(1);
 // Right(1)
 ```
+
 #### static fromNullable ($failVal, $val) : Either
 If `$val` is null, it creates a `Left($failVal)`, otherwise it creates a `Right($val)`.
 ```php
@@ -24,6 +25,7 @@ Either::fromNullable('left val', 'right val');
 Either::fromNullable('left val', null);
 // Left('left val')
 ```
+
 #### static tryCatch (callable $f) : Either
 Performs a function that might throw an exception. If it succeeds,
 it stores the result in a `Right($f())`, otherwise, it returns a `Left($exception)`.
@@ -43,6 +45,7 @@ Either::tryCatch($connectToDB);
 
 // If no exception was thrown, returns Right($connection)
 ```
+
 #### static zero () : Either
 Gives you the type-level empty instance for Either. You can think of this
 like an empty method such as `[]` for arrays, `''` for strings, but now
@@ -57,6 +60,7 @@ Either::zero()->map(function($x) {
 });
 // Left(null)
 ```
+
 #### equals (Either $e) : bool
 Used to compare two `Either`'s for equality.
 Two `Eithers`'s are equal if they are of the same type (Left or Right) and they contain the same value.
@@ -68,6 +72,7 @@ Right(1)->equals(Right(1)); // true
 Right(1)->equals(Left(1)); // false
 Left(1)->equals(Left(1)); // true
 ```
+
 #### concat (Either $e) : Either
 Used to concatenate two `Either` values together.
 If the instance is a `Left`, it just returns the
@@ -82,6 +87,7 @@ current instance.
 Right(1)->concat(Left(1)); // Right(1)
 Right(2)->concat(Right(1)); // Right(2)
 ```
+
 #### map (callable $f) : Either
 Used to transform the values inside of our Either instance.
 If the instance is a `Right`, it applies the function `$f` and returns a `Right` containing the result of the function.
@@ -98,6 +104,7 @@ Either::fromNullable('Val is null!', null)->map(function($x) {
 });
 // Left('Val is null!')
 ```
+
 #### ap (Either $e) : Either
 Used when you want to apply a function inside of an `Either` to a value inside of an `Either`.
 If the instance is a `Right`, it applies the function inside of the parameter to the value inside of our instance.
@@ -119,6 +126,7 @@ $b = Either::of(strtolower());
 $a->ap($b);
 // Left('Val is null!')
 ```
+
 #### chain (callable $f) : Either (aliases: bind, flatMap)
 Used when you want to map over your value, but where the mapping function returns an `Either` context.
 If the instance is a `Right`, it simply returns the result of the function.
@@ -135,6 +143,7 @@ $a = Either::fromNullable(0, null)->chain(function($x) {
 });
 // Left(0)
 ```
+
 #### extend (callable $f) : Either
 Very similar to map, it's used to extend the computation
 instead of passing the value through. So the callable `$f` actually takes in the current instance, rather than the value of the instance.
@@ -159,6 +168,7 @@ Left('Request failed!')->extend(function ($x) {
 });
 // Left('Request failed!')
 ```
+
 #### fold (callable $f, callable $g) (aliases: cata)
 Used to extract values out of an `Either` context.
 If the instance is a `Right`, it returns the result of the right function, `$g`.
@@ -185,6 +195,7 @@ $a = Either::fromNullable(null, null)->fold(
 );
 // 'Error'
 ```
+
 #### bimap (callable $f, callable $g) : Either
 Used to map over the value in our instance, dependent on if the instance is a `Right`, or a `Left`.
 If the instance is a `Right`, it calls the right function `$g`.
@@ -216,6 +227,7 @@ Either::tryCatch(function() {
 }, identity();
 // 'Something went wrong!'
 ```
+
 #### alt (Either $m) : Either
 Allows you to provide an alternative value as a fallback if the current
 instance computation fails. You can look at it as a type-level if/else
@@ -238,6 +250,7 @@ Left(1)->alt(Right(2));
 Left(1)->alt(Left(2));
 // Left(2)
 ```
+
 #### reduce (callable $f, $acc)
 Used to get the result of a function applied to an instance value.
 Pulls the computation out of the `Either` context and just returns the
@@ -257,6 +270,7 @@ Left(12)->reduce(function($carry, $val) {
 }, 2);
 // 2
 ```
+
 #### sequence (string $className)
 Helpful in swapping the types of the object you are
 working with.
@@ -272,6 +286,7 @@ instance in the type defined by `$className`.
 Left('Request Failed')->sequence(Maybe::class);
 // Just(Left('Request Failed'))
 ```
+
 #### traverse (string $className, callable $f)
 Does the same as sequence, but lets you map over the
 value with `$f` before the types get swapped.
@@ -293,6 +308,7 @@ Left('Request Failed')->traverse(Maybe::class, function ($x) {
 });
 // Just(Left('Request Failed'))
 ```
+
 #### toMaybe () : Maybe
 Converts an `Either` into a `Maybe` context.
 If the instance is a `Right`, it simply returns a `Just` with the same value.
@@ -305,7 +321,8 @@ If the instance is a `Left`, it returns `Nothing`.
 Either::fromNullable(0, null)->toMaybe();
 // Nothing()
 ```
-#### toValidation () : Maybe
+
+#### toValidation () : Validation
 Used to transform a `Either` into a `Validation` context.
 If the instance is a `Right`, then it returns a `Success` containing that instance value.
 ```php

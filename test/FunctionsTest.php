@@ -1839,6 +1839,16 @@ class FunctionsTest extends TestCase
         $this->assertEquals(foldMap($Sum, [1, 2, 3])->val, 6);
     }
 
+    public function testFoldMapArrToLinkedList()
+    {
+        $toLinkedList = function ($x) {
+            return new Cons($x, new Nil());
+        };
+
+        $expected = new Cons(1, new Cons(2, new Cons(3, new Nil())));
+        $this->assertEquals(foldMap($toLinkedList, [1, 2, 3]), $expected);
+    }
+
     public function testFoldMapCurried()
     {
         $Sum = function ($x) {

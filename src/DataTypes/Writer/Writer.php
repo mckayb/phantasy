@@ -16,20 +16,20 @@ final class Writer
         $this->func = $f;
     }
 
-    private static function of($val, $m = []) : Writer
+    protected static function of($val, $m = []) : Writer
     {
         return new static(function () use ($val, $m) {
             return [$val, mempty($m)];
         });
     }
 
-    private static function chainRec(callable $f, $i, $m = []) : Writer
+    protected static function chainRec(callable $f, $i, $m = []) : Writer
     {
         $loopOrDone = function ($b) {
             return function ($x) use ($b) {
                 return new class ($b, $x) {
                     public $x;
-                    private $b;
+                    protected $b;
 
                     public function __construct($b, $x)
                     {
@@ -67,7 +67,7 @@ final class Writer
         return call_user_func($this->func);
     }
 
-    private function map(callable $f) : Writer
+    protected function map(callable $f) : Writer
     {
         return new static(function () use ($f) {
             list ($compVal, $logVal) = $this->run();
@@ -75,7 +75,7 @@ final class Writer
         });
     }
 
-    private function ap(Writer $w) : Writer
+    protected function ap(Writer $w) : Writer
     {
         return new static(function () use ($w) {
             list ($compX, $logX) = $this->run();
@@ -85,7 +85,7 @@ final class Writer
         });
     }
 
-    private function chain(callable $g) : Writer
+    protected function chain(callable $g) : Writer
     {
         return new static(function () use ($g) {
             list($compX, $logX) = $this->run();
@@ -94,7 +94,7 @@ final class Writer
         });
     }
 
-    private function extend(callable $f) : Writer
+    protected function extend(callable $f) : Writer
     {
         return new static(function () use ($f) {
             $x = $this->run();
@@ -108,12 +108,12 @@ final class Writer
         return $x;
     }
 
-    private function bind(callable $g) : Writer
+    protected function bind(callable $g) : Writer
     {
         return $this->chain($g);
     }
 
-    private function flatMap(callable $g) : Writer
+    protected function flatMap(callable $g) : Writer
     {
         return $this->chain($g);
     }

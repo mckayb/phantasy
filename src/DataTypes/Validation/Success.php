@@ -5,7 +5,7 @@ namespace Phantasy\DataTypes\Validation;
 use Phantasy\DataTypes\Maybe\{Maybe, Just};
 use Phantasy\DataTypes\Either\{Either, Right};
 use Phantasy\Traits\CurryNonPublicMethods;
-use function Phantasy\Core\curry;
+use function Phantasy\Core\{curry, identity, map};
 
 final class Success extends Validation
 {
@@ -18,22 +18,22 @@ final class Success extends Validation
         $this->value = $val;
     }
 
-    public function __toString()
+    public function __toString() : string
     {
         return "Success(" . var_export($this->value, true) . ")";
     }
 
-    private function equals(Validation $v) : bool
+    protected function equals(Validation $v) : bool
     {
         return $this == $v;
     }
 
-    private function map(callable $f) : Validation
+    protected function map(callable $f) : Validation
     {
         return new static($f($this->value));
     }
 
-    private function ap(Validation $validationWithFunc) : Validation
+    protected function ap(Validation $validationWithFunc) : Validation
     {
         $val = $this->value;
         return $validationWithFunc->map(
@@ -43,33 +43,56 @@ final class Success extends Validation
         );
     }
 
-    private function concat(Validation $v) : Validation
+    protected function concat(Validation $v) : Validation
     {
         return $v;
     }
 
-    private function fold(callable $f, callable $g)
+    protected function extend(callable $f) : Validation
+    {
+        return new static($f($this));
+    }
+
+    protected function fold(callable $f, callable $g)
     {
         return $g($this->value);
     }
 
-    private function bimap(callable $f, callable $g) : Validation
+    protected function bimap(callable $f, callable $g) : Validation
     {
         return new static($g($this->value));
     }
 
-    private function alt(Validation $v) : Validation
+    protected function alt(Validation $v) : Validation
     {
         return $this;
     }
 
-    private function reduce(callable $f, $acc)
+    protected function reduce(callable $f, $acc)
     {
         return $f($acc, $this->value);
     }
 
+    protected function traverse(string $className, callable $f)
+    {
+        if (!class_exists($className) || !is_callable([$className, 'of'])) {
+            throw new \InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an \'of\' method).'
+            );
+        }
+
+        return map(function ($x) {
+            return new Success($x);
+        }, $f($this->value));
+    }
+
+    protected function sequence(string $className)
+    {
+        return $this->traverse($className, identity());
+    }
+
     // Aliases
-    private function cata(callable $f, callable $g)
+    protected function cata(callable $f, callable $g)
     {
         return $this->fold($f, $g);
     }

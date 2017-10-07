@@ -7,6 +7,8 @@ use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 use function Phantasy\DataTypes\Validation\{Success, Failure};
+use function Phantasy\DataTypes\Maybe\Just;
+use function Phantasy\Core\identity;
 
 class ValidationTest extends TestCase
 {
@@ -838,5 +840,301 @@ class ValidationTest extends TestCase
         $this->assertTrue($equals(Failure(12)));
         $this->assertTrue($equals_(Failure(12)));
         $this->assertTrue($equals__(Failure(12)));
+    }
+
+    public function testSuccessExtend()
+    {
+        $this->assertEquals(
+            Success(1)->extend(function ($x) {
+                return $x->map(function ($y) {
+                    return $y + 1;
+                })->fold(identity(), identity());
+            }),
+            Success(2)
+        );
+    }
+
+    public function testSuccessExtendCurried()
+    {
+        $a = Success(1);
+        $extend = $a->extend;
+        $extend_ = $a->extend();
+        $extend__ = $extend();
+
+        $f = function ($x) {
+            return $x->map(function ($y) {
+                return $y + 1;
+            })->fold(identity(), identity());
+        };
+        $expected = Success(2);
+
+        $this->assertEquals($extend($f), $expected);
+        $this->assertEquals($extend_($f), $expected);
+        $this->assertEquals($extend__($f), $expected);
+    }
+
+    public function testSuccessExtendLaws()
+    {
+        $f = function ($x) {
+            return $x->map(function ($y) {
+                return $y % 2;
+            })->fold(identity(), identity());
+        };
+
+        $g = function ($x) {
+            return $x->map(function ($y) {
+                return $y / 5;
+            })->fold(identity(), identity());
+        };
+
+        $a = Success(1);
+
+        $this->assertEquals(
+            $a->extend($g)->extend($f),
+            $a->extend(function ($w) use ($f, $g) {
+                return $f($w->extend($g));
+            })
+        );
+    }
+
+    public function testFailureExtend()
+    {
+        $this->assertEquals(
+            Failure('foo')->extend(function ($x) {
+                return $x->map(function ($y) {
+                    return $y . 'bar';
+                })->fold(identity(), identity());
+            }),
+            Failure('foo')
+        );
+    }
+
+    public function testFailureExtendCurried()
+    {
+        $a = Failure('foo');
+        $extend = $a->extend;
+        $extend_ = $a->extend();
+        $extend__ = $extend();
+
+        $f = function ($x) {
+            return $x->map(function ($y) {
+                return $y . 'bar';
+            })->fold(identity(), identity());
+        };
+        $expected = Failure('foo');
+
+        $this->assertEquals($extend($f), $expected);
+        $this->assertEquals($extend_($f), $expected);
+        $this->assertEquals($extend__($f), $expected);
+    }
+
+    public function testFailureExtendLaws()
+    {
+        $f = function ($x) {
+            return $x->map(function ($y) {
+                return $y % 2;
+            })->fold(identity(), identity());
+        };
+
+        $g = function ($x) {
+            return $x->map(function ($y) {
+                return $y / 5;
+            })->fold(identity(), identity());
+        };
+
+        $this->assertEquals(
+            Failure('foo')->extend($g)->extend($f),
+            Failure('foo')->extend(function ($w) use ($f, $g) {
+                return $f($w->extend($g));
+            })
+        );
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testSuccessTraverseInvalidClass()
+    {
+        Success(1)->traverse('FOO', function ($x) {
+            return $x . 'bar';
+        });
+    }
+
+    public function testSuccessTraverse()
+    {
+        $this->assertEquals(
+            Success(1)->traverse(Maybe::class, function ($x) {
+                return Just($x + 1);
+            }),
+            Just(Success(2))
+        );
+    }
+
+    public function testSuccessTraverseCurried()
+    {
+        $a = Success(1);
+        $trav = $a->traverse;
+        $trav_ = $a->traverse();
+        $trav__ = $trav();
+
+        $travMaybe = $trav(Maybe::class);
+        $travMaybe_ = $trav_(Maybe::class);
+        $travMaybe__ = $trav__(Maybe::class);
+
+        $f = function ($x) {
+            return Just($x + 1);
+        };
+
+        $expected = Just(Success(2));
+
+        $this->assertEquals($trav(Maybe::class, $f), $expected);
+        $this->assertEquals($trav_(Maybe::class, $f), $expected);
+        $this->assertEquals($trav__(Maybe::class, $f), $expected);
+        $this->assertEquals($travMaybe($f), $expected);
+        $this->assertEquals($travMaybe_($f), $expected);
+        $this->assertEquals($travMaybe__($f), $expected);
+    }
+
+    public function testSuccessTraverseIdentity()
+    {
+        $a = Success(Just(1));
+
+        $this->assertEquals(
+            $a->traverse(Maybe::class, Maybe::of()),
+            Maybe::of($a)
+        );
+    }
+
+    public function testSuccessTraverseNaturality()
+    {
+        $u = Success(Just(1));
+        $t = function (Maybe $m) : Either {
+            return $m->toEither(null);
+        };
+        $F = Maybe::class;
+        $G = Either::class;
+        $this->assertEquals(
+            $t($u->traverse($F, identity())),
+            $u->traverse($G, $t)
+        );
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testSuccessSequenceInvalidClass()
+    {
+        Success(1)->sequence('FOO');
+    }
+
+    public function testSuccessSequence()
+    {
+        $this->assertEquals(
+            Success(Just(1))->sequence(Maybe::class),
+            Just(Success(1))
+        );
+    }
+
+    public function testSuccessSequenceCurried()
+    {
+        $a = Success(Just(1));
+        $seq = $a->sequence;
+        $seq_ = $a->sequence();
+        $seq__ = $seq();
+
+        $expected = Just(Success(1));
+        $this->assertEquals($seq(Maybe::class), $expected);
+        $this->assertEquals($seq_(Maybe::class), $expected);
+        $this->assertEquals($seq__(Maybe::class), $expected);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testFailureTraverseInvalidClass()
+    {
+        Failure('foo')->traverse('FOO', function ($x) {
+            return $x . 'bar';
+        });
+    }
+
+    public function testFailureTraverse()
+    {
+        $this->assertEquals(
+            Failure('foo')->traverse(Maybe::class, function ($x) {
+                return $x . 'bar';
+            }),
+            Just(Failure('foo'))
+        );
+    }
+
+    public function testFailureTraverseCurried()
+    {
+        $a = Failure('foo');
+        $trav = $a->traverse;
+        $trav_ = $a->traverse();
+        $trav__ = $trav();
+
+        $f = function ($x) {
+            return Just($x . 'bar');
+        };
+
+        $expected = Just(Failure('foo'));
+
+        $this->assertEquals($trav(Maybe::class, $f), $expected);
+        $this->assertEquals($trav_(Maybe::class, $f), $expected);
+        $this->assertEquals($trav__(Maybe::class, $f), $expected);
+    }
+
+    public function testFailureTraverseIdentity()
+    {
+        $a = Failure('Failed');
+
+        $this->assertEquals(
+            $a->traverse(Maybe::class, Maybe::of()),
+            Maybe::of($a)
+        );
+    }
+
+    public function testFailureTraverseNaturality()
+    {
+        $u = Failure('Failed');
+        $t = function (Maybe $m) : Either {
+            return $m->toEither(10);
+        };
+        $F = Maybe::class;
+        $G = Either::class;
+        $this->assertEquals(
+            $t($u->traverse($F, identity())),
+            $u->traverse($G, $t)
+        );
+    }
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testFailureSequenceInvalidClass()
+    {
+        Failure(1)->sequence('FOO');
+    }
+
+    public function testFailureSequence()
+    {
+        $this->assertEquals(
+            Failure('Request Failed')->sequence(Maybe::class),
+            Just(Failure('Request Failed'))
+        );
+    }
+
+    public function testFailureSequenceCurried()
+    {
+        $a = Failure('Request Failed');
+        $seq = $a->sequence;
+        $seq_ = $a->sequence();
+        $seq__ = $seq();
+
+        $expected = Just(Failure('Request Failed'));
+        $this->assertEquals($seq(Maybe::class), $expected);
+        $this->assertEquals($seq_(Maybe::class), $expected);
+        $this->assertEquals($seq__(Maybe::class), $expected);
     }
 }
