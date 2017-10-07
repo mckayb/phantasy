@@ -7,6 +7,8 @@ use function Phantasy\Core\{ap, map, curry, composeK};
 
 final class Roll extends Free
 {
+    use CurryNonPublicMethods;
+
     private $value = null;
     private $g = null;
 

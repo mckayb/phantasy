@@ -68,68 +68,6 @@ function constant(...$args)
     return $constant(...$args);
 }
 
-// +bars :: (a -> c) -> (b -> c) -> Either a b -> c
-function bars(...$args)
-{
-    $bars = curry(function (callable $f, callable $g, Either $e) {
-        return $e->fold($f, $g);
-    });
-
-    return $bars(...$args);
-}
-
-// +ampersands :: (a -> b) -> (a -> c) -> a -> (b, c)
-function ampersands(...$args)
-{
-    $ampersands = curry(function (callable $f, callable $g, $x) {
-        return [$f($x), $g($x)];
-    });
-
-    return $ampersands(...$args);
-}
-
-// +stars :: (a -> b) -> (a' -> b') -> (a, a') -> (b, b')
-function stars(...$args)
-{
-    $stars = curry(function (callable $f, callable $g, array $pair) {
-        list($x, $y) = $pair;
-        return [$f($x), $g($y)];
-    });
-
-    return $stars(...$args);
-}
-
-// +funzip :: Functor f => f (a, b) -> (f a, f b)
-function funzip(...$args)
-{
-    $funzip = ampersands(map(fst()), map(snd()));
-    return $funzip(...$args);
-}
-
-function fst(...$args)
-{
-    $fst = curry(function ($x) {
-        if (is_array($x)) {
-            list($y, $_) = $x;
-            return $y;
-        }
-    });
-
-    return $fst(...$args);
-}
-
-function snd(...$args)
-{
-    $snd = curry(function ($x) {
-        if (is_array($x)) {
-            list($_, $y) = $x;
-            return $y;
-        }
-    });
-
-    return $snd(...$args);
-}
-
 // +identity :: a -> a
 function identity(...$args)
 {
