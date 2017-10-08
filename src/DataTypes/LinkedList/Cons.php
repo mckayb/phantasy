@@ -9,18 +9,18 @@ final class Cons extends LinkedList
 {
     use CurryNonPublicMethods;
 
-    private $value = null;
+    private $head = null;
     private $tail = null;
 
     public function __construct($head, $tail)
     {
-        $this->value = $head;
+        $this->head = $head;
         $this->tail = $tail;
     }
 
     public function __toString() : string
     {
-        return "Cons(" . $this->value . ", " . $this->tail . ")";
+        return "Cons(" . $this->head . ", " . $this->tail . ")";
     }
 
     protected function equals(LinkedList $l) : bool
@@ -30,7 +30,7 @@ final class Cons extends LinkedList
 
     protected function map(callable $f) : LinkedList
     {
-        return new static($f($this->value), $this->tail->map($f));
+        return new static($f($this->head), $this->tail->map($f));
     }
 
     protected function ap(LinkedList $c) : LinkedList
@@ -47,17 +47,17 @@ final class Cons extends LinkedList
 
     protected function concat(LinkedList $c) : LinkedList
     {
-        return new static($this->value, $this->tail->concat($c));
+        return new static($this->head, $this->tail->concat($c));
     }
 
     protected function reduce(callable $f, $acc)
     {
-        return $this->tail->reduce($f, $f($acc, $this->value));
+        return $this->tail->reduce($f, $f($acc, $this->head));
     }
 
     public function join() : LinkedList
     {
-        return $this->value->concat($this->tail->join());
+        return $this->head->concat($this->tail->join());
     }
 
     protected function traverse(string $className, callable $f)

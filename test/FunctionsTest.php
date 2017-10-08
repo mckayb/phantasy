@@ -1969,6 +1969,15 @@ class FunctionsTest extends TestCase
         $this->assertEquals(new Right('foobarbaz'), $a);
     }
 
+    public function testMDoLinkedList()
+    {
+        $a = mDo(function () {
+            $foo = yield LinkedList::of(1);
+            return $foo;
+        });
+        $this->assertEquals(new Cons(1, new Nil()), $a);
+    }
+
     /**
      * @expectedException TypeError
      */
