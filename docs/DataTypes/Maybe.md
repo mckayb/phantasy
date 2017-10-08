@@ -17,6 +17,7 @@ $appendBar = function($x) {
 Maybe::of('foo')->map($appendBar);
 // Equivalent to Just('foo')->map($appendBar);
 ```
+
 #### static fromNullable ($val) : Maybe
 Checks the value that is passed in. If it's null, it returns a `Nothing()`,
 otherwise it returns a `Just($val)`.
@@ -26,6 +27,7 @@ $b = 12;
 Maybe::fromNullable($a); // Nothing()
 Maybe::fromNullable($b); // Just(12)
 ```
+
 #### static tryCatch (callable $f) : Maybe
 Performs a function that might throw an exception. If it succeeds,
 it stores the result in a `Just`, with the value of the result of the function. If it throws an exception, it returns a `Nothing()`.
@@ -42,6 +44,7 @@ Maybe::tryCatch($connectToDB);
 // If an exception is thrown, it returns Nothing()
 // If no exception was thrown, returns Just($connection)
 ```
+
 #### static zero () : Maybe
 Gives you the type-level empty instance for Maybe. You can think of this
 like an empty method such as `[]` for arrays, `''` for strings, but now
@@ -56,6 +59,7 @@ Maybe::zero()->map(function($x) {
 });
 // Nothing()
 ```
+
 #### equals (Maybe $m) : bool
 Used to compare two `Maybe`'s for equality.
 Two `Maybe`'s are equal if they are of the same type (Just or Nothing) and they contain the same value.
@@ -67,6 +71,7 @@ Just(1)->equals(Just(1)); // true
 Just(1)->equals(Nothing()); // false
 Nothing()->equals(Nothing()); // true
 ```
+
 #### concat (Maybe $m) : Maybe
 Used to concatencate two `Maybe`'s together.
 If the instance is a `Nothing`, it just returns the parameter `$m`.
@@ -102,6 +107,7 @@ Maybe::fromNullable(null)->map(function($x) {
 });
 // Nothing()
 ```
+
 #### ap (Maybe $m) : Maybe
 Used when you want to apply a function inside of a `Maybe` to a value inside of a `Maybe`.
 If the instance is a `Just`, then it takes the function inside `$m`, the parameter, and applies that function to our instance value.
@@ -122,6 +128,7 @@ $b = Maybe::of(function($x) {
 $a->ap($b);
 // Nothing()
 ```
+
 #### chain (callable $f) : Maybe (aliases: bind, flatMap)
 Used when you want to map with a function that also returns a `Maybe`.
 If the instance is a `Just`, then it simply returns the result of the function `$f`.
@@ -142,6 +149,7 @@ Maybe::fromNullable(null)->chain(function($x) {
 });
 // Nothing()
 ```
+
 #### extend (callable $f) : Maybe
 Very similar to map, it's used to extend the computation
 instead of passing the value through. So the callable `$f` actually takes in the current instance, rather than the value of the instance.
@@ -167,18 +175,31 @@ Nothing()->extend(function ($x) {
 });
 // Nothing()
 ```
-#### fold ($d) (aliases: getOrElse)
+#### fold (callable $f, callable $g) (aliases: cata)
 Used to extract the value out of the `Maybe` context.
-If it's a `Just`, it returns the value of our instance.
+If it's a `Just`, it runs the right function `g` on our value.
 ```php
-Maybe::of(1)->fold(0);
-// 1
+$nothingFunc = function () {
+    return 0;
+};
+$justFunc = function ($x) {
+    return $x + 1;
+};
+Maybe::of(1)->fold($nothingFunc, $justFunc);
+// 2
 ```
-If it's a `Nothing`, it simply returns the parameter `$d`.
+If it's a `Nothing`, it runs the left function.
 ```php
-Maybe::fromNullable(null)->fold('foo');
-// 'foo'
+$nothingFunc = function () {
+    return 0;
+};
+$justFunc = function ($x) {
+    return $x + 1;
+};
+Maybe::fromNullable(null)->fold($nothingFunc, $justFunc);
+// 0
 ```
+
 #### alt (Maybe $m) : Maybe
 Allows you to provide an alternative value as a fallback if the current
 instance computation fails. You can look at it as a type-level if/else
@@ -220,6 +241,7 @@ Nothing()->reduce(function($carry, $val) {
 }, 2);
 // 2
 ```
+
 #### sequence (string $className)
 Useful in swapping the types of the object you are dealing with.
 
@@ -234,6 +256,7 @@ type given by `$className`.
 Nothing()->sequence(Either::class);
 // Right(Nothing())
 ```
+
 #### traverse (string $className, callable $f)
 Does the same as sequence, but lets you map over the
 value with `$f` before the types get swapped.
@@ -255,6 +278,23 @@ Nothing()->traverse(Either::class, function ($x) {
 });
 // Right(Nothing())
 ```
+
+#### getOrElse ($d)
+Used as an alternative to `fold`, for extracting a value
+from our `Maybe` context.
+If the instance is a `Just`, it just returns the value
+that our instance is holding.
+```php
+Just('foo')->getOrElse('bar');
+// 'foo'
+```
+If the instance is a `Nothing`, it returns the parameter
+value.
+```php
+Nothing()->getOrElse('bar');
+// 'bar'
+```
+
 #### toEither ($val) : Either
 Used to transform a `Maybe` into an `Either` context.
 If the instance is a `Just`, then it returns a `Right` containing that instance value.

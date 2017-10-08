@@ -9,44 +9,49 @@ final class Nil extends LinkedList
 {
     use CurryNonPublicMethods;
 
-    private function equals(LinkedList $l) : bool
+    public function __toString() : string
+    {
+        return "Nil()";
+    }
+
+    protected function equals(LinkedList $l) : bool
     {
         return $this == $l;
     }
 
-    private function map(callable $f) : LinkedList
+    protected function map(callable $f) : LinkedList
     {
         return $this;
     }
 
-    private function ap(LinkedList $c) : LinkedList
+    protected function ap(LinkedList $c) : LinkedList
     {
         return $this;
     }
 
-    private function chain(callable $f) : LinkedList
+    protected function chain(callable $f) : LinkedList
     {
         return $this;
     }
 
-    private function concat(LinkedList $c) : LinkedList
+    protected function concat(LinkedList $c) : LinkedList
     {
         return $c;
     }
 
-    private function reduce(callable $f, $acc)
+    protected function reduce(callable $f, $acc)
     {
         return $acc;
     }
 
-    private function join() : LinkedList
+    public function join() : LinkedList
     {
         return $this;
     }
 
-    private function traverse(string $className, callable $f)
+    protected function traverse(string $className, callable $f)
     {
-        if (!class_exists($className) || !method_exists($className, 'of')) {
+        if (!class_exists($className) || !is_callable([$className, 'of'])) {
             throw new \InvalidArgumentException(
                 'Method must be a class name of an Applicative (must have an of method).'
             );
@@ -55,14 +60,29 @@ final class Nil extends LinkedList
         return call_user_func([$className, 'of'], new Nil());
     }
 
-    private function sequence(string $className)
+    protected function sequence(string $className)
     {
         return $this->traverse($className, identity());
     }
 
-    public function __toString()
+    protected function bind(callable $f) : LinkedList
     {
-        return "Nil()";
+        return $this->chain($f);
+    }
+
+    protected function flatMap(callable $f) : LinkedList
+    {
+        return $this->chain($f);
+    }
+
+    public function head()
+    {
+        return null;
+    }
+
+    public function tail() : LinkedList
+    {
+        return $this;
     }
 }
 

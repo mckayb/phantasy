@@ -2,6 +2,10 @@
 
 namespace Phantasy\Core;
 
+use Phantasy\DataTypes\Maybe\Maybe;
+use Phantasy\DataTypes\Either\Either;
+use function Phantasy\DataTypes\Maybe\Nothing;
+
 function curry(callable $callable)
 {
     $ref = new \ReflectionFunction($callable);
@@ -40,7 +44,7 @@ function curryN(...$args)
     return $curryN(...$args);
 }
 
-function compose(...$fns)
+function compose(callable ...$fns)
 {
     return array_reduce(
         $fns,
@@ -51,6 +55,17 @@ function compose(...$fns)
         },
         identity()
     );
+}
+
+// +constant :: a -> (b -> a)
+function constant(...$args)
+{
+    $constant = curry(function ($x) {
+        return curry(function ($y) use ($x) {
+            return $x;
+        });
+    });
+    return $constant(...$args);
 }
 
 // +identity :: a -> a
@@ -101,7 +116,7 @@ function trace(...$args)
 function equals(...$args)
 {
     $equals = curry(function ($a, $b) {
-        if (method_exists($a, 'equals')) {
+        if (is_callable([$a, 'equals'])) {
             return call_user_func([$a, 'equals'], $b);
         }
 
@@ -115,7 +130,7 @@ function equals(...$args)
 function lte(...$args)
 {
     $lte = curry(function ($a, $b) {
-        if (method_exists($a, 'lte')) {
+        if (is_callable([$a, 'lte'])) {
             return call_user_func([$a, 'lte'], $b);
         }
 
@@ -130,9 +145,9 @@ function contramap(...$args)
 {
     $contramap = curry(
         function (callable $f, $x) {
-            if (method_exists($x, 'contramap')) {
+            if (is_callable([$x, 'contramap'])) {
                 return call_user_func([$x, 'contramap'], $f);
-            } elseif (method_exists($x, 'cmap')) {
+            } elseif (is_callable([$x, 'cmap'])) {
                 return call_user_func([$x, 'cmap'], $f);
             }
         }
@@ -152,7 +167,7 @@ function map(...$args)
 {
     $map = curry(
         function (callable $f, $x) {
-            if (method_exists($x, 'map')) {
+            if (is_callable([$x, 'map'])) {
                 return call_user_func([$x, 'map'], $f);
             } else {
                 $res = [];
@@ -177,7 +192,7 @@ function filter(...$args)
 {
     $filter = curry(
         function (callable $f, $x) {
-            if (method_exists($x, 'filter')) {
+            if (is_callable([$x, 'filter'])) {
                 return call_user_func([$x, 'filter'], $f);
             } else {
                 $res = [];
@@ -221,9 +236,9 @@ function reduce(...$args)
 {
     $reduce = curry(
         function (callable $f, $i, $x) {
-            if (method_exists($x, 'reduce')) {
+            if (is_callable([$x, 'reduce'])) {
                 return call_user_func([$x, 'reduce'], $f, $i);
-            } elseif (method_exists($x, 'foldl')) {
+            } elseif (is_callable([$x, 'foldl'])) {
                 return call_user_func([$x, 'foldl'], $f, $i);
             } else {
                 $acc = $i;
@@ -243,9 +258,9 @@ function reduceRight(...$args)
 {
     $reduceRight = curry(
         function (callable $f, $i, $x) {
-            if (method_exists($x, 'reduceRight')) {
+            if (is_callable([$x, 'reduceRight'])) {
                 return call_user_func([$x, 'reduceRight'], $f, $i);
-            } elseif (method_exists($x, 'foldr')) {
+            } elseif (is_callable([$x, 'foldr'])) {
                 return call_user_func([$x, 'foldr'], $f, $i);
             } else {
                 $c = count($x);
@@ -275,21 +290,33 @@ function ap(...$args)
 function of(...$args)
 {
     $of = curry(function ($a, $x) {
-        return call_user_func([$a, 'of'], $x);
+        if (is_callable([$a, 'of'])) {
+            return call_user_func([$a, 'of'], $x);
+        } elseif (is_callable([$a, 'pure'])) {
+            return call_user_func([$a, 'pure'], $x);
+        } elseif (is_callable([$a, 'return'])) {
+            return call_user_func([$a, 'return'], $x);
+        }
     });
 
     return $of(...$args);
+}
+
+// +pure :: a -> b -> f b
+function pure(...$args)
+{
+    return of(...$args);
 }
 
 // +chain :: Chain m => (a -> m b) -> m a -> m b
 function chain(...$args)
 {
     $chain = curry(function (callable $f, $a) {
-        if (method_exists($a, 'chain')) {
+        if (is_callable([$a, 'chain'])) {
             return call_user_func([$a, 'chain'], $f);
-        } elseif (method_exists($a, 'flatMap')) {
+        } elseif (is_callable([$a, 'flatMap'])) {
             return call_user_func([$a, 'flatMap'], $f);
-        } elseif (method_exists($a, 'bind')) {
+        } elseif (is_callable([$a, 'bind'])) {
             return call_user_func([$a, 'bind'], $f);
         }
     });
@@ -311,7 +338,7 @@ function flatMap(...$args)
 function alt(...$args)
 {
     $alt = curry(function ($a, $b) {
-        if (method_exists($a, 'alt')) {
+        if (is_callable([$a, 'alt'])) {
             return call_user_func([$a, 'alt'], $b);
         }
 
@@ -334,15 +361,15 @@ function zero(...$args)
 function sequence(...$args)
 {
     $sequence = curry(function (string $className, $x) {
-        if (!method_exists($className, 'of')) {
+        if (!is_callable([$className, 'of'])) {
             throw new \InvalidArgumentException(
                 'Method must be a class name of an Applicative (must have an of method).'
             );
         }
 
-        if (method_exists($x, 'sequence')) {
+        if (is_callable([$x, 'sequence'])) {
             return call_user_func([$x, 'sequence'], $className);
-        } elseif (method_exists($x, 'traverse')) {
+        } elseif (is_callable([$x, 'traverse'])) {
             return call_user_func([$x, 'traverse'], $className, identity());
         }
     });
@@ -353,7 +380,7 @@ function sequence(...$args)
 function traverse(...$args)
 {
     $traverse = curry(function (string $className, callable $f, $x) {
-        if (!method_exists($className, 'of')) {
+        if (!is_callable([$className, 'of'])) {
             throw new \InvalidArgumentException(
                 'Method must be a class name of an Applicative (must have an of method).'
             );
@@ -396,9 +423,9 @@ function extract(...$args)
 function mjoin(...$args)
 {
     $mjoin = curry(function ($a) {
-        if (method_exists($a, 'join')) {
+        if (is_callable([$a, 'join'])) {
             return call_user_func([$a, 'join']);
-        } elseif (method_exists($a, 'mjoin')) {
+        } elseif (is_callable([$a, 'mjoin'])) {
             return call_user_func([$a, 'mjoin']);
         }
     });
@@ -419,7 +446,7 @@ function semigroupConcat(...$args)
             return array_merge($x, $y);
         }
 
-        if (method_exists($x, 'concat')) {
+        if (is_callable([$x, 'concat'])) {
             return call_user_func([$x, 'concat'], $y);
         }
 
@@ -449,7 +476,7 @@ function mempty(...$args)
             return [];
         }
 
-        if (method_exists($x, 'empty')) {
+        if (is_callable([$x, 'empty'])) {
             return call_user_func([$x, 'empty']);
         }
 
@@ -546,4 +573,107 @@ function isTraversable(...$args)
     });
 
     return $isTraversable(...$args);
+}
+
+function head(...$args)
+{
+    $head = curry(function ($xs) {
+        if (is_array($xs)) {
+            return $xs[0] ?? null;
+        } elseif (is_object($xs)) {
+            if (property_exists($xs, 'head')) {
+                return $xs->head ?? null;
+            } elseif (is_callable([$xs, 'head'])) {
+                return call_user_func([$xs, 'head']) ?? null;
+            }
+        }
+    });
+    return $head(...$args);
+}
+
+function tail(...$args)
+{
+    $tail = curry(function ($xs) {
+        if (is_array($xs)) {
+            return array_slice($xs, 1);
+        } elseif (is_object($xs)) {
+            if (property_exists($xs, 'tail')) {
+                return $xs->tail ?? null;
+            } elseif (is_callable([$xs, 'tail'])) {
+                return call_user_func([$xs, 'tail']) ?? null;
+            }
+        }
+    });
+    return $tail(...$args);
+}
+
+function composeK(callable ...$fns)
+{
+    return array_reduce($fns, function ($f, $g) {
+        return is_null($f)
+            ? $g
+            : function (...$args) use ($f, $g) {
+                return $g(...$args)->chain($f);
+            };
+    }, null);
+}
+
+function foldMap(...$args)
+{
+    $foldMap = curry(function (callable $f, $xs) {
+        return compose(fold(), map($f))($xs);
+    });
+
+    return $foldMap(...$args);
+}
+
+function fold(...$args)
+{
+    $fold = curry(function ($xs) {
+        return reduce(function ($prev, $curr) {
+            return is_null($prev)
+                ? concat(mempty($curr), $curr)
+                : concat($prev, $curr);
+        }, null, $xs);
+    });
+
+    return $fold(...$args);
+}
+
+function unfold(...$args)
+{
+    $go = function (callable $f, $seed, $acc) use (&$go) {
+        list($val, $nextSeed) = $f($seed);
+        return $val ? $go($f, $nextSeed, concat($acc, [$val])) : $acc;
+    };
+
+    $unfold = curry(function (callable $f, $seed) use ($go) {
+        return $go($f, $seed, []);
+    });
+
+    return $unfold(...$args);
+}
+
+function mDo(callable $generatorFunc)
+{
+    $getOfObj = function ($x) {
+        $par = get_parent_class($x);
+        return $par === false ? $x : $par;
+    };
+
+    $handleGen = function (&$generator) use (&$handleGen, $getOfObj) {
+        $curr = $generator->current();
+
+        if (!$generator->valid()) {
+            return $curr;
+        }
+        return $curr->chain(function ($x) use (&$handleGen, $generator, $getOfObj, $curr) {
+            $generator->send($x);
+            $val = $handleGen($generator);
+            return $val ?? of($getOfObj($curr), $x);
+        });
+    };
+
+    $gen = $generatorFunc();
+    return of($getOfObj($handleGen($gen)), $gen->getReturn());
 }

@@ -937,20 +937,70 @@ class MaybeTest extends TestCase
 
     public function testJustFold()
     {
-        $a = Maybe::of(3)->fold(15);
+        $a = Maybe::of(3)->fold(function () {
+            return 15;
+        }, identity());
         $this->assertEquals(3, $a);
     }
 
     public function testJustFoldCurried()
     {
-        $a = Maybe::of(3);
-        $g = $a->fold;
-        $g_ = $a->fold();
-        $g__ = $g();
+        $f = function () {
+            return 15;
+        };
+        $g = function ($x) {
+            return $x + 1;
+        };
 
-        $this->assertEquals($g(12), 3);
-        $this->assertEquals($g_(12), 3);
-        $this->assertEquals($g__(12), 3);
+        $a = Maybe::of(3);
+        $fold = $a->fold;
+        $fold_ = $a->fold();
+        $fold__ = $fold();
+
+        $foldF = $fold($f);
+        $foldF_ = $fold_($f);
+        $foldF__ = $fold__($f);
+
+        $this->assertEquals($fold($f, $g), 4);
+        $this->assertEquals($fold_($f, $g), 4);
+        $this->assertEquals($fold__($f, $g), 4);
+        $this->assertEquals($foldF($g), 4);
+        $this->assertEquals($foldF_($g), 4);
+        $this->assertEquals($foldF__($g), 4);
+    }
+
+    public function testJustCata()
+    {
+        $a = Maybe::of(3)->cata(function () {
+            return 15;
+        }, identity());
+        $this->assertEquals(3, $a);
+    }
+
+    public function testJustCataCurried()
+    {
+        $f = function () {
+            return 15;
+        };
+        $g = function ($x) {
+            return $x + 1;
+        };
+
+        $a = Maybe::of(3);
+        $fold = $a->cata;
+        $fold_ = $a->cata();
+        $fold__ = $fold();
+
+        $foldF = $fold($f);
+        $foldF_ = $fold_($f);
+        $foldF__ = $fold__($f);
+
+        $this->assertEquals($fold($f, $g), 4);
+        $this->assertEquals($fold_($f, $g), 4);
+        $this->assertEquals($fold__($f, $g), 4);
+        $this->assertEquals($foldF($g), 4);
+        $this->assertEquals($foldF_($g), 4);
+        $this->assertEquals($foldF__($g), 4);
     }
 
     public function testJustAlt()
@@ -1224,14 +1274,74 @@ class MaybeTest extends TestCase
 
     public function testNothingFold()
     {
-        $a = Maybe::fromNullable(null)->fold(10);
+        $a = Maybe::fromNullable(null)->fold(function () {
+            return 10;
+        }, function ($x) {
+            return $x + 1;
+        });
         $this->assertEquals($a, 10);
     }
 
     public function testNothingFoldCurried()
     {
-        $f = Maybe::fromNullable(null)->fold();
-        $this->assertEquals($f(10), 10);
+        $f = function () {
+            return 15;
+        };
+        $g = function ($x) {
+            return $x + 1;
+        };
+
+        $a = Maybe::fromNullable(null);
+        $fold = $a->fold;
+        $fold_ = $a->fold();
+        $fold__ = $fold();
+
+        $foldF = $fold($f);
+        $foldF_ = $fold_($f);
+        $foldF__ = $fold__($f);
+
+        $this->assertEquals($fold($f, $g), 15);
+        $this->assertEquals($fold_($f, $g), 15);
+        $this->assertEquals($fold__($f, $g), 15);
+        $this->assertEquals($foldF($g), 15);
+        $this->assertEquals($foldF_($g), 15);
+        $this->assertEquals($foldF__($g), 15);
+    }
+
+    public function testNothingCata()
+    {
+        $a = Maybe::fromNullable(null)->cata(function () {
+            return 10;
+        }, function ($x) {
+            return $x + 1;
+        });
+        $this->assertEquals($a, 10);
+    }
+
+    public function testNothingCataCurried()
+    {
+        $f = function () {
+            return 15;
+        };
+        $g = function ($x) {
+            return $x + 1;
+        };
+
+        $a = Maybe::fromNullable(null);
+        $fold = $a->cata;
+        $fold_ = $a->cata();
+        $fold__ = $fold();
+
+        $foldF = $fold($f);
+        $foldF_ = $fold_($f);
+        $foldF__ = $fold__($f);
+
+        $this->assertEquals($fold($f, $g), 15);
+        $this->assertEquals($fold_($f, $g), 15);
+        $this->assertEquals($fold__($f, $g), 15);
+        $this->assertEquals($foldF($g), 15);
+        $this->assertEquals($foldF_($g), 15);
+        $this->assertEquals($foldF__($g), 15);
     }
 
     public function testNothingAlt()

@@ -16,19 +16,19 @@ final class State
         $this->func = $f;
     }
 
-    private static function of($x) : State
+    protected static function of($x) : State
     {
         return new static(function ($s) use ($x) {
             return [$x, $s];
         });
     }
 
-    private function run($s)
+    protected function run($s)
     {
         return call_user_func($this->func, $s);
     }
 
-    private function map(callable $f) : State
+    protected function map(callable $f) : State
     {
         return new static(function ($s) use ($f) {
             list ($x, $s2) = $this->run($s);
@@ -36,7 +36,7 @@ final class State
         });
     }
 
-    private function ap(State $m) : State
+    protected function ap(State $m) : State
     {
         return new static(function ($s) use ($m) {
             list ($x1, $s1) = $this->run($s);
@@ -45,7 +45,7 @@ final class State
         });
     }
 
-    private function chain(callable $f) : State
+    protected function chain(callable $f) : State
     {
         return new static(function ($s) use ($f) {
             list ($x, $s2) = $this->run($s);
@@ -53,12 +53,12 @@ final class State
         });
     }
 
-    private function bind(callable $f) : State
+    protected function bind(callable $f) : State
     {
         return $this->chain($f);
     }
 
-    private function flatMap(callable $f) : State
+    protected function flatMap(callable $f) : State
     {
         return $this->chain($f);
     }

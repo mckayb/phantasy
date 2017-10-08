@@ -18,27 +18,27 @@ final class Right extends Either
         $this->value = $val;
     }
 
-    public function __toString()
+    public function __toString() : string
     {
         return "Right(" . var_export($this->value, true) . ")";
     }
 
-    private function equals(Either $e) : bool
+    protected function equals(Either $e) : bool
     {
         return $this == $e;
     }
 
-    private function concat(Either $e) : Either
+    protected function concat(Either $e) : Either
     {
         return $this;
     }
 
-    private function map(callable $f) : Either
+    protected function map(callable $f) : Either
     {
         return new static($f($this->value));
     }
 
-    private function ap(Either $eitherWithFunction)
+    protected function ap(Either $eitherWithFunction) : Either
     {
         $val = $this->value;
         return $eitherWithFunction->map(
@@ -48,39 +48,39 @@ final class Right extends Either
         );
     }
 
-    private function chain(callable $f) : Either
+    protected function chain(callable $f) : Either
     {
         return $f($this->value);
     }
 
-    private function extend(callable $f) : Either
+    protected function extend(callable $f) : Either
     {
         return new static($f($this));
     }
 
-    private function fold($f, $g)
+    protected function fold(callable $f, callable $g)
     {
         return $g($this->value);
     }
 
-    private function bimap($f, $g) : Either
+    protected function bimap(callable $f, callable $g) : Either
     {
         return new static($g($this->value));
     }
 
-    private function alt(Either $e) : Either
+    protected function alt(Either $e) : Either
     {
         return $this;
     }
 
-    private function reduce($f, $acc)
+    protected function reduce(callable $f, $acc)
     {
         return $f($acc, $this->value);
     }
 
-    private function traverse(string $className, callable $f)
+    protected function traverse(string $className, callable $f)
     {
-        if (!class_exists($className) || !method_exists($className, 'of')) {
+        if (!class_exists($className) || !is_callable([$className, 'of'])) {
             throw new \InvalidArgumentException(
                 'Method must be a class name of an Applicative (must have an \'of\' method).'
             );
@@ -91,23 +91,23 @@ final class Right extends Either
         }, $f($this->value));
     }
 
-    private function sequence(string $className)
+    protected function sequence(string $className)
     {
         return $this->traverse($className, identity());
     }
 
     // Aliases
-    private function bind(callable $f) : Either
+    protected function bind(callable $f) : Either
     {
         return $this->chain($f);
     }
 
-    private function flatMap(callable $f) : Either
+    protected function flatMap(callable $f) : Either
     {
         return $this->chain($f);
     }
 
-    private function cata(callable $f, callable $g)
+    protected function cata(callable $f, callable $g)
     {
         return $this->fold($f, $g);
     }

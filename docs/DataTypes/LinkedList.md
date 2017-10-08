@@ -89,7 +89,7 @@ $b = LinkedList::fromArray([
 $a->ap($b);
 // Nil
 ```
-#### chain (callable $f) : LinkedList
+#### chain (callable $f) : LinkedList (aliases: bind, flatMap)
 Used when you have a function that returns a LinkedList.
 If the instance is a `Cons`, it calls the
 function on each of the values in the current LinkedList and then
@@ -194,4 +194,38 @@ use function Phantasy\Core\identity;
 $a = Nil();
 $a->traverse(Either::class, identity());
 // Right(Nil)
+```
+#### head ()
+Simply pulls the head of the `LinkedList`.
+If the instance is a `Cons`, it just grabs the value of the head.
+```php
+Cons(1, Nil())->head();
+// 1
+
+Cons('foo', Cons('bar', Nil()))->head();
+// 'foo'
+```
+If the instance is a `Nil`, it returns null.
+```php
+Nil()->head();
+// null
+
+Maybe::fromNullable(Nil()->head());
+// Nothing()
+```
+#### tail ()
+Simply returns the tail of the `LinkedList`.
+If the instance is a `Cons`, it returns everything but
+the head.
+```php
+Cons(1, Nil())->tail();
+// Nil()
+
+Cons(1, Cons(2, Nil()))->tail();
+// Cons(2, Nil())
+```
+If the instance is a `Nil`, it just returns `Nil`.
+```php
+Nil()->tail();
+// Nil()
 ```

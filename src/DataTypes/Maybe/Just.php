@@ -18,29 +18,29 @@ final class Just extends Maybe
         $this->value = $val;
     }
 
-    public function __toString()
+    public function __toString() : string
     {
         return "Just(" . var_export($this->value, true) . ")";
     }
 
-    private function equals(Maybe $m) : bool
+    protected function equals(Maybe $m) : bool
     {
         return $this == $m;
     }
 
-    private function concat(Maybe $m) : Maybe
+    protected function concat(Maybe $m) : Maybe
     {
         return $m instanceof Just
             ? new static(concat($this->value, $m->getOrElse(null)))
             : $this;
     }
 
-    private function map(callable $f) : Maybe
+    protected function map(callable $f) : Maybe
     {
         return new static($f($this->value));
     }
 
-    private function ap(Maybe $maybeWithFunction) : Maybe
+    protected function ap(Maybe $maybeWithFunction) : Maybe
     {
         $val = $this->value;
         return $maybeWithFunction->map(
@@ -50,29 +50,29 @@ final class Just extends Maybe
         );
     }
 
-    private function chain(callable $f) : Maybe
+    protected function chain(callable $f) : Maybe
     {
         return $f($this->value);
     }
 
-    private function extend(callable $f) : Maybe
+    protected function extend(callable $f) : Maybe
     {
         return new static($f($this));
     }
 
-    private function alt(Maybe $m) : Maybe
+    protected function alt(Maybe $m) : Maybe
     {
         return $this;
     }
 
-    private function reduce(callable $f, $acc)
+    protected function reduce(callable $f, $acc)
     {
         return $f($acc, $this->value);
     }
 
-    private function traverse(string $className, callable $f)
+    protected function traverse(string $className, callable $f)
     {
-        if (!class_exists($className) || !method_exists($className, 'of')) {
+        if (!class_exists($className) || !is_callable([$className, 'of'])) {
             throw new \InvalidArgumentException(
                 'Method must be a class name of an Applicative (must have an \'of\' method).'
             );
@@ -83,39 +83,44 @@ final class Just extends Maybe
         }, $f($this->value));
     }
 
-    private function sequence(string $className)
+    protected function sequence(string $className)
     {
         return $this->traverse($className, identity());
     }
 
-    private function getOrElse($d)
+    protected function getOrElse($d)
     {
         return $this->value;
     }
 
     // Aliases
-    private function bind(callable $f) : Maybe
+    protected function bind(callable $f) : Maybe
     {
         return $this->chain($f);
     }
 
-    private function flatMap(callable $f) : Maybe
+    protected function flatMap(callable $f) : Maybe
     {
         return $this->chain($f);
     }
 
-    private function fold($d)
+    protected function fold(callable $f, callable $g)
     {
-        return $this->getOrElse($d);
+        return $g($this->value);
+    }
+
+    protected function cata(callable $f, callable $g)
+    {
+        return $this->fold($f, $g);
     }
 
     // Transformations
-    private function toEither($val) : Either
+    protected function toEither($val) : Either
     {
         return new Right($this->value);
     }
 
-    private function toValidation($val) : Validation
+    protected function toValidation($val) : Validation
     {
         return new Success($this->value);
     }
