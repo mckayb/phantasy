@@ -12,7 +12,7 @@ final class Cons extends LinkedList
     private $head = null;
     private $tail = null;
 
-    public function __construct($head, $tail)
+    public function __construct($head, LinkedList $tail)
     {
         $this->head = $head;
         $this->tail = $tail;
@@ -88,6 +88,16 @@ final class Cons extends LinkedList
     protected function flatMap(callable $f) : LinkedList
     {
         return $this->chain($f);
+    }
+
+    public function head()
+    {
+        return $this->head;
+    }
+
+    public function tail() : LinkedList
+    {
+        return $this->tail;
     }
 }
 

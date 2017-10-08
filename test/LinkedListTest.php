@@ -678,4 +678,26 @@ class LinkedListTest extends TestCase
 
         $this->assertEquals($expectedA, $actualA);
     }
+
+    public function testConsHead()
+    {
+        $this->assertEquals(Cons(1, Nil())->head(), 1);
+        $this->assertEquals(Cons(1, Cons(2, Nil()))->head(), 1);
+    }
+
+    public function testConsTail()
+    {
+        $this->assertEquals(Cons(1, Cons(2, Nil()))->tail(), Cons(2, Nil()));
+        $this->assertEquals(Cons(1, Nil())->tail(), Nil());
+    }
+
+    public function testNilHead()
+    {
+        $this->assertNull(Nil()->head());
+    }
+
+    public function testNilTail()
+    {
+        $this->assertEquals(Nil()->tail(), Nil());
+    }
 }

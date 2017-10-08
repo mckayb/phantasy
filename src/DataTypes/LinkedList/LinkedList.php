@@ -22,6 +22,8 @@ abstract class LinkedList
     abstract protected function sequence(string $className);
     abstract public function join() : LinkedList;
     abstract public function __toString() : string;
+    abstract public function head();
+    abstract public function tail() : LinkedList;
 
     final private static function of($x) : LinkedList
     {

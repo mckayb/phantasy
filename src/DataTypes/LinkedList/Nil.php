@@ -74,6 +74,16 @@ final class Nil extends LinkedList
     {
         return $this->chain($f);
     }
+
+    public function head()
+    {
+        return null;
+    }
+
+    public function tail() : LinkedList
+    {
+        return $this;
+    }
 }
 
 function Nil() : LinkedList

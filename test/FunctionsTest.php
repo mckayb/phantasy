@@ -1762,11 +1762,24 @@ class FunctionsTest extends TestCase
         $this->assertEquals(head($a), 'blue');
     }
 
+    public function testHeadLinkedList()
+    {
+        $this->assertEquals(head(new Cons(1, new Nil())), 1);
+        $this->assertNull(head(new Nil()));
+    }
+
     public function testTail()
     {
         $this->assertEquals(tail([]), []);
         $this->assertEquals(tail([1]), []);
         $this->assertEquals(tail(['foo', 'bar']), ['bar']);
+    }
+
+    public function testTailLinkedList()
+    {
+        $this->assertEquals(tail(new Cons(2, new Cons(1, new Nil()))), new Cons(1, new Nil()));
+        $this->assertEquals(tail(new Cons(1, new Nil())), new Nil());
+        $this->assertEquals(tail(new Nil()), new Nil());
     }
 
     public function testTailProp()
