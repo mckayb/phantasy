@@ -1,12 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\DataTypes\Either;
 
-use Phantasy\DataTypes\Maybe\Nothing;
-use Phantasy\DataTypes\Validation\Failure;
+use Phantasy\DataTypes\Maybe\{Maybe, Nothing};
+use Phantasy\DataTypes\Validation\{Validation, Failure};
+use Phantasy\Traits\CurryNonPublicMethods;
+use function Phantasy\Core\{curry, identity};
 
-class Left
+final class Left extends Either
 {
+    use CurryNonPublicMethods;
+
     private $value = null;
 
     public function __construct($val)
@@ -14,75 +18,108 @@ class Left
         $this->value = $val;
     }
 
-    public function __toString()
+    public function __toString() : string
     {
         return "Left(" . var_export($this->value, true) . ")";
     }
 
-    public function map(callable $f) : Left
+    protected function equals(Either $e) : bool
     {
-        return $this;
+        return $this == $e;
     }
 
-    public function ap($eitherWithFunction) : Left
-    {
-        return $this;
-    }
-
-    public function chain(callable $f) : Left
-    {
-        return $this;
-    }
-
-    public function fold(callable $f, callable $g)
-    {
-        return $f($this->value);
-    }
-
-    public function bimap(callable $f, callable $g) : Left
-    {
-        return new Left($f($this->value));
-    }
-
-    public function alt($e)
+    protected function concat(Either $e) : Either
     {
         return $e;
     }
 
-    public function reduce(callable $f, $acc)
+    protected function map(callable $f) : Either
+    {
+        return $this;
+    }
+
+    protected function ap(Either $eitherWithFunction) : Either
+    {
+        return $this;
+    }
+
+    protected function chain(callable $f) : Either
+    {
+        return $this;
+    }
+
+    protected function extend(callable $f) : Either
+    {
+        return $this;
+    }
+
+    protected function fold(callable $f, callable $g)
+    {
+        return $f($this->value);
+    }
+
+    protected function bimap(callable $f, callable $g) : Either
+    {
+        return new static($f($this->value));
+    }
+
+    protected function alt(Either $e) : Either
+    {
+        return $e;
+    }
+
+    protected function reduce(callable $f, $acc)
     {
         return $acc;
     }
 
+    protected function traverse(string $className, callable $f)
+    {
+        if (!class_exists($className) || !is_callable([$className, 'of'])) {
+            throw new \InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an \'of\' method).'
+            );
+        }
+
+        return call_user_func([$className, 'of'], new static($this->value));
+    }
+
+    protected function sequence(string $className)
+    {
+        return $this->traverse($className, identity());
+    }
+
     // Aliases
-    public function bind(callable $f) : Left
+    protected function bind(callable $f) : Either
     {
         return $this->chain($f);
     }
 
-    public function flatMap(callable $f) : Left
+    protected function flatMap(callable $f) : Either
     {
         return $this->chain($f);
     }
 
-    public function cata($f, $g)
+    protected function cata(callable $f, callable $g)
     {
         return $this->fold($f, $g);
     }
 
     // Conversions
-    public function toMaybe()
+    public function toMaybe() : Maybe
     {
         return new Nothing();
     }
 
-    public function toValidation()
+    public function toValidation() : Validation
     {
         return new Failure($this->value);
     }
 }
 
-function Left($x)
+function Left(...$args)
 {
-    return new Left($x);
+    return curry(function ($x) {
+        return new Left($x);
+    })(...$args);
 }

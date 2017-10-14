@@ -1,73 +1,109 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\DataTypes\LinkedList;
 
-use function Phantasy\Core\{concat, curry, identity, map};
+use Phantasy\Traits\CurryNonPublicMethods;
+use function Phantasy\Core\{concat, curry, identity, map, liftA2};
 
-class Cons
+final class Cons extends LinkedList
 {
+    use CurryNonPublicMethods;
+
     private $head = null;
     private $tail = null;
 
-    public function __construct($head, $tail)
+    public function __construct($head, LinkedList $tail)
     {
         $this->head = $head;
         $this->tail = $tail;
     }
 
-    public function map(callable $f) : Cons
+    public function __toString() : string
+    {
+        return "Cons(" . $this->head . ", " . $this->tail . ")";
+    }
+
+    protected function equals(LinkedList $l) : bool
+    {
+        return $this == $l;
+    }
+
+    protected function map(callable $f) : LinkedList
     {
         return new static($f($this->head), $this->tail->map($f));
     }
 
-    public function ap($c)
+    protected function ap(LinkedList $c) : LinkedList
     {
         return $c->map(function ($fn) {
             return $this->map($fn);
         })->join();
     }
 
-    public function chain(callable $f)
+    protected function chain(callable $f) : LinkedList
     {
         return $this->map($f)->join();
     }
 
-    public function concat($c) : Cons
+    protected function concat(LinkedList $c) : LinkedList
     {
         return new static($this->head, $this->tail->concat($c));
     }
 
-    public function reduce(callable $f, $acc)
+    protected function reduce(callable $f, $acc)
     {
         return $this->tail->reduce($f, $f($acc, $this->head));
     }
 
-    public function join() : Cons
+    public function join() : LinkedList
     {
         return $this->head->concat($this->tail->join());
     }
 
-    public function traverse(callable $of, callable $f)
+    protected function traverse(string $className, callable $f)
     {
+        if (!class_exists($className) || !is_callable([$className, 'of'])) {
+            throw new \InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an \'of\' method).'
+            );
+        }
+
         return $this->reduce(function ($ys, $x) use ($f) {
-            return $ys->ap($f($x)->map(curry(function ($a, $b) {
-                return $b->concat(new Cons($a, new Nil()));
-            })));
-        }, $of(new Nil()));
+            return liftA2(curry(function ($a, $b) {
+                return $b->concat(Cons($a, Nil()));
+            }), $f($x), $ys);
+        }, call_user_func([$className, 'of'], new Nil()));
     }
 
-    public function sequence(callable $of)
+    protected function sequence(string $className)
     {
-        return $this->traverse($of, identity());
+        return $this->traverse($className, identity());
     }
 
-    public function __toString()
+    protected function bind(callable $f) : LinkedList
     {
-        return "Cons(" . $this->head . ", " . $this->tail . ")";
+        return $this->chain($f);
+    }
+
+    protected function flatMap(callable $f) : LinkedList
+    {
+        return $this->chain($f);
+    }
+
+    public function head()
+    {
+        return $this->head;
+    }
+
+    public function tail() : LinkedList
+    {
+        return $this->tail;
     }
 }
 
-function Cons($head, $tail)
+function Cons(...$args)
 {
-    return new Cons($head, $tail);
+    return curry(function ($head, $tail) {
+        return new Cons($head, $tail);
+    })(...$args);
 }

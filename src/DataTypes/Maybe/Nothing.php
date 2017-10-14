@@ -1,70 +1,111 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\DataTypes\Maybe;
 
-use Phantasy\DataTypes\Either\Left;
-use Phantasy\DataTypes\Validation\Failure;
+use Phantasy\DataTypes\Either\{Either, Left};
+use Phantasy\DataTypes\Validation\{Validation, Failure};
+use Phantasy\Traits\CurryNonPublicMethods;
+use function Phantasy\Core\identity;
 
-class Nothing
+final class Nothing extends Maybe
 {
-    public function __toString()
+    use CurryNonPublicMethods;
+
+    public function __toString() : string
     {
         return "Nothing()";
     }
 
-    public function map(callable $f) : Nothing
+    protected function equals(Maybe $m) : bool
+    {
+        return $this == $m;
+    }
+
+    protected function concat(Maybe $m) : Maybe
+    {
+        return $m;
+    }
+
+    protected function map(callable $f) : Maybe
     {
         return $this;
     }
 
-    public function ap($maybeWithFunction) : Nothing
+    protected function ap(Maybe $maybeWithFunction) : Maybe
     {
         return $this;
     }
 
-    public function chain(callable $f) : Nothing
+    protected function chain(callable $f) : Maybe
     {
         return $this;
     }
 
-    public function alt($maybe)
+    protected function extend(callable $f) : Maybe
     {
-        return $maybe;
+        return $this;
     }
 
-    public function reduce(callable $f, $acc)
+    protected function alt(Maybe $m) : Maybe
+    {
+        return $m;
+    }
+
+    protected function reduce(callable $f, $acc)
     {
         return $acc;
     }
 
-    public function getOrElse($d)
+    protected function traverse(string $className, callable $f)
+    {
+        if (!class_exists($className) || !is_callable([$className, 'of'])) {
+            throw new \InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an \'of\' method).'
+            );
+        }
+
+        return call_user_func([$className, 'of'], new static());
+    }
+
+    protected function sequence(string $className)
+    {
+        return $this->traverse($className, identity());
+    }
+
+
+    protected function getOrElse($d)
     {
         return $d;
     }
 
     // Aliases
-    public function bind(callable $f)
+    protected function bind(callable $f) : Maybe
     {
         return $this->chain($f);
     }
 
-    public function flatMap(callable $f)
+    protected function flatMap(callable $f) : Maybe
     {
         return $this->chain($f);
     }
 
-    public function fold($d)
+    protected function fold(callable $f, callable $g)
     {
-        return $this->getOrElse($d);
+        return $f();
+    }
+
+    protected function cata(callable $f, callable $g)
+    {
+        return $this->fold($f, $g);
     }
 
     // Conversions
-    public function toEither($val) : Left
+    protected function toEither($val) : Either
     {
         return new Left($val);
     }
 
-    public function toValidation($val) : Failure
+    protected function toValidation($val) : Validation
     {
         return new Failure($val);
     }

@@ -1,56 +1,92 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\DataTypes\LinkedList;
 
-class Nil
+use Phantasy\Traits\CurryNonPublicMethods;
+use function Phantasy\Core\identity;
+
+final class Nil extends LinkedList
 {
-    public function map(callable $f) : Nil
+    use CurryNonPublicMethods;
+
+    public function __toString() : string
     {
-        return new Nil();
+        return "Nil()";
     }
 
-    public function ap($c) : Nil
+    protected function equals(LinkedList $l) : bool
     {
-        return new Nil();
+        return $this == $l;
     }
 
-    public function chain(callable $f) : Nil
+    protected function map(callable $f) : LinkedList
     {
-        return new Nil();
+        return $this;
     }
 
-    public function concat($c)
+    protected function ap(LinkedList $c) : LinkedList
+    {
+        return $this;
+    }
+
+    protected function chain(callable $f) : LinkedList
+    {
+        return $this;
+    }
+
+    protected function concat(LinkedList $c) : LinkedList
     {
         return $c;
     }
 
-    public function reduce(callable $f, $acc)
+    protected function reduce(callable $f, $acc)
     {
         return $acc;
     }
 
-    public function join() : Nil
+    public function join() : LinkedList
     {
-        return new Nil();
+        return $this;
     }
 
-    public function traverse(callable $of, callable $f)
+    protected function traverse(string $className, callable $f)
     {
-        return $of(new Nil());
+        if (!class_exists($className) || !is_callable([$className, 'of'])) {
+            throw new \InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an of method).'
+            );
+        }
+
+        return call_user_func([$className, 'of'], new Nil());
     }
 
-    public function sequence(callable $of)
+    protected function sequence(string $className)
     {
-        return $of(new Nil());
+        return $this->traverse($className, identity());
     }
 
-    public function __toString()
+    protected function bind(callable $f) : LinkedList
     {
-        return "Nil()";
+        return $this->chain($f);
+    }
+
+    protected function flatMap(callable $f) : LinkedList
+    {
+        return $this->chain($f);
+    }
+
+    public function head()
+    {
+        return null;
+    }
+
+    public function tail() : LinkedList
+    {
+        return $this;
     }
 }
 
-function Nil()
+function Nil() : LinkedList
 {
     return new Nil();
 }

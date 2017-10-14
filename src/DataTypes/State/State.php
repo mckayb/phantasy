@@ -1,9 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\DataTypes\State;
 
-class State
+use function Phantasy\Core\curry;
+use Phantasy\Traits\CurryNonPublicMethods;
+
+final class State
 {
+    use CurryNonPublicMethods;
+
     private $func = null;
 
     public function __construct(callable $f)
@@ -11,55 +16,57 @@ class State
         $this->func = $f;
     }
 
-    public static function of($x) : State
+    protected static function of($x) : State
     {
-        return new State(function ($s) use ($x) {
+        return new static(function ($s) use ($x) {
             return [$x, $s];
         });
     }
 
-    public function run($s)
+    protected function run($s)
     {
         return call_user_func($this->func, $s);
     }
 
-    public function map(callable $f) : State
+    protected function map(callable $f) : State
     {
-        return new State(function ($s) use ($f) {
+        return new static(function ($s) use ($f) {
             list ($x, $s2) = $this->run($s);
             return [$f($x), $s2];
         });
     }
 
-    public function ap(State $m) : State
+    protected function ap(State $m) : State
     {
-        return new State(function ($s) use ($m) {
+        return new static(function ($s) use ($m) {
             list ($x1, $s1) = $this->run($s);
             list ($x2, $s2) = $m->run($s1);
             return [$x2($x1), $s1];
         });
     }
 
-    public function chain(callable $f) : State
+    protected function chain(callable $f) : State
     {
-        return new State(function ($s) use ($f) {
+        return new static(function ($s) use ($f) {
             list ($x, $s2) = $this->run($s);
             return $f($x)->run($s2);
         });
     }
 
-    public function bind(callable $f) : State
+    protected function bind(callable $f) : State
     {
         return $this->chain($f);
     }
 
-    public function flatMap(callable $f) : State
+    protected function flatMap(callable $f) : State
     {
         return $this->chain($f);
     }
 }
 
-function State(callable $f)
+function State(...$args)
 {
-    return new State($f);
+    return curry(function (callable $f) {
+        return new State($f);
+    })(...$args);
 }

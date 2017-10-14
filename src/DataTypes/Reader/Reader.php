@@ -1,9 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\DataTypes\Reader;
 
-class Reader
+use Phantasy\Traits\CurryNonPublicMethods;
+use function Phantasy\Core\{mempty, curry};
+
+final class Reader
 {
+    use CurryNonPublicMethods;
+
     private $f;
 
     public function __construct(callable $f)
@@ -11,51 +16,65 @@ class Reader
         $this->f = $f;
     }
 
-    public function run($x)
+    protected function run($x)
     {
         return call_user_func($this->f, $x);
     }
 
-    public static function of($x) : Reader
+    protected static function of($x) : Reader
     {
-        return new Reader(function ($_) use ($x) {
+        return new static(function ($_) use ($x) {
             return $x;
         });
     }
 
-    public function map(callable $g) : Reader
+    protected function map(callable $g) : Reader
     {
-        return new Reader(function ($x) use ($g) {
+        return new static(function ($x) use ($g) {
             return $g($this->run($x));
         });
     }
 
-    public function ap(Reader $g) : Reader
+    protected function ap(Reader $g) : Reader
     {
-        return new Reader(function ($x) use ($g) {
+        return new static(function ($x) use ($g) {
             return $g->run($x)($this->run($x));
         });
     }
 
-    public function chain(callable $r) : Reader
+    protected function chain(callable $r) : Reader
     {
-        return new Reader(function ($s) use ($r) {
+        return new static(function ($s) use ($r) {
             return $r($this->run($s))->run($s);
         });
     }
 
-    public function bind(callable $r) : Reader
+    protected function extend(callable $f) : Reader
+    {
+        return new static(function ($s) use ($f) {
+            return $f($this);
+        });
+    }
+
+    public function extract($m = [])
+    {
+        return $this->run(mempty($m));
+    }
+
+    protected function bind(callable $r) : Reader
     {
         return $this->chain($r);
     }
 
-    public function flatMap(callable $r) : Reader
+    protected function flatMap(callable $r) : Reader
     {
         return $this->chain($r);
     }
 }
 
-function Reader(callable $f)
+function Reader(...$args)
 {
-    return new Reader($f);
+    return curry(function (callable $f) {
+        return new Reader($f);
+    })(...$args);
 }

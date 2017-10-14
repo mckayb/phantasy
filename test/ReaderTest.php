@@ -1,4 +1,6 @@
-<?php
+<?php declare(strict_types=1);
+
+namespace Phantasy\Test;
 
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Reader\Reader;
@@ -134,5 +136,106 @@ class ReaderTest extends TestCase
             });
         $this->assertEquals($r->run([ 'ENVIRONMENT' => 'production' ]), 'Hello Valued Customer!');
         $this->assertEquals($r->run([ 'ENVIRONMENT' => 'development' ]), 'Hello Devs!');
+    }
+
+    public function testReaderExtend()
+    {
+        $state = 1;
+        $a = Reader::of('The number is ')
+            ->chain(function ($x) {
+                return new Reader(function (int $s) use ($x) : string {
+                    return $s < 1
+                        ? concat($x, 'less than 1, ')
+                        : concat($x, 'greater than or equal to 1, ');
+                });
+            })
+            ->extend(function (Reader $s) use ($state) : string {
+                return $s->run($state - 1) . 'Joe.';
+            })
+            ->run($state);
+
+        $this->assertEquals($a, 'The number is less than 1, Joe.');
+
+        $b = Reader::of('The name is ')
+            ->chain(function ($x) {
+                return Reader(function ($s) use ($x) {
+                    return concat($x, $s['name']);
+                });
+            })
+            ->extend(function (Reader $r) {
+                return $r->run([ 'name' => 'Jim' ]);
+            })
+            ->run([ 'name' => 'Joe' ]);
+        $this->assertEquals($b, 'The name is Jim');
+    }
+
+    public function testReaderExtendCurried()
+    {
+        $state = ['name' => 'John'];
+
+        $f = function (Reader $r) use ($state) : string {
+            return $r->run(['name' => 'Joe']);
+        };
+
+        $g = function (Reader $r) use ($state) : string {
+            return $r->run(['name' => 'Jim']);
+        };
+
+        $w = Reader::of('The name is ')
+            ->extend($f)
+            ->chain(function ($x) {
+                return Reader(function ($s) use ($x) {
+                    return concat($x, $s['name']);
+                });
+            })
+            ->extend($g);
+        $this->assertEquals($w->run($state), 'The name is Jim');
+    }
+
+    public function testReaderExtendLaws()
+    {
+        $state = ['num' => 10];
+
+        $f = function (Reader $r) use ($state) : string {
+            $val = $r->run($state);
+            return $val . ' foo';
+        };
+
+        $g = function (Reader $r) use ($state) : string {
+            $val = $r->run($state);
+            return $val . ' bar';
+        };
+
+        $w = Reader::of('The number is ')
+            ->chain(function ($x) {
+                return Reader(function ($s) use ($x) {
+                    return $s['num'] < 1
+                        ? concat($x, 'less than 1.')
+                        : concat($x, 'greater than or equal to 1');
+                });
+            });
+
+        $this->assertEquals(
+            $w->extend($g)->extend($f)->run($state),
+            $w->extend(function ($w_) use ($f, $g) {
+                return $f($w_->extend($g));
+            })->run($state)
+        );
+    }
+
+    public function testReaderExtract()
+    {
+        $a = Reader::of('Foo Bar')->chain(function (string $x) : Reader {
+            return Reader(function (string $s) use ($x) : string {
+                return concat($x, concat(' ', $s));
+            });
+        })->extend(function (Reader $x) : string {
+            return $x->run('Baz');
+        })->chain(function (string $x) : Reader {
+            return Reader(function (string $s) use ($x) : string {
+                return concat($x, $s);
+            });
+        })->extract('');
+        $this->assertEquals($a, 'Foo Bar Baz');
     }
 }

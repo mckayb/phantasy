@@ -1,12 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\DataTypes\Validation;
 
-use Phantasy\DataTypes\Maybe\Just;
-use Phantasy\DataTypes\Either\Right;
+use Phantasy\DataTypes\Maybe\{Maybe, Just};
+use Phantasy\DataTypes\Either\{Either, Right};
+use Phantasy\Traits\CurryNonPublicMethods;
+use function Phantasy\Core\{curry, identity, map};
 
-class Success
+final class Success extends Validation
 {
+    use CurryNonPublicMethods;
+
     private $value = null;
 
     public function __construct($val)
@@ -14,17 +18,22 @@ class Success
         $this->value = $val;
     }
 
-    public function __toString()
+    public function __toString() : string
     {
         return "Success(" . var_export($this->value, true) . ")";
     }
 
-    public function map(callable $f) : Success
+    protected function equals(Validation $v) : bool
     {
-        return new Success($f($this->value));
+        return $this == $v;
     }
 
-    public function ap($validationWithFunc)
+    protected function map(callable $f) : Validation
+    {
+        return new static($f($this->value));
+    }
+
+    protected function ap(Validation $validationWithFunc) : Validation
     {
         $val = $this->value;
         return $validationWithFunc->map(
@@ -34,49 +43,74 @@ class Success
         );
     }
 
-    public function concat($validation)
+    protected function concat(Validation $v) : Validation
     {
-        return $validation;
+        return $v;
     }
 
-    public function fold(callable $f, callable $g)
+    protected function extend(callable $f) : Validation
+    {
+        return new static($f($this));
+    }
+
+    protected function fold(callable $f, callable $g)
     {
         return $g($this->value);
     }
 
-    public function bimap(callable $f, callable $g) : Success
+    protected function bimap(callable $f, callable $g) : Validation
     {
-        return new Success($g($this->value));
+        return new static($g($this->value));
     }
 
-    public function alt($v) : Success
+    protected function alt(Validation $v) : Validation
     {
         return $this;
     }
 
-    public function reduce(callable $f, $acc)
+    protected function reduce(callable $f, $acc)
     {
         return $f($acc, $this->value);
     }
 
+    protected function traverse(string $className, callable $f)
+    {
+        if (!class_exists($className) || !is_callable([$className, 'of'])) {
+            throw new \InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an \'of\' method).'
+            );
+        }
+
+        return map(function ($x) {
+            return new Success($x);
+        }, $f($this->value));
+    }
+
+    protected function sequence(string $className)
+    {
+        return $this->traverse($className, identity());
+    }
+
     // Aliases
-    public function cata(callable $f, callable $g)
+    protected function cata(callable $f, callable $g)
     {
         return $this->fold($f, $g);
     }
 
-    public function toEither() : Right
+    public function toEither() : Either
     {
         return new Right($this->value);
     }
 
-    public function toMaybe() : Just
+    public function toMaybe() : Maybe
     {
         return new Just($this->value);
     }
 }
 
-function Success($x)
+function Success(...$args)
 {
-    return new Success($x);
+    return curry(function ($x) {
+        return new Success($x);
+    })(...$args);
 }

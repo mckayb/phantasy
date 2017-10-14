@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Phantasy\Tests;
+namespace Phantasy\Test;
 
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Either\{Either, Left, Right};

@@ -1,22 +1,64 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\DataTypes\Writer;
 
-use function Phantasy\Core\{mempty, concat};
+use function Phantasy\Core\{mempty, concat, curry};
+use Phantasy\Traits\CurryNonPublicMethods;
 
-class Writer
+final class Writer
 {
+    use CurryNonPublicMethods;
+
     private $func = null;
 
-    public function __construct($f)
+    public function __construct(callable $f)
     {
         $this->func = $f;
     }
 
-    public static function of($val, $m = [])
+    protected static function of($val, $m = []) : Writer
     {
-        return new Writer(function () use ($val, $m) {
+        return new static(function () use ($val, $m) {
             return [$val, mempty($m)];
+        });
+    }
+
+    protected static function chainRec(callable $f, $i, $m = []) : Writer
+    {
+        $loopOrDone = function ($b) {
+            return function ($x) use ($b) {
+                return new class ($b, $x) {
+                    public $x;
+                    protected $b;
+
+                    public function __construct($b, $x)
+                    {
+                        $this->b = $b;
+                        $this->x = $x;
+                    }
+
+                    public function isDone()
+                    {
+                        return $this->b;
+                    }
+                };
+            };
+        };
+
+        $loop = $loopOrDone(false);
+        $done = $loopOrDone(true);
+
+        $acc = mempty($m);
+        $currentVal = $loop($i);
+        $count = 0;
+        do {
+            list($val, $log) = $f($loop, $done, $currentVal->x)->run();
+            $acc = concat($acc, $log);
+            $currentVal = $val;
+        } while (!$currentVal->isDone());
+
+        return new static(function () use ($acc, $currentVal) {
+            return [$currentVal->x, $acc];
         });
     }
 
@@ -25,17 +67,17 @@ class Writer
         return call_user_func($this->func);
     }
 
-    public function map(callable $f) : Writer
+    protected function map(callable $f) : Writer
     {
-        return new Writer(function () use ($f) {
+        return new static(function () use ($f) {
             list ($compVal, $logVal) = $this->run();
             return [$f($compVal), $logVal];
         });
     }
 
-    public function ap(Writer $w) : Writer
+    protected function ap(Writer $w) : Writer
     {
-        return new Writer(function () use ($w) {
+        return new static(function () use ($w) {
             list ($compX, $logX) = $this->run();
             list ($compY, $logY) = $w->run();
 
@@ -43,27 +85,43 @@ class Writer
         });
     }
 
-    public function chain(callable $g) : Writer
+    protected function chain(callable $g) : Writer
     {
-        return new Writer(function () use ($g) {
+        return new static(function () use ($g) {
             list($compX, $logX) = $this->run();
             list($compY, $logY) = $g($compX)->run();
             return [$compY, concat($logY, $logX)];
         });
     }
 
-    public function bind(callable $g) : Writer
+    protected function extend(callable $f) : Writer
+    {
+        return new static(function () use ($f) {
+            $x = $this->run();
+            return [$f($this), $x[1]];
+        });
+    }
+
+    public function extract()
+    {
+        list($x, $_) = $this->run();
+        return $x;
+    }
+
+    protected function bind(callable $g) : Writer
     {
         return $this->chain($g);
     }
 
-    public function flatMap(callable $g) : Writer
+    protected function flatMap(callable $g) : Writer
     {
         return $this->chain($g);
     }
 }
 
-function Writer($f)
+function Writer(...$args)
 {
-    return new Writer($f);
+    return curry(function (callable $f) {
+        return new Writer($f);
+    })(...$args);
 }
