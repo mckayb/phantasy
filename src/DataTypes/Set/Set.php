@@ -37,7 +37,7 @@ class Set
 
     public function map(callable $f) : Set
     {
-        return new Set(map($f, $this->xs));
+        return new Set(...map($f, $this->xs));
     }
 
     public function ap(Set $s) : Set
@@ -79,7 +79,8 @@ class Set
     public function equals(Set $s)
     {
         // Need equals regardless of order
-        return $s->toArray() == $this->xs;
+        return empty(array_diff($s->toArray(), $this->xs))
+            && empty(array_diff($this->xs, $s->toArray()));
     }
 
     public function join() : Set

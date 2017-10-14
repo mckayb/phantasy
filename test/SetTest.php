@@ -36,6 +36,8 @@ class SetTest extends TestCase
     public function testSetEmpty()
     {
         $this->assertEquals(Set::empty(), Set());
+        $this->assertEquals(Set::empty(), Set::fromArray([]));
+        $this->assertEquals(Set::empty(), Set::fromList(Nil()));
     }
 
     public function testSetOf()
@@ -43,5 +45,14 @@ class SetTest extends TestCase
         $this->assertEquals(Set::of(null), Set(null));
         $this->assertEquals(Set::of(concat()), Set(concat()));
         $this->assertEquals(Set::of('foo'), Set('foo'));
+    }
+
+    public function testSetMap()
+    {
+        $s = Set(1, 2, 3, 4)->map(function ($x) {
+            return $x + 1;
+        });
+
+        $this->assertEquals($s, Set(2, 3, 4, 5));
     }
 }
