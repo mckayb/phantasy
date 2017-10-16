@@ -566,6 +566,20 @@ class SetTest extends TestCase
         $this->assertEquals(Set()->size(), 0);
     }
 
+    public function testCardinality()
+    {
+        $this->assertEquals(Set(2)->cardinality(), 1);
+        $this->assertEquals(Set(2, 1)->cardinality(), 2);
+        $this->assertEquals(Set()->cardinality(), 0);
+    }
+
+    public function testCount()
+    {
+        $this->assertEquals(Set(2)->count(), 1);
+        $this->assertEquals(Set(2, 1)->count(), 2);
+        $this->assertEquals(Set()->count(), 0);
+    }
+
     public function testToArray()
     {
         $this->assertEquals(Set()->toArray(), []);

@@ -58,6 +58,24 @@ class MaybeTest extends TestCase
         $this->assertEquals($fn(12), Just(12));
     }
 
+    public function testMaybeFromFalse()
+    {
+        $a = Maybe::fromFalse('foo');
+        $b = Maybe::fromFalse(false);
+
+        $this->assertInstanceOf(Just::class, $a);
+        $this->assertInstanceOf(Nothing::class, $b);
+        $this->assertEquals(new Just('foo'), $a);
+        $this->assertEquals(new Nothing(), $b);
+    }
+
+    public function testMaybeFromFalseCurried()
+    {
+        $fn = Maybe::fromFalse();
+        $this->assertEquals($fn(false), Nothing());
+        $this->assertEquals($fn(12), Just(12));
+    }
+
     public function testMaybeTryCatchRight()
     {
         $a = Maybe::tryCatch(

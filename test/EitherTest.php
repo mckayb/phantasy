@@ -65,6 +65,24 @@ class EitherTest extends TestCase
         $this->assertEquals(new Left("left"), $withDef(null));
     }
 
+    public function testEitherFromFalse()
+    {
+        $a = Either::fromFalse('bar', 'foo');
+        $b = Either::fromFalse('baz', false);
+
+        $this->assertInstanceOf(Right::class, $a);
+        $this->assertInstanceOf(Left::class, $b);
+        $this->assertEquals(new Right('foo'), $a);
+        $this->assertEquals(new Left('baz'), $b);
+    }
+
+    public function testEitherFromFalseCurried()
+    {
+        $fn = Either::fromFalse('baz');
+        $this->assertEquals($fn(false), Left('baz'));
+        $this->assertEquals($fn(12), Right(12));
+    }
+
     public function testEitherTryCatchRight()
     {
         $a = Either::tryCatch(

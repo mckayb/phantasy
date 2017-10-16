@@ -142,24 +142,34 @@ final class Set
         }, new Set());
     }
 
-    protected function isSubsetOf(Set $s)
+    protected function isSubsetOf(Set $s) : bool
     {
         return $this->equals(Set::empty()) || $this->intersect($s)->equals($this);
     }
 
-    protected function isProperSubsetOf(Set $s)
+    protected function isProperSubsetOf(Set $s) : bool
     {
         return $this->isSubsetOf($s) && !$this->equals($s);
     }
 
-    protected function contains($x)
+    protected function contains($x) : bool
     {
         return in_array($x, $this->xs);
     }
 
-    public function size() : int
+    public function cardinality() : int
     {
         return count($this->xs);
+    }
+
+    public function size() : int
+    {
+        return $this->cardinality();
+    }
+
+    public function count() : int
+    {
+        return $this->cardinality();
     }
 
     public function toArray() : array

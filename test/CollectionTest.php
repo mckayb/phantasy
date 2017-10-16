@@ -412,4 +412,32 @@ class CollectionTest extends TestCase
             new Cons(1, new Cons(2, new Cons(3, new Nil())))
         );
     }
+
+    public function testHead()
+    {
+        $this->assertEquals(
+            Collection(1, 2)->head(),
+            1
+        );
+
+        $this->assertNull(Collection()->head());
+    }
+
+    public function testTail()
+    {
+        $this->assertEquals(
+            Collection()->tail(),
+            Collection()
+        );
+
+        $this->assertEquals(
+            Collection(1, 2)->tail(),
+            Collection(2)
+        );
+
+        $this->assertEquals(
+            Collection(1)->tail(),
+            Collection()
+        );
+    }
 }

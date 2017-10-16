@@ -33,6 +33,11 @@ abstract class Maybe
         return new Just($val);
     }
 
+    final private static function fromFalse($val) : Maybe
+    {
+        return $val === false ? new Nothing() : new Just($val);
+    }
+
     final private static function fromNullable($val) : Maybe
     {
         return is_null($val) ? new Nothing() : new Just($val);

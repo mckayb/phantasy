@@ -5,7 +5,7 @@ namespace Phantasy\DataTypes\Collection;
 use Phantasy\Traits\CurryNonPublicMethods;
 use Phantasy\DataTypes\Set\Set;
 use Phantasy\DataTypes\LinkedList\LinkedList;
-use function Phantasy\Core\{curry, map, concat, identity};
+use function Phantasy\Core\{curry, map, concat, identity, head, tail};
 
 final class Collection
 {
@@ -125,6 +125,16 @@ final class Collection
     public function toLinkedList() : LinkedList
     {
         return LinkedList::fromArray($this->xs);
+    }
+
+    public function head()
+    {
+        return head($this->xs);
+    }
+
+    public function tail() : Collection
+    {
+        return new Collection(...tail($this->xs));
     }
 }
 

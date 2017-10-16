@@ -1157,3 +1157,99 @@ $val = mDo(function () {
 });
 // Just(6)
 ```
+
+## arrayToLinkedList (array $a) : LinkedList
+### Usage
+```php
+use Phantasy\Core\arrayToLinkedList;
+```
+### Description
+Turns an array into a `LinkedList`.
+### Examples
+```php
+arrayToLinkedList([1, 2, 3]);
+// Cons(1, Cons(2, Cons(3, Nil())))
+
+arrayToLinkedList([]);
+// Nil()
+```
+
+## arrayToCollection (array $a) : Collection
+### Usage
+```php
+use Phantasy\Core\arrayToCollection;
+```
+### Description
+Turns an array into a `Collection`.
+### Examples
+```php
+arrayToCollection([1, 2, 3]);
+// Collection(1, 2, 3)
+
+arrayToCollection([]);
+// Collection()
+```
+
+## arrayToSet (array $a) : Set
+### Usage
+```php
+use Phantasy\Core\arrayToSet;
+```
+### Description
+Turns an array into a `Set`.
+### Examples
+```php
+arrayToSet([1, 2, 1, 2]);
+// Set(1, 2)
+
+arrayToSet([]);
+// Set()
+```
+
+## arrayFromLinkedList (LinkedList $a) : array
+### Usage
+```php
+use Phantasy\Core\arrayFromLinkedList;
+```
+### Description
+Turns a `LinkedList` into an array.
+### Examples
+```php
+arrayFromLinkedList(Cons(1, Cons(2, Nil())));
+// [1, 2]
+
+arrayFromLinkedList(Nil());
+// []
+```
+
+## arrayFromCollection (Collection $a) : array
+### Usage
+```php
+use Phantasy\Core\arrayFromCollection;
+```
+### Description
+Turns a `Collection` into an array.
+### Examples
+```php
+arrayFromCollection(Collection(1, 2, 3));
+// [1, 2, 3]
+
+arrayFromCollection(Collection());
+// []
+```
+
+## arrayFromSet (Set $a) : array
+### Usage
+```php
+use Phantasy\Core\arrayFromSet;
+```
+### Description
+Turns a `Set` into an array.
+### Examples
+```php
+arrayFromSet(Set(1, 2, 3));
+// [1, 2, 3]
+
+arrayFromSet(Set());
+// []
+```

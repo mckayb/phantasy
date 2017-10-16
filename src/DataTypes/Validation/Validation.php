@@ -32,6 +32,11 @@ abstract class Validation
         return new Success($x);
     }
 
+    final private static function fromFalse($failVal, $val) : Validation
+    {
+        return $val === false ? new Failure($failVal) : new Success($val);
+    }
+
     final private static function fromNullable($failVal, $val) : Validation
     {
         return is_null($val) ? new Failure($failVal) : new Success($val);
