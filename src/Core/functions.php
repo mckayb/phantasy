@@ -4,14 +4,18 @@ namespace Phantasy\Core;
 
 use Phantasy\DataTypes\Maybe\Maybe;
 use Phantasy\DataTypes\Either\Either;
+use Phantasy\DataTypes\LinkedList\LinkedList;
+use Phantasy\DataTypes\Collection\Collection;
+use Phantasy\DataTypes\Set\Set;
 use function Phantasy\DataTypes\Maybe\Nothing;
 
 function curry(callable $callable)
 {
     $ref = new \ReflectionFunction($callable);
+    $numParams = $ref->getNumberOfRequiredParameters();
 
-    $recurseFunc = function (...$args) use ($callable, $ref, &$recurseFunc) {
-        if (count($args) >= $ref->getNumberOfRequiredParameters()) {
+    $recurseFunc = function (...$args) use ($callable, $numParams, &$recurseFunc) {
+        if (count($args) >= $numParams) {
             return call_user_func_array($callable, $args);
         } else {
             return function (...$args2) use ($args, &$recurseFunc) {
@@ -280,7 +284,13 @@ function reduceRight(...$args)
 function ap(...$args)
 {
     $ap = curry(function ($fa, $a) {
-        return call_user_func([$a, 'ap'], $fa);
+        if (is_callable([$a, 'ap'])) {
+            return call_user_func([$a, 'ap'], $fa);
+        } elseif (is_array($a)) {
+            return join(map(function (callable $fn) use ($a) {
+                return map($fn, $a);
+            }, $fa));
+        }
     });
 
     return $ap(...$args);
@@ -296,6 +306,8 @@ function of(...$args)
             return call_user_func([$a, 'pure'], $x);
         } elseif (is_callable([$a, 'return'])) {
             return call_user_func([$a, 'return'], $x);
+        } elseif (is_array($a) || (is_string($a) && strtolower($a) === 'array')) {
+            return [$x];
         }
     });
 
@@ -318,6 +330,8 @@ function chain(...$args)
             return call_user_func([$a, 'flatMap'], $f);
         } elseif (is_callable([$a, 'bind'])) {
             return call_user_func([$a, 'bind'], $f);
+        } elseif (is_array($a)) {
+            return join(map($f, $a));
         }
     });
 
@@ -371,6 +385,8 @@ function sequence(...$args)
             return call_user_func([$x, 'sequence'], $className);
         } elseif (is_callable([$x, 'traverse'])) {
             return call_user_func([$x, 'traverse'], $className, identity());
+        } else {
+            return traverse($className, identity(), $x);
         }
     });
 
@@ -386,7 +402,15 @@ function traverse(...$args)
             );
         }
 
-        return call_user_func([$x, 'traverse'], $className, $f);
+        if (is_callable([$x, 'traverse'])) {
+            return call_user_func([$x, 'traverse'], $className, $f);
+        } elseif (is_array($x)) {
+            return reduce(function ($ys, $z) use ($f, $className) {
+                return liftA2(curry(function ($a, $b) {
+                    return concat($b, of('array', $a));
+                }), $f($z), $ys);
+            }, of($className, mempty($x)), $x);
+        }
     });
 
     return $traverse(...$args);
@@ -427,6 +451,8 @@ function mjoin(...$args)
             return call_user_func([$a, 'join']);
         } elseif (is_callable([$a, 'mjoin'])) {
             return call_user_func([$a, 'mjoin']);
+        } elseif (is_array($a)) {
+            return reduce(concat(), [], $a);
         }
     });
 
@@ -480,6 +506,10 @@ function mempty(...$args)
             return call_user_func([$x, 'empty']);
         }
 
+        if (is_string($x) && strtolower($x) === 'array') {
+            return [];
+        }
+
         if (is_string($x)) {
             return '';
         }
@@ -491,18 +521,15 @@ function mempty(...$args)
 // +liftA :: Functor f => (a -> b) -> f a -> f b
 function liftA(...$args)
 {
-    $liftA = curry(function (callable $f, $a) {
-        return call_user_func([$a, 'map'], $f);
-    });
-
-    return $liftA(...$args);
+    return map(...$args);
 }
 
 // +liftA2 :: Apply f => (a -> b -> c) -> f a -> f b -> f c
 function liftA2(...$args)
 {
     $liftA2 = curry(function (callable $f, $a1, $a2) {
-        return call_user_func([$a2, 'ap'], call_user_func([$a1, 'map'], $f));
+        return ap(map($f, $a1), $a2);
+        // return call_user_func([$a2, 'ap'], call_user_func([$a1, 'map'], $f));
     });
 
     return $liftA2(...$args);
@@ -512,7 +539,7 @@ function liftA2(...$args)
 function liftA3(...$args)
 {
     $liftA3 = curry(function (callable $f, $a1, $a2, $a3) {
-        return call_user_func([$a3, 'ap'], call_user_func([$a2, 'ap'], call_user_func([$a1, 'map'], $f)));
+        return ap(ap(map($f, $a1), $a2), $a3);
     });
 
     return $liftA3(...$args);
@@ -522,19 +549,7 @@ function liftA3(...$args)
 function liftA4(...$args)
 {
     $liftA4 = curry(function (callable $f, $a1, $a2, $a3, $a4) {
-        return call_user_func(
-            [$a4, 'ap'],
-            call_user_func(
-                [$a3, 'ap'],
-                call_user_func(
-                    [$a2, 'ap'],
-                    call_user_func(
-                        [$a1, 'map'],
-                        $f
-                    )
-                )
-            )
-        );
+        return ap(ap(ap(map($f, $a1), $a2), $a3), $a4);
     });
 
     return $liftA4(...$args);
@@ -544,22 +559,7 @@ function liftA4(...$args)
 function liftA5(...$args)
 {
     $liftA5 = curry(function (callable $f, $a1, $a2, $a3, $a4, $a5) {
-        return call_user_func(
-            [$a5, 'ap'],
-            call_user_func(
-                [$a4, 'ap'],
-                call_user_func(
-                    [$a3, 'ap'],
-                    call_user_func(
-                        [$a2, 'ap'],
-                        call_user_func(
-                            [$a1, 'map'],
-                            $f
-                        )
-                    )
-                )
-            )
-        );
+        return ap(ap(ap(ap(map($f, $a1), $a2), $a3), $a4), $a5);
     });
 
     return $liftA5(...$args);
@@ -613,7 +613,7 @@ function composeK(callable ...$fns)
         return is_null($f)
             ? $g
             : function (...$args) use ($f, $g) {
-                return $g(...$args)->chain($f);
+                return chain($f, $g(...$args));
             };
     }, null);
 }
@@ -667,13 +667,55 @@ function mDo(callable $generatorFunc)
         if (!$generator->valid()) {
             return $curr;
         }
-        return $curr->chain(function ($x) use (&$handleGen, $generator, $getOfObj, $curr) {
+        return chain(function ($x) use (&$handleGen, $generator, $getOfObj, $curr) {
             $generator->send($x);
             $val = $handleGen($generator);
             return $val ?? of($getOfObj($curr), $x);
-        });
+        }, $curr);
     };
 
     $gen = $generatorFunc();
     return of($getOfObj($handleGen($gen)), $gen->getReturn());
+}
+
+function arrayToLinkedList(...$args)
+{
+    return curry(function (array $a) : LinkedList {
+        return LinkedList::fromArray($a);
+    })(...$args);
+}
+
+function arrayToCollection(...$args)
+{
+    return curry(function (array $a) : Collection {
+        return Collection::fromArray($a);
+    })(...$args);
+}
+
+function arrayToSet(...$args)
+{
+    return curry(function (array $a) : Set {
+        return Set::fromArray($a);
+    })(...$args);
+}
+
+function arrayFromSet(...$args)
+{
+    return curry(function (Set $a) : array {
+        return $a->toArray();
+    })(...$args);
+}
+
+function arrayFromLinkedList(...$args)
+{
+    return curry(function (LinkedList $a) : array {
+        return $a->toArray();
+    })(...$args);
+}
+
+function arrayFromCollection(...$args)
+{
+    return curry(function (Collection $a) : array {
+        return $a->toArray();
+    })(...$args);
 }

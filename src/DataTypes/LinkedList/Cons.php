@@ -4,6 +4,8 @@ namespace Phantasy\DataTypes\LinkedList;
 
 use Phantasy\Traits\CurryNonPublicMethods;
 use function Phantasy\Core\{concat, curry, identity, map, liftA2};
+use Phantasy\DataTypes\Set\Set;
+use Phantasy\DataTypes\Collection\Collection;
 
 final class Cons extends LinkedList
 {
@@ -98,6 +100,23 @@ final class Cons extends LinkedList
     public function tail() : LinkedList
     {
         return $this->tail;
+    }
+
+    public function toSet() : Set
+    {
+        return new Set(...$this->toArray());
+    }
+
+    public function toCollection() : Collection
+    {
+        return new Collection(...$this->toArray());
+    }
+
+    public function toArray() : array
+    {
+        return $this->reduce(function ($prev, $curr) {
+            return concat($prev, [$curr]);
+        }, []);
     }
 }
 

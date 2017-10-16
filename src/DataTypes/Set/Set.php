@@ -1,21 +1,33 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\DataTypes\Set;
 
-use function Phantasy\Core\{concat, map, identity};
+use Phantasy\Traits\CurryNonPublicMethods;
+use Phantasy\DataTypes\LinkedList\LinkedList;
+use Phantasy\DataTypes\Collection\Collection;
+use function Phantasy\Core\{curry, concat, map, identity};
 
-class Set
+final class Set
 {
+    use CurryNonPublicMethods;
+
     private $xs = [];
 
-    public static function fromArray(array $a) : Set
+    protected static function fromArray(array $a) : Set
     {
         return new Set(...$a);
     }
 
-    public static function fromList($l) : Set
+    protected static function fromLinkedList(LinkedList $l) : Set
     {
         return $l->reduce(function ($prev, $curr) {
+            return $prev->concat(new Set($curr));
+        }, new Set());
+    }
+
+    protected static function fromCollection(Collection $c) : Set
+    {
+        return $c->reduce(function ($prev, $curr) {
             return $prev->concat(new Set($curr));
         }, new Set());
     }
@@ -25,60 +37,65 @@ class Set
         return new Set();
     }
 
-    public static function of($x) : Set
+    private static function of($x) : Set
     {
         return new Set($x);
     }
 
     public function __construct(...$xs)
     {
-        $this->xs = array_values(array_unique($xs));
+        $this->xs = array_values(array_unique($xs, SORT_REGULAR));
     }
 
-    public function map(callable $f) : Set
+    protected function map(callable $f) : Set
     {
         return new Set(...map($f, $this->xs));
     }
 
-    public function ap(Set $s) : Set
+    protected function ap(Set $s) : Set
     {
         return $s->map(function ($fn) {
             return $this->map($fn);
         })->join();
     }
 
-    public function chain(callable $f) : Set
+    protected function chain(callable $f) : Set
     {
         return $this->map($f)->join();
     }
 
-    public function reduce(callable $f, $acc)
+    protected function reduce(callable $f, $acc)
     {
         return array_reduce($this->xs, $f, $acc);
     }
 
-    public function traverse(callable $of, callable $f)
+    protected function traverse(string $className, callable $f)
     {
+        if (!class_exists($className) || !is_callable([$className, 'of'])) {
+            throw new \InvalidArgumentException(
+                'Method must be a class name of an Applicative (must have an \'of\' method).'
+            );
+        }
+
         return $this->reduce(function ($ys, $x) use ($f) {
             return $ys->ap($f($x)->map(curry(function ($a, $b) {
                 return $b->concat(Set::of($a));
             })));
-        }, $of(Set::empty()));
+        }, call_user_func([$className, 'of'], Set::empty()));
     }
 
-    public function sequence(callable $of)
+    protected function sequence(string $className)
     {
-        return $this->traverse($of, identity());
+        return $this->traverse($className, identity());
     }
 
-    public function concat(Set $s) : Set
+    protected function concat(Set $s) : Set
     {
         return new Set(...array_merge($this->xs, $s->toArray()));
     }
 
-    public function equals(Set $s)
+    protected function equals(Set $s)
     {
-        // Need equals regardless of order
         return empty(array_diff($s->toArray(), $this->xs))
             && empty(array_diff($this->xs, $s->toArray()));
     }
@@ -90,57 +107,57 @@ class Set
         }, new Set());
     }
 
-    public function bind(callable $f) : Set
+    protected function bind(callable $f) : Set
     {
         return $this->chain($f);
     }
 
-    public function flatMap(callable $f) : Set
+    protected function flatMap(callable $f) : Set
     {
         return $this->chain($f);
     }
 
-    public function union(Set $s) : Set
+    protected function union(Set $s) : Set
     {
         return $this->concat($s);
     }
 
-    public function intersection(Set $s) : Set
+    protected function intersect(Set $s) : Set
     {
         return $this->reduce(function ($prev, $curr) use ($s) {
             if ($this->contains($curr) && $s->contains($curr)) {
-                return $prev->concat($curr);
+                return $prev->concat(new Set($curr));
             }
             return $prev;
         }, new Set());
     }
 
-    public function difference(Set $s) : Set
+    protected function difference(Set $s) : Set
     {
         return $this->reduce(function ($prev, $curr) use ($s) {
             if ($this->contains($curr) && !$s->contains($curr)) {
-                return $prev->concat($curr);
+                return $prev->concat(new Set($curr));
             }
             return $prev;
         }, new Set());
     }
 
-    public function isSubsetOf(Set $s)
+    protected function isSubsetOf(Set $s)
     {
-        return $this->equals(Set::empty()) || $this->intersection($s)->equals($this);
+        return $this->equals(Set::empty()) || $this->intersect($s)->equals($this);
     }
 
-    public function isProperSubsetOf(Set $s)
+    protected function isProperSubsetOf(Set $s)
     {
         return $this->isSubsetOf($s) && !$this->equals($s);
     }
 
-    public function contains($x)
+    protected function contains($x)
     {
-        return Set::of($x)->isSubsetOf($this);
+        return in_array($x, $this->xs);
     }
 
-    public function size(Set $s) : int
+    public function size() : int
     {
         return count($this->xs);
     }
@@ -149,9 +166,19 @@ class Set
     {
         return $this->xs;
     }
+
+    public function toLinkedList() : LinkedList
+    {
+        return LinkedList::fromArray($this->xs);
+    }
+
+    public function toCollection() : Collection
+    {
+        return Collection::fromArray($this->xs);
+    }
 }
 
-function Set()
+function Set(...$args)
 {
-    return new Set(...func_get_args());
+    return new Set(...$args);
 }

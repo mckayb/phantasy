@@ -8,6 +8,8 @@ use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\LinkedList\{LinkedList, Cons, Nil};
 use Phantasy\DataTypes\Validation\Validation;
 use Phantasy\DataTypes\Writer\Writer;
+use Phantasy\DataTypes\Set\Set;
+use Phantasy\DataTypes\Collection\Collection;
 use function Phantasy\Core\{
     id,
     identity,
@@ -60,7 +62,13 @@ use function Phantasy\Core\{
     fold,
     foldMap,
     unfold,
-    mDo
+    mDo,
+    arrayToLinkedList,
+    arrayToCollection,
+    arrayToSet,
+    arrayFromLinkedList,
+    arrayFromCollection,
+    arrayFromSet
 };
 
 class TestVarClass
@@ -2029,4 +2037,199 @@ class FunctionsTest extends TestCase
     {
     }
     */
+
+    public function testArrayOf()
+    {
+        $this->assertEquals(of('array', 1), [1]);
+        $this->assertEquals(of('Array', 1), [1]);
+        $this->assertEquals(of([23], 1), [1]);
+    }
+
+    public function testArrayMap()
+    {
+        $this->assertEquals(
+            map(function ($x) {
+                return $x + 1;
+            }, [1, 2, 3]),
+            [2, 3, 4]
+        );
+    }
+
+    public function testArrayAp()
+    {
+        $this->assertEquals(
+            ap([concat('foo'), concat('bar')], ['baz', 'quux']),
+            ['foobaz', 'fooquux', 'barbaz', 'barquux']
+        );
+    }
+
+    public function testArrayChain()
+    {
+        $this->assertEquals(
+            chain(function ($x) {
+                return [$x + 1];
+            }, [1, 2, 3]),
+            [2, 3, 4]
+        );
+    }
+
+    public function testArrayEmpty()
+    {
+        $this->assertEquals(mempty('array'), []);
+    }
+
+    public function testArrayConcat()
+    {
+        $this->assertEquals(concat([1, 2, 3], [4, 5, 6]), [1, 2, 3, 4, 5, 6]);
+    }
+
+    public function testArrayReduce()
+    {
+        $this->assertEquals(reduce(function ($prev, $curr) {
+            return $prev + $curr;
+        }, 0, [1, 2, 3, 4, 5]), 15);
+    }
+
+    public function testArraySequence()
+    {
+        $a = [new Just(1), new Just(2), new Just(3)];
+        $this->assertEquals(
+            sequence(Maybe::class, $a),
+            new Just([1, 2, 3])
+        );
+
+        $b = [new Just(1), new Nothing()];
+        $this->assertEquals(
+            sequence(Maybe::class, $b),
+            new Nothing()
+        );
+    }
+
+    public function testArrayTraverse()
+    {
+        $a = [1, 2, 3];
+        $this->assertEquals(
+            traverse(Maybe::class, Maybe::fromNullable(), $a),
+            new Just([1, 2, 3])
+        );
+
+        $b = [1, null];
+        $this->assertEquals(
+            traverse(Maybe::class, Maybe::fromNullable(), $b),
+            new Nothing()
+        );
+    }
+
+    public function testArrayEquals()
+    {
+        $this->assertTrue(equals([1, 2], [1, 2]));
+        $this->assertFalse(equals(['1', '2'], [1, 2]));
+        $this->assertFalse(equals([1, 2], [2, 1]));
+    }
+
+    public function testArrayJoin()
+    {
+        $this->assertEquals(
+            join([[1, 2], [3, 4], [5, 6]]),
+            [1, 2, 3, 4, 5, 6]
+        );
+    }
+
+    public function testArrayToLinkedList()
+    {
+        $this->assertEquals(
+            arrayToLinkedList([1, 2, 3]),
+            new Cons(1, new Cons(2, new Cons(3, new Nil())))
+        );
+
+        $arrToLL = arrayToLinkedList();
+        $this->assertEquals(
+            $arrToLL([1, 2, 3]),
+            new Cons(1, new Cons(2, new Cons(3, new Nil())))
+        );
+
+        $this->assertEquals(
+            $arrToLL([]),
+            new Nil()
+        );
+    }
+
+    public function testArrayToSet()
+    {
+        $this->assertEquals(
+            arrayToSet([1, 2, 3]),
+            new Set(1, 2, 3)
+        );
+
+        $arrToSet = arrayToSet();
+        $this->assertEquals(
+            $arrToSet([1, 2, 3]),
+            new Set(1, 2, 3)
+        );
+
+        $this->assertEquals(
+            $arrToSet([]),
+            new Set()
+        );
+    }
+
+    public function testArrayToCollection()
+    {
+        $this->assertEquals(
+            arrayToCollection([1, 2, 3]),
+            new Collection(1, 2, 3)
+        );
+
+        $arrToCollection = arrayToCollection();
+        $this->assertEquals(
+            $arrToCollection([1, 2, 3]),
+            new Collection(1, 2, 3)
+        );
+
+        $this->assertEquals(
+            $arrToCollection([]),
+            new Collection()
+        );
+    }
+
+    public function testArrayFromSet()
+    {
+        $this->assertEquals(arrayFromSet(new Set(1, 2, 3, 4)), [1, 2, 3, 4]);
+
+        $arrFromSet = arrayFromSet();
+        $this->assertEquals($arrFromSet(new Set(1, 2, 3, 4)), [1, 2, 3, 4]);
+    }
+
+    public function testArrayFromLinkedList()
+    {
+        $this->assertEquals(
+            arrayFromLinkedList(new Cons(1, new Cons(2, new Cons(3, new Nil())))),
+            [1, 2, 3]
+        );
+
+        $arrFromLL = arrayFromLinkedList();
+        $this->assertEquals(
+            $arrFromLL(new Nil()),
+            []
+        );
+
+        $this->assertEquals(
+            $arrFromLL(new Cons(1, new Cons(2, new Cons(3, new Nil())))),
+            [1, 2, 3]
+        );
+    }
+
+    public function testArrayFromCollection()
+    {
+        $this->assertEquals(
+            arrayFromCollection(new Collection(1, 2, 3)),
+            [1, 2, 3]
+        );
+
+        $arrFromCollection = arrayFromCollection();
+        $this->assertEquals(
+            $arrFromCollection(new Collection(1, 2, 3)),
+            [1, 2, 3]
+        );
+    }
 }
