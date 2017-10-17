@@ -186,6 +186,14 @@ final class Set
     {
         return Collection::fromArray($this->xs);
     }
+
+    public function __toString() : string
+    {
+        $vals = implode(',', array_map(function ($x) {
+            return var_export($x, true);
+        }, $this->xs));
+        return "Set(" . $vals . ")";
+    }
 }
 
 function Set(...$args)

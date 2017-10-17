@@ -440,4 +440,33 @@ class CollectionTest extends TestCase
             Collection()
         );
     }
+
+    public function testToString()
+    {
+        $a = Collection([1, 2]);
+        $b = Collection('foo');
+        $c = Collection(12);
+
+        $expectedA = "Collection(array (\n  0 => 1,\n  1 => 2,\n))";
+        $expectedB = "Collection('foo')";
+        $expectedC = "Collection(12)";
+        ob_start();
+        echo $a;
+        $actualA = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        echo $b;
+        $actualB = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        echo $c;
+        $actualC = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEquals($expectedA, $actualA);
+        $this->assertEquals($expectedB, $actualB);
+        $this->assertEquals($expectedC, $actualC);
+    }
 }

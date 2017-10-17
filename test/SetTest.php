@@ -600,4 +600,33 @@ class SetTest extends TestCase
         $this->assertEquals(Set(1, 2, 'foo')->toLinkedList(), Cons(1, Cons(2, Cons('foo', Nil()))));
         $this->assertEquals(Set(1, 2, 3, 1)->toLinkedList(), Cons(1, Cons(2, Cons(3, Nil()))));
     }
+
+    public function testToString()
+    {
+        $a = Set([1, 2]);
+        $b = Set('foo');
+        $c = Set(12);
+
+        $expectedA = "Set(array (\n  0 => 1,\n  1 => 2,\n))";
+        $expectedB = "Set('foo')";
+        $expectedC = "Set(12)";
+        ob_start();
+        echo $a;
+        $actualA = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        echo $b;
+        $actualB = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        echo $c;
+        $actualC = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEquals($expectedA, $actualA);
+        $this->assertEquals($expectedB, $actualB);
+        $this->assertEquals($expectedC, $actualC);
+    }
 }
