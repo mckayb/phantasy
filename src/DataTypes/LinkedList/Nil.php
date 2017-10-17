@@ -4,6 +4,8 @@ namespace Phantasy\DataTypes\LinkedList;
 
 use Phantasy\Traits\CurryNonPublicMethods;
 use function Phantasy\Core\identity;
+use Phantasy\DataTypes\Set\Set;
+use Phantasy\DataTypes\Collection\Collection;
 
 final class Nil extends LinkedList
 {
@@ -83,6 +85,21 @@ final class Nil extends LinkedList
     public function tail() : LinkedList
     {
         return $this;
+    }
+
+    public function toSet() : Set
+    {
+        return new Set();
+    }
+
+    public function toCollection() : Collection
+    {
+        return new Collection();
+    }
+
+    public function toArray() : array
+    {
+        return [];
     }
 }
 

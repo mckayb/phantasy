@@ -10,6 +10,8 @@ use function Phantasy\Core\identity;
 use function Phantasy\DataTypes\LinkedList\{Cons, Nil};
 use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 use function Phantasy\DataTypes\Either\Right;
+use function Phantasy\DataTypes\Collection\Collection;
+use function Phantasy\DataTypes\Set\Set;
 
 class LinkedListTest extends TestCase
 {
@@ -699,5 +701,41 @@ class LinkedListTest extends TestCase
     public function testNilTail()
     {
         $this->assertEquals(Nil()->tail(), Nil());
+    }
+
+    public function testConsToArray()
+    {
+        $this->assertEquals(Cons(1, Nil())->toArray(), [1]);
+        $this->assertEquals(Cons(1, Cons(2, Nil()))->toArray(), [1, 2]);
+        $this->assertEquals(Cons(1, Cons(2, Cons(1, Nil())))->toArray(), [1, 2, 1]);
+    }
+
+    public function testNilToArray()
+    {
+        $this->assertEquals(Nil()->toArray(), []);
+    }
+
+    public function testConsToSet()
+    {
+        $this->assertEquals(Cons(1, Nil())->toSet(), Set(1));
+        $this->assertEquals(Cons(1, Cons(2, Nil()))->toSet(), Set(1, 2));
+        $this->assertEquals(Cons(1, Cons(2, Cons(1, Nil())))->toSet(), Set(1, 2));
+    }
+
+    public function testNilToSet()
+    {
+        $this->assertEquals(Nil()->toSet(), Set());
+    }
+
+    public function testConsToCollection()
+    {
+        $this->assertEquals(Cons(1, Nil())->toCollection(), Collection(1));
+        $this->assertEquals(Cons(1, Cons(2, Nil()))->toCollection(), Collection(1, 2));
+        $this->assertEquals(Cons(1, Cons(2, Cons(1, Nil())))->toCollection(), Collection(1, 2, 1));
+    }
+
+    public function testNilToCollection()
+    {
+        $this->assertEquals(Nil()->toCollection(), Collection());
     }
 }

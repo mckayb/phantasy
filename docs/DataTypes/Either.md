@@ -26,6 +26,16 @@ Either::fromNullable('left val', null);
 // Left('left val')
 ```
 
+#### static fromFalse ($failVal, $val) : Either
+If `$val` is false, it creates a `Left($failVal)`, otherwise it creates a `Right($val)`.
+```php
+Either::fromFalse('left val', 'right val');
+// Right('right val')
+
+Either::fromFalse('left val', false);
+// Left('left val')
+```
+
 #### static tryCatch (callable $f) : Either
 Performs a function that might throw an exception. If it succeeds,
 it stores the result in a `Right($f())`, otherwise, it returns a `Left($exception)`.

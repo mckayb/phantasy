@@ -28,6 +28,16 @@ Maybe::fromNullable($a); // Nothing()
 Maybe::fromNullable($b); // Just(12)
 ```
 
+#### static fromFalse ($val) : Maybe
+Checks the value that is passed in. If it's false, it returns a `Nothing()`,
+otherwise it returns a `Just($val)`.
+```php
+$a = false;
+$b = 12;
+Maybe::fromNullable($a); // Nothing()
+Maybe::fromNullable($b); // Just(12)
+```
+
 #### static tryCatch (callable $f) : Maybe
 Performs a function that might throw an exception. If it succeeds,
 it stores the result in a `Just`, with the value of the result of the function. If it throws an exception, it returns a `Nothing()`.

@@ -34,7 +34,9 @@
       "src/DataTypes/LinkedList/Nil.php",
       "src/DataTypes/Reader/Reader.php",
       "src/DataTypes/Writer/Writer.php",
-      "src/DataTypes/State/State.php"
+      "src/DataTypes/State/State.php",
+      "src/DataTypes/Set/Set.php",
+      "src/DataTypes/Collection/Collection.php"
     ]
   },
   "scripts": {

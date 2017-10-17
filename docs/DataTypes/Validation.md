@@ -27,6 +27,16 @@ Validation::fromNullable(0, $a); // Failure(0)
 Validation::fromNullable($b); // Success(12)
 ```
 
+#### static fromFalse ($failVal, $val) : Validation
+Checks the value that is passed in. If it's false, it returns a `Failure($failVal)`,
+otherwise it returns a `Success($val)`.
+```php
+$a = false;
+$b = 12;
+Validation::fromNullable(0, $a); // Failure(0)
+Validation::fromNullable($b); // Success(12)
+```
+
 #### static tryCatch (callable $f) : Validation
 Performs a function that might throw an exception. If it succeeds,
 it stores the result in a `Success`, with the value of the result of the function. If it throws an exception, it returns a `Failure` with the result of the exception.

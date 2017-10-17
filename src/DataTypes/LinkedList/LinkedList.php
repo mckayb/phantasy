@@ -5,6 +5,8 @@ namespace Phantasy\DataTypes\LinkedList;
 use Phantasy\DataTypes\LinkedList\{Cons, Nil};
 use Phantasy\Traits\CurryNonPublicMethods;
 use function Phantasy\Core\{reduce, curry};
+use Phantasy\DataTypes\Set\Set;
+use Phantasy\DataTypes\Collection\Collection;
 
 abstract class LinkedList
 {
@@ -24,6 +26,9 @@ abstract class LinkedList
     abstract public function __toString() : string;
     abstract public function head();
     abstract public function tail() : LinkedList;
+    abstract public function toSet() : Set;
+    abstract public function toCollection() : Collection;
+    abstract public function toArray() : array;
 
     final private static function of($x) : LinkedList
     {

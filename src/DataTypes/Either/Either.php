@@ -35,6 +35,11 @@ abstract class Either
         return new Right($val);
     }
 
+    final private static function fromFalse($failVal, $val) : Either
+    {
+        return $val === false ? new Left($failVal) : new Right($val);
+    }
+
     final private static function fromNullable($failVal, $val) : Either
     {
         return is_null($val) ? new Left($failVal) : new Right($val);

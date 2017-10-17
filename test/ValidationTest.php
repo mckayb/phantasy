@@ -70,6 +70,24 @@ class ValidationTest extends TestCase
         $this->assertEquals($defVal('foo'), Success('foo'));
     }
 
+    public function testValidationFromFalse()
+    {
+        $a = Validation::fromFalse('bar', 'foo');
+        $b = Validation::fromFalse('baz', false);
+
+        $this->assertInstanceOf(Success::class, $a);
+        $this->assertInstanceOf(Failure::class, $b);
+        $this->assertEquals(new Success('foo'), $a);
+        $this->assertEquals(new Failure('baz'), $b);
+    }
+
+    public function testValidationFromFalseCurried()
+    {
+        $fn = Validation::fromFalse('baz');
+        $this->assertEquals($fn(false), Failure('baz'));
+        $this->assertEquals($fn(12), Success(12));
+    }
+
     public function testValidationTryCatchSuccess()
     {
         $a = Validation::tryCatch(
