@@ -12,9 +12,13 @@ use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 use function Phantasy\DataTypes\Either\Right;
 use function Phantasy\DataTypes\Collection\Collection;
 use function Phantasy\DataTypes\Set\Set;
+use Phantasy\Test\Traits\FunctorTests;
 
 class LinkedListTest extends TestCase
 {
+    // protected $testClasses = [Cons::class, Nil::class];
+    // use FunctorTests;
+
     public function testConsNilFunc()
     {
         $this->assertEquals(Cons(12, Nil()), new Cons(12, new Nil()));

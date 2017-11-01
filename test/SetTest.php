@@ -1,4 +1,6 @@
-<?php
+<?php declare(strict_types=1);
+
+namespace Phantasy\Test;
 
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Set\Set;
@@ -8,9 +10,13 @@ use function Phantasy\DataTypes\LinkedList\{Cons, Nil};
 use function Phantasy\DataTypes\Collection\Collection;
 use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 use function Phantasy\Core\concat;
+use Phantasy\Test\Traits\FunctorTests;
 
 class SetTest extends TestCase
 {
+    protected $testClasses = [Set::class];
+    use FunctorTests;
+
     public function testFunc()
     {
         $this->assertEquals(new Set(1, 2, 3), Set(1, 2, 3));

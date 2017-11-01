@@ -9,9 +9,13 @@ use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 use function Phantasy\DataTypes\Validation\{Success, Failure};
 use function Phantasy\DataTypes\Maybe\Just;
 use function Phantasy\Core\identity;
+use Phantasy\Test\Traits\FunctorTests;
 
 class ValidationTest extends TestCase
 {
+    protected $testClasses = [Success::class, Failure::class];
+    use FunctorTests;
+
     public function testSuccessFunc()
     {
         $this->assertEquals(Success(12), new Success(12));

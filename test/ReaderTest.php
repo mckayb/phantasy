@@ -6,9 +6,13 @@ use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Reader\Reader;
 use function Phantasy\Core\concat;
 use function Phantasy\DataTypes\Reader\Reader;
+use Phantasy\Test\Traits\FunctorTests;
 
 class ReaderTest extends TestCase
 {
+    protected $testClasses = [Reader::class];
+    use FunctorTests;
+
     public function testReaderFunc()
     {
         $a = function ($x) {

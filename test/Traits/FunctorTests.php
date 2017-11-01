@@ -2,7 +2,7 @@
 
 namespace Phantasy\Test\Traits;
 
-use function Phantasy\Core\{of, id};
+use function Phantasy\Core\id;
 
 trait FunctorTests
 {
@@ -26,61 +26,49 @@ trait FunctorTests
                     $g = function ($x) {
                         return $x . 'baz';
                     };
+
                     $this->assertEquals($u->map(function ($x) use ($f, $g) {
                         return $f($g($x));
-                    }), $u->map($f)->map($g));
+                    }), $u->map($g)->map($f));
                     $successes++;
                 } catch (\Throwable $e) {
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) {
+                }
 
                 // the lazy-ones
-                try {
-                    // Identity
-                    $a = new $x(function () {
-                        return 1;
-                    });
-                    $b = (new $x(function () {
-                        return 1;
-                    }))->map(id());
-                    $this->assertEquals($a, $b);
+                if ($successes === 0) {
+                    try {
+                        // Identity
+                        $a = new $x(function () {
+                            return 1;
+                        });
+                        $b = (new $x(function () {
+                            return 1;
+                        }))->map(id());
+                        $this->assertEquals($a, $b);
 
-                    // Composition
-                    $u = new $x(function () {
-                        return 'foo';
-                    });
-                    $f = function ($x) {
-                        return $x . 'bar';
-                    };
-                    $g = function ($x) {
-                        return $x . 'baz';
-                    };
-                    $this->assertEquals($u->map(function ($x) use ($f, $g) {
-                        return $f($g($x));
-                    }), $u->map($f)->map($g));
-                    $successes++;
-                } catch (\Throwable $e) {
-                } catch (\Exception $e) {}
+                        // Composition
+                        $u = new $x(function () {
+                            return 'foo';
+                        });
+                        $f = function ($x) {
+                            return $x . 'bar';
+                        };
+                        $g = function ($x) {
+                            return $x . 'baz';
+                        };
+                        $this->assertEquals($u->map(function ($x) use ($f, $g) {
+                            return $f($g($x));
+                        }), $u->map($g)->map($f));
+                        $successes++;
+                    } catch (\Throwable $e) {
+                    } catch (\Exception $e) {
+                    }
+                }
             }
         }
         if ($successes === 0 || $successes !== count($this->testClasses ?? [])) {
             $this->fail();
         }
-    }
-
-    /**
-     * @depends testSetupFunctor
-     */
-    public function testFunctorIdentity($data)
-    {
-        $a = $data[0];
-        $this->assertEquals($a->map(id()), $a);
-    }
-
-    /**
-     * @depends testSetupFunctor
-     */
-    public function testFunctorComposition($data)
-    {
-
     }
 }

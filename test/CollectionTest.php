@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Phantasy\Test;
 
@@ -9,9 +9,13 @@ use Phantasy\DataTypes\LinkedList\{LinkedList, Cons, Nil};
 use Phantasy\DataTypes\Maybe\Maybe;
 use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 use function Phantasy\DataTypes\Collection\Collection;
+use Phantasy\Test\Traits\FunctorTests;
 
 class CollectionTest extends TestCase
 {
+    protected $testClasses = [Collection::class];
+    use FunctorTests;
+
     public function testCollectionFunc()
     {
         $this->assertEquals(Collection(1, 2, 3), new Collection(1, 2, 3));

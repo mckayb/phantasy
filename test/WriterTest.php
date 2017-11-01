@@ -8,9 +8,13 @@ use function Phantasy\Core\concat;
 use function Phantasy\DataTypes\Writer\Writer;
 use function Phantasy\DataTypes\Either\Right;
 use function Phantasy\DataTypes\Maybe\Just;
+use Phantasy\Test\Traits\FunctorTests;
 
 class WriterTest extends TestCase
 {
+    protected $testClasses = [Writer::class];
+    use FunctorTests;
+
     public function testWriterFunc()
     {
         $a = function () {

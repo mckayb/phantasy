@@ -5,9 +5,13 @@ namespace Phantasy\Test;
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\State\State;
 use function Phantasy\DataTypes\State\State;
+use Phantasy\Test\Traits\FunctorTests;
 
 class StateTest extends TestCase
 {
+    protected $testClasses = [State::class];
+    use FunctorTests;
+
     public function testStateFunc()
     {
         $a = function ($s) {
