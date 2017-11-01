@@ -20,7 +20,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Phantasy\\": "src/"
+      "Phantasy\\": "src/",
+      "Phantasy\\Test\\": "test/"
     },
     "files": [
       "src/Core/functions.php",
@@ -36,7 +37,8 @@
       "src/DataTypes/Writer/Writer.php",
       "src/DataTypes/State/State.php",
       "src/DataTypes/Set/Set.php",
-      "src/DataTypes/Collection/Collection.php"
+      "src/DataTypes/Collection/Collection.php",
+      "src/DataTypes/IO/IO.php"
     ]
   },
   "scripts": {
