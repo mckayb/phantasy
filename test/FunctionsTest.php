@@ -18,6 +18,7 @@ use function Phantasy\Core\{
     of,
     pure,
     constant,
+    flip,
     compose,
     composeK,
     curry,
@@ -52,7 +53,6 @@ use function Phantasy\Core\{
     concat,
     contramap,
     cmap,
-    flip,
     foldl,
     foldr,
     reduceRight,
@@ -246,6 +246,33 @@ class FunctionsTest extends TestCase
         };
 
         $this->assertEquals(pure($a, 'foo'), 'foobar');
+    }
+
+    public function testFlip()
+    {
+        $f = flip(concat());
+        $this->assertEquals($f('a', 'b'), 'ba');
+
+        $g = flip(function ($a, $b, $c, $d) {
+            return $a . $b . $c . $d;
+        });
+        $this->assertEquals($g('a', 'b', 'c', 'd'), 'bacd');
+
+        $appendA = $f('a');
+        $this->assertEquals($appendA('b'), 'ba');
+
+        $appendBa = $g('a', 'b');
+        $appendBac = $appendBa('c');
+        $this->assertEquals($appendBac('d'), 'bacd');
+
+        $h = flip(curry(function ($a, $b, $c, $d) {
+            return $a . $b. $c . $d;
+        }));
+        $this->assertEquals($h('a', 'b', 'c', 'd'), 'bacd');
+
+        $appendBa = $h('a', 'b');
+        $appendBac = $appendBa('c');
+        $this->assertEquals($appendBac('d'), 'bacd');
     }
 
     public function testCompose()

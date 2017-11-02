@@ -61,6 +61,18 @@ function compose(callable ...$fns)
     );
 }
 
+// +flip :: (a -> b -> c) -> b -> a -> c
+function flip(...$args)
+{
+    $flip = curry(function (callable $f) {
+        return curry(function ($a, $b, ...$args) use ($f) {
+            return curry($f)($b, $a, ...$args);
+        });
+    });
+
+    return $flip(...$args);
+}
+
 // +constant :: a -> (b -> a)
 function constant(...$args)
 {
