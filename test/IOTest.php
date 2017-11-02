@@ -3,15 +3,22 @@
 namespace Phantasy\Test;
 
 use PHPUnit\Framework\TestCase;
-use Phantasy\Test\Traits\FunctorTests;
+use Phantasy\Test\Traits\LawAssertions;
 use Phantasy\DataTypes\IO\IO;
 use function Phantasy\DataTypes\IO\IO;
 use function Phantasy\Core\curry;
 
 class IOTest extends TestCase
 {
-    protected $testClasses = [IO::class];
-    use FunctorTests;
+    use LawAssertions;
+
+    public function testLaws()
+    {
+        $a = IO(function ($x) {
+            return 'foo';
+        });
+        $this->assertFunctorLaws($a);
+    }
 
     public function testIOFunc()
     {

@@ -9,12 +9,19 @@ use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
 use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 use function Phantasy\DataTypes\Either\Right;
 use function Phantasy\Core\identity;
-use Phantasy\Test\Traits\FunctorTests;
+use Phantasy\Test\Traits\LawAssertions;
 
 class MaybeTest extends TestCase
 {
-    protected $testClasses = [Just::class, Nothing::class];
-    use FunctorTests;
+    use LawAssertions;
+
+    public function testLaws()
+    {
+        $a = Just('foo');
+        $b = Nothing();
+        $this->assertFunctorLaws($a);
+        $this->assertFunctorLaws($b);
+    }
 
     public function testJustFunc()
     {

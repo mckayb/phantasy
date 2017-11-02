@@ -10,12 +10,17 @@ use function Phantasy\DataTypes\LinkedList\{Cons, Nil};
 use function Phantasy\DataTypes\Collection\Collection;
 use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 use function Phantasy\Core\concat;
-use Phantasy\Test\Traits\FunctorTests;
+use Phantasy\Test\Traits\LawAssertions;
 
 class SetTest extends TestCase
 {
-    protected $testClasses = [Set::class];
-    use FunctorTests;
+    use LawAssertions;
+
+    public function testLaws()
+    {
+        $a = Set('foo');
+        $this->assertFunctorLaws($a);
+    }
 
     public function testFunc()
     {

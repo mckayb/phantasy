@@ -12,12 +12,19 @@ use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 use function Phantasy\DataTypes\Either\Right;
 use function Phantasy\DataTypes\Collection\Collection;
 use function Phantasy\DataTypes\Set\Set;
-use Phantasy\Test\Traits\FunctorTests;
+use Phantasy\Test\Traits\LawAssertions;
 
 class LinkedListTest extends TestCase
 {
-    // protected $testClasses = [Cons::class, Nil::class];
-    // use FunctorTests;
+    use LawAssertions;
+
+    public function testLaws()
+    {
+        $a = Cons('foo', Nil());
+        $b = Nil();
+        $this->assertFunctorLaws($a);
+        $this->assertFunctorLaws($b);
+    }
 
     public function testConsNilFunc()
     {

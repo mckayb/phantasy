@@ -9,12 +9,17 @@ use Phantasy\DataTypes\LinkedList\{LinkedList, Cons, Nil};
 use Phantasy\DataTypes\Maybe\Maybe;
 use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 use function Phantasy\DataTypes\Collection\Collection;
-use Phantasy\Test\Traits\FunctorTests;
+use Phantasy\Test\Traits\LawAssertions;
 
 class CollectionTest extends TestCase
 {
-    protected $testClasses = [Collection::class];
-    use FunctorTests;
+    use LawAssertions;
+
+    public function testLaws()
+    {
+        $a = Collection('foo', 'bar', 'baz');
+        $this->assertFunctorLaws($a);
+    }
 
     public function testCollectionFunc()
     {

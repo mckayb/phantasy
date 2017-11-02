@@ -5,12 +5,19 @@ namespace Phantasy\Test;
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\State\State;
 use function Phantasy\DataTypes\State\State;
-use Phantasy\Test\Traits\FunctorTests;
+use Phantasy\Test\Traits\LawAssertions;
 
 class StateTest extends TestCase
 {
-    protected $testClasses = [State::class];
-    use FunctorTests;
+    use LawAssertions;
+
+    public function testLaws()
+    {
+        $a = State(function ($x) {
+            return 'Hello';
+        });
+        $this->assertFunctorLaws($a);
+    }
 
     public function testStateFunc()
     {

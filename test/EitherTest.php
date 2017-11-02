@@ -10,12 +10,19 @@ use Phantasy\DataTypes\LinkedList\{Cons, Nil};
 use function Phantasy\DataTypes\Either\{Left, Right};
 use function Phantasy\DataTypes\Maybe\{Nothing, Just};
 use function Phantasy\Core\identity;
-use Phantasy\Test\Traits\FunctorTests;
+use Phantasy\Test\Traits\LawAssertions;
 
 class EitherTest extends TestCase
 {
-    protected $testClasses = [Left::class, Right::class];
-    use FunctorTests;
+    use LawAssertions;
+
+    public function testLaws()
+    {
+        $a = Left('foo');
+        $b = Right('foo');
+        $this->assertFunctorLaws($a);
+        $this->assertFunctorLaws($b);
+    }
 
     public function testLeftFunc()
     {
