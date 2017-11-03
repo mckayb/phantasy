@@ -15,6 +15,7 @@ class StateTest extends TestCase
     {
         $this->assertFunctorLaws(State::of());
         $this->assertApplyLaws(State::of());
+        $this->assertApplicativeLaws(State::class, State::of());
     }
 
     public function testStateFunc()

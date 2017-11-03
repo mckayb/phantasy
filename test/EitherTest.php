@@ -24,6 +24,8 @@ class EitherTest extends TestCase
         $this->assertSetoidLaws(Right());
         $this->assertApplyLaws(Left());
         $this->assertApplyLaws(Right());
+        $this->assertApplicativeLaws(Either::class, Left());
+        $this->assertApplicativeLaws(Either::class, Right());
     }
 
     public function testLeftFunc()

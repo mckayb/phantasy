@@ -21,6 +21,8 @@ class ValidationTest extends TestCase
         $this->assertFunctorLaws(Failure());
         $this->assertApplyLaws(Success());
         $this->assertApplyLaws(Failure());
+        $this->assertApplicativeLaws(Validation::class, Success());
+        $this->assertApplicativeLaws(Validation::class, Failure());
     }
 
     public function testSuccessFunc()

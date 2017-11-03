@@ -204,13 +204,12 @@ trait LawAssertions
                 );
 
                 // interchange
-                // TODO: FIX ME
-                // $this->assertEquals(
-                    // $clss::of($a)->ap($of($f)),
-                    // $of($f)->ap($clss::of(function ($f) use ($of, $a) {
-                        // return $f($of($a));
-                    // }))
-                // );
+                $this->assertEquals(
+                    $clss::of($a)->ap($of($f)),
+                    $of($f)->ap($clss::of(function ($f) use ($a) {
+                        return $f($a);
+                    }))
+                );
             });
     }
 

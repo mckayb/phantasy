@@ -16,6 +16,7 @@ class ReaderTest extends TestCase
     {
         $this->assertFunctorLaws(Reader::of());
         $this->assertApplyLaws(Reader::of());
+        $this->assertApplicativeLaws(Reader::class, Reader::of());
     }
 
     public function testReaderFunc()

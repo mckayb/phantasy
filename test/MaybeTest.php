@@ -25,6 +25,8 @@ class MaybeTest extends TestCase
         $this->assertFunctorLaws($n);
         $this->assertApplyLaws($n);
         $this->assertApplyLaws(Just());
+        $this->assertApplicativeLaws(Maybe::class, $n);
+        $this->assertApplicativeLaws(Maybe::class, Just());
     }
 
     public function testJustFunc()
