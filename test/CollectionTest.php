@@ -10,6 +10,7 @@ use Phantasy\DataTypes\Maybe\Maybe;
 use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 use function Phantasy\DataTypes\Collection\Collection;
 use Phantasy\Test\Traits\LawAssertions;
+use function Phantasy\Core\concat;
 
 class CollectionTest extends TestCase
 {
@@ -17,8 +18,10 @@ class CollectionTest extends TestCase
 
     public function testLaws()
     {
-        $a = Collection('foo', 'bar', 'baz');
-        $this->assertFunctorLaws($a);
+        $this->assertSetoidLaws(Collection::of());
+        $this->assertSemigroupLaws(Collection::of());
+        $this->assertMonoidLaws(Collection::class, Collection::of());
+        $this->assertFunctorLaws(Collection::of());
     }
 
     public function testCollectionFunc()

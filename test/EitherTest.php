@@ -18,10 +18,10 @@ class EitherTest extends TestCase
 
     public function testLaws()
     {
-        $a = Left('foo');
-        $b = Right('foo');
-        $this->assertFunctorLaws($a);
-        $this->assertFunctorLaws($b);
+        $this->assertFunctorLaws(Left());
+        $this->assertFunctorLaws(Right());
+        $this->assertSetoidLaws(Left());
+        $this->assertSetoidLaws(Right());
     }
 
     public function testLeftFunc()

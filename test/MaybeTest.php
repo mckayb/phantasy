@@ -17,10 +17,10 @@ class MaybeTest extends TestCase
 
     public function testLaws()
     {
-        $a = Just('foo');
-        $b = Nothing();
-        $this->assertFunctorLaws($a);
-        $this->assertFunctorLaws($b);
+        $this->assertFunctorLaws(Just());
+        $this->assertFunctorLaws(function ($x) {
+            return Nothing();
+        });
     }
 
     public function testJustFunc()

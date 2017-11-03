@@ -13,10 +13,7 @@ class StateTest extends TestCase
 
     public function testLaws()
     {
-        $a = State(function ($x) {
-            return 'Hello';
-        });
-        $this->assertFunctorLaws($a);
+        $this->assertFunctorLaws(State::of());
     }
 
     public function testStateFunc()
