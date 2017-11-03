@@ -28,6 +28,7 @@ class CollectionTest extends TestCase
         $this->assertPlusLaws(Collection::class, Collection::of());
         $this->assertAlternativeLaws(Collection::class, Collection::of());
         $this->assertMonadLaws(Collection::class, Collection::of());
+        $this->assertTraversableLaws(Collection::class, Collection::of());
     }
 
     public function testCollectionFunc()

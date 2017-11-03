@@ -3,6 +3,8 @@
 namespace Phantasy\Test\Traits;
 
 use function Phantasy\Core\{curry, compose, id, concat};
+use Phantasy\DataTypes\Maybe\Maybe;
+use Phantasy\DataTypes\Validation\Validation;
 use Eris\Generator;
 
 trait LawAssertions
@@ -280,8 +282,53 @@ trait LawAssertions
             });
     }
 
-    public function assertTraversableLaws($a)
+    public function assertTraversableLaws(string $clssName, callable $of)
     {
+        $this->forAll(Generator\int())
+            ->then(function ($a) use ($of) {
+                $t = function (Maybe $m) : Validation {
+                    return $m->toValidation(null);
+                };
+
+                // naturality
+                $this->assertEquals(
+                    $t($of(Maybe::of($a))->traverse(Maybe::class, id())),
+                    $of(Maybe::of($a))->traverse(Validation::class, $t)
+                );
+
+                // identity
+                $this->assertEquals(
+                    $of($a)->traverse(Maybe::class, Maybe::of()),
+                    Maybe::of($of($a))
+                );
+
+                $Compose = function ($c) {
+                    return new class ($c) {
+                        public $c = null;
+
+                        public function __construct($c)
+                        {
+                            $this->c = $c;
+                        }
+
+                        public function ap($fc)
+                        {
+                            return new static($this->c->ap($f->c->map(curry(function ($a, $b) {
+                                return $b->ap($a);
+                            }))));
+                        }
+
+                        public function map($f)
+                        {
+                            return new static($this->c->map(function ($y) {
+                                return $y->map($f);
+                            }));
+                        }
+                    };
+                };
+
+                // composition
+            });
     }
 
     public function assertChainLaws(callable $of)
