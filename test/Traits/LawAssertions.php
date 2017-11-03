@@ -213,63 +213,222 @@ trait LawAssertions
             });
     }
 
-    public function assertAltLaws($a)
+    public function assertAltLaws(callable $of)
     {
+        $this->forAll(Generator\int(), Generator\int(), Generator\int())
+            ->then(function ($a, $b, $c) use ($of) {
+                $f = function ($x) {
+                    return $x / 2;
+                };
 
+                // associativity
+                $this->assertEquals(
+                    $of($a)->alt($of($b))->alt($of($c)),
+                    $of($a)->alt($of($b)->alt($of($c)))
+                );
+
+                // distributivity
+                $this->assertEquals(
+                    $of($a)->alt($of($b))->map($f),
+                    $of($a)->map($f)->alt($of($b)->map($f))
+                );
+            });
     }
 
-    public function assertPlusLaws($a)
+    public function assertPlusLaws(string $clssName, callable $of)
     {
+        $this->forAll(Generator\int())
+            ->then(function ($a) use ($clssName, $of) {
+                $f = function ($x) {
+                    return $x + 1;
+                };
 
+                // right identity
+                $this->assertEquals($of($a)->alt($clssName::zero()), $of($a));
+
+                // left identity
+                $this->assertEquals($clssName::zero()->alt($of($a)), $of($a));
+
+                // annihilation
+                $this->assertEquals($clssName::zero()->map($f), $clssName::zero());
+            });
     }
 
-    public function assertAlternativeLaws($a)
+    public function assertAlternativeLaws(string $clssName, callable $of)
     {
+        $this->forAll(Generator\int())
+            ->then(function ($a) use ($clssName, $of) {
+                $f = function ($x) {
+                    return $x - 2;
+                };
 
-    }
+                $g = function ($x) {
+                    return $x % 4;
+                };
 
-    public function assertFoldableLaws($a)
-    {
+                // distributivity
+                $this->assertEquals(
+                    $of($a)->ap($of($f)->alt($of($g))),
+                    $of($a)->ap($of($f))->alt($of($a)->ap($of($g)))
+                );
 
+                // annihilation
+                $this->assertEquals(
+                    $of($a)->ap($clssName::zero()),
+                    $clssName::zero()
+                );
+            });
     }
 
     public function assertTraversableLaws($a)
     {
-
     }
 
-    public function assertChainLaws($a)
+    public function assertChainLaws(callable $of)
     {
+        $this->forAll(Generator\int())
+            ->then(function ($a) use ($of) {
+                $f = function ($x) use ($of) {
+                    return $of($x % 2);
+                };
+                $g = function ($x) use ($of) {
+                    return $of($x / 3);
+                };
 
+                // associativity
+                $this->assertEquals(
+                    $of($a)->chain($f)->chain($g),
+                    $of($a)->chain(function ($x) {
+                        return $f($x)->chain($g);
+                    })
+                );
+            });
     }
 
     public function assertChainRecLaws($a)
     {
-
     }
 
-    public function assertMonadLaws($a)
+    public function assertMonadLaws(string $clssName, callable $of)
     {
+        $this->forAll(Generator\int())
+            ->then(function ($a) use ($clssName, $of) {
+                $f = function ($x) use ($of) {
+                    return $of($x + 1);
+                };
 
+                // left identity
+                $this->assertEquals($clssName::of($a)->chain($f), $f($a));
+
+                // right identity
+                $this->assertEquals($of($a)->chain($clssName::of()), $of($a));
+            });
     }
 
-    public function assertExtendLaws($a)
+    public function assertExtendLaws(callable $of)
     {
+        $this->forAll(Generator\int())
+            ->then(function ($a) use ($of) {
+                $f = function ($x) use ($a) {
+                    return $a + 5;
+                };
 
+                $g = function ($x) use ($a) {
+                    return $a % 3;
+                };
+
+                $this->assertEquals(
+                    $of($a)->extend($g)->extend($f),
+                    $of($a)->extend(function ($w_) use ($f, $g) {
+                        return $f($w_->extend($g));
+                    })
+                );
+            });
     }
 
-    public function assertComonadLaws($a)
+    public function assertComonadLaws(callable $of)
     {
+        $this->forAll(Generator\int())
+            ->then(function ($a) use ($of) {
+                // left identity
+                $this->assertEquals(
+                    $of($a)->extend(function ($_w) {
+                        return $_w->extract();
+                    }),
+                    $of($a)
+                );
 
+                $f = function ($w) use ($a) {
+                    return $a + 5;
+                };
+
+                // right identity
+                $this->assertEquals(
+                    $of($a)->extend($f)->extract(),
+                    $f($of($a))
+                );
+            });
     }
 
-    public function assertBifunctorLaws($a)
+    public function assertBifunctorLaws(callable $of)
     {
+        $this->forAll(Generator\int())
+            ->then(function ($a) use ($of) {
+                // identity
+                $this->assertEquals($of($a)->bimap(id(), id()), $of($a));
 
+                $f = function ($x) {
+                    return $x + 2;
+                };
+
+                $g = function ($x) {
+                    return $x - 2;
+                };
+
+                $h = function ($x) {
+                    return $x / 2;
+                };
+
+                $i = function ($x) {
+                    return $x % 2;
+                };
+
+                // composition
+                $this->assertEquals(
+                    $of($a)->bimap(compose($f, $g), compose($h, $i)),
+                    $of($a)->bimap($g, $i)->bimap($f, $h)
+                );
+            });
     }
 
-    public function assertProfunctorLaws($a)
+    public function assertProfunctorLaws(callable $of)
     {
+        $this->forAll(Generator\int())
+            ->then(function ($a) use ($of) {
+                // identity
+                $this->assertEquals($of($a)->promap(id(), id()), $of($a));
 
+                $f = function ($x) {
+                    return $x + 2;
+                };
+
+                $g = function ($x) {
+                    return $x - 2;
+                };
+
+                $h = function ($x) {
+                    return $x / 2;
+                };
+
+                $i = function ($x) {
+                    return $x % 2;
+                };
+
+                // composition
+                $this->assertEquals(
+                    $of($a)->promap(compose($f, $g), compose($h, $i)),
+                    $of($a)->promap($f, $i)->bimap($g, $h)
+                );
+            });
     }
 }

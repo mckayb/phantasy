@@ -24,6 +24,10 @@ class CollectionTest extends TestCase
         $this->assertFunctorLaws(Collection::of());
         $this->assertApplyLaws(Collection::of());
         $this->assertApplicativeLaws(Collection::class, Collection::of());
+        $this->assertAltLaws(Collection::of());
+        $this->assertPlusLaws(Collection::class, Collection::of());
+        $this->assertAlternativeLaws(Collection::class, Collection::of());
+        $this->assertMonadLaws(Collection::class, Collection::of());
     }
 
     public function testCollectionFunc()

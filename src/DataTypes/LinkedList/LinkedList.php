@@ -22,6 +22,7 @@ abstract class LinkedList
     abstract protected function reduce(callable $f, $acc);
     abstract protected function traverse(string $className, callable $f);
     abstract protected function sequence(string $className);
+    abstract protected function alt(LinkedList $l) : LinkedList;
     abstract public function join() : LinkedList;
     abstract public function __toString() : string;
     abstract public function head();
@@ -43,6 +44,11 @@ abstract class LinkedList
     }
 
     final public static function empty() : LinkedList
+    {
+        return new Nil();
+    }
+
+    final public static function zero() : LinkedList
     {
         return new Nil();
     }

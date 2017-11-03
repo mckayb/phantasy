@@ -33,6 +33,8 @@ class LinkedListTest extends TestCase
         $this->assertApplyLaws($g);
         $this->assertApplicativeLaws(LinkedList::class, $f);
         $this->assertApplicativeLaws(LinkedList::class, $g);
+        $this->assertAltLaws($f);
+        $this->assertAltLaws($g);
     }
 
     public function testConsNilFunc()

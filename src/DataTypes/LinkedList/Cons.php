@@ -52,6 +52,11 @@ final class Cons extends LinkedList
         return new static($this->head, $this->tail->concat($c));
     }
 
+    protected function alt(LinkedList $c) : LinkedList
+    {
+        return $this->concat($c);
+    }
+
     protected function reduce(callable $f, $acc)
     {
         return $this->tail->reduce($f, $f($acc, $this->head));

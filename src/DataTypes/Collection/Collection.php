@@ -40,6 +40,11 @@ final class Collection
         return new Collection();
     }
 
+    public static function zero() : Collection
+    {
+        return new Collection();
+    }
+
     public function __construct(...$xs)
     {
         $this->xs = $xs;
@@ -65,6 +70,11 @@ final class Collection
     protected function concat(Collection $c) : Collection
     {
         return new Collection(...array_merge($this->xs, $c->toArray()));
+    }
+
+    protected function alt(Collection $c) : Collection
+    {
+        return $this->concat($c);
     }
 
     protected function reduce(callable $f, $acc)

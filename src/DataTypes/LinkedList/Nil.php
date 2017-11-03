@@ -41,6 +41,11 @@ final class Nil extends LinkedList
         return $c;
     }
 
+    protected function alt(LinkedList $l) : LinkedList
+    {
+        return $l;
+    }
+
     protected function reduce(callable $f, $acc)
     {
         return $acc;

@@ -37,6 +37,11 @@ final class Set
         return new Set();
     }
 
+    public static function zero() : Set
+    {
+        return new Set();
+    }
+
     private static function of($x) : Set
     {
         return new Set($x);
@@ -92,6 +97,11 @@ final class Set
     protected function concat(Set $s) : Set
     {
         return new Set(...array_merge($this->xs, $s->toArray()));
+    }
+
+    protected function alt(Set $s) : Set
+    {
+        return $this->concat($s);
     }
 
     protected function equals(Set $s)
