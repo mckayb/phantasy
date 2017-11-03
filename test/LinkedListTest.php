@@ -20,12 +20,17 @@ class LinkedListTest extends TestCase
 
     public function testLaws()
     {
-        $this->assertFunctorLaws(function ($x) {
+        $f = function ($x) {
             return Cons($x, Nil());
-        });
-        $this->assertFunctorLaws(function ($x) {
+        };
+        $g = function ($x) {
             return Nil();
-        });
+        };
+
+        $this->assertFunctorLaws($f);
+        $this->assertFunctorLaws($g);
+        $this->assertApplyLaws($f);
+        $this->assertApplyLaws($g);
     }
 
     public function testConsNilFunc()

@@ -15,6 +15,7 @@ class IOTest extends TestCase
     public function testLaws()
     {
         $this->assertFunctorLaws(IO::of());
+        $this->assertApplyLaws(IO::of());
     }
 
     public function testIOFunc()

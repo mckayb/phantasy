@@ -2,7 +2,7 @@
 
 namespace Phantasy\Test\Traits;
 
-use function Phantasy\Core\{compose, id, concat};
+use function Phantasy\Core\{curry, compose, id, concat};
 use Eris\Generator;
 
 trait LawAssertions
@@ -136,26 +136,82 @@ trait LawAssertions
                 // composition
                 $this->assertEquals(
                     $of($a)->map($g)->map($f),
-                    $of($a)->map(function ($x) use ($f, $g) {
-                        return $f($g($x));
-                    })
+                    $of($a)->map(compose($f, $g))
                 );
             });
     }
 
-    public function assertContravariantLaws($a)
+    public function assertContravariantLaws(callable $of)
     {
+        $this->forAll(Generator\string())
+            ->then(function ($a) use ($of) {
+                $f = concat('foo');
+                $g = concat('bar');
 
+                // identity
+                $this->assertEquals($of($a)->contramap(id()), $of($a));
+
+                // composition
+                $this->assertEquals(
+                    $of($a)->contramap(compose($f, $g)),
+                    $of($a)->contramap($f)->contramap($g)
+                );
+            });
     }
 
-    public function assertApplyLaws($a)
+    public function assertApplyLaws(callable $of)
     {
+        $this->forAll(Generator\int())
+            ->then(function ($a) use ($of) {
+                $f = function ($x) {
+                    return $x + 4;
+                };
 
+                $g = function ($y) {
+                    return $y / 2;
+                };
+
+                $compose = curry(function ($f, $g, $x) {
+                    return $f($g($x));
+                });
+
+                // composition
+                $this->assertEquals(
+                    $of($a)->ap($of($g)->ap($of($f)->map($compose))),
+                    $of($a)->ap($of($g))->ap($of($f))
+                );
+            });
     }
 
-    public function assertApplicativeLaws($a)
+    public function assertApplicativeLaws(string $clss, callable $of)
     {
+        $this->forAll(Generator\int())
+            ->then(function ($a) use ($of, $clss) {
+                $f = function ($x) {
+                    return $x + 4;
+                };
 
+                // identity
+                $this->assertEquals(
+                    $of($a)->ap($clss::of(id())),
+                    $of($a)
+                );
+
+                // homomorphism
+                $this->assertEquals(
+                    $clss::of($a)->ap($clss::of($f)),
+                    $clss::of($f($a))
+                );
+
+                // interchange
+                // TODO: FIX ME
+                // $this->assertEquals(
+                    // $clss::of($a)->ap($of($f)),
+                    // $of($f)->ap($clss::of(function ($f) use ($of, $a) {
+                        // return $f($of($a));
+                    // }))
+                // );
+            });
     }
 
     public function assertAltLaws($a)

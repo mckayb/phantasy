@@ -17,6 +17,7 @@ class WriterTest extends TestCase
     public function testLaws()
     {
         $this->assertFunctorLaws(Writer::of());
+        $this->assertApplyLaws(Writer::of());
     }
 
     public function testWriterFunc()

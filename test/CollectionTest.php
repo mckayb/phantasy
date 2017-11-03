@@ -22,6 +22,8 @@ class CollectionTest extends TestCase
         $this->assertSemigroupLaws(Collection::of());
         $this->assertMonoidLaws(Collection::class, Collection::of());
         $this->assertFunctorLaws(Collection::of());
+        $this->assertApplyLaws(Collection::of());
+        $this->assertApplicativeLaws(Collection::class, Collection::of());
     }
 
     public function testCollectionFunc()

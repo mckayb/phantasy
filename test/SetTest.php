@@ -19,6 +19,7 @@ class SetTest extends TestCase
     public function testLaws()
     {
         $this->assertFunctorLaws(Set::of());
+        $this->assertApplyLaws(Set::of());
     }
 
     public function testFunc()
