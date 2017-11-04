@@ -23,8 +23,8 @@ abstract class Either
     abstract protected function bimap(callable $f, callable $g) : Either;
     abstract protected function alt(Either $e) : Either;
     abstract protected function reduce(callable $f, $acc);
-    abstract protected function traverse(string $className, callable $f);
-    abstract protected function sequence(string $className);
+    abstract protected function traverse(callable $of, callable $f);
+    abstract protected function sequence(callable $of);
     abstract public function toMaybe() : Maybe;
     abstract public function toValidation() : Validation;
     abstract public function __toString() : string;

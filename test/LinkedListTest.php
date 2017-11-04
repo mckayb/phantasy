@@ -484,7 +484,7 @@ class LinkedListTest extends TestCase
     {
         $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
         $this->assertEquals(
-            $a->traverse(Either::class, function ($x) {
+            $a->traverse(Either::of(), function ($x) {
                 return $x->map(function ($y) {
                     return $y + 1;
                 });
@@ -503,7 +503,7 @@ class LinkedListTest extends TestCase
         };
 
         $this->assertEquals(
-            $a->traverse(Either::class, $toChar),
+            $a->traverse(Either::of(), $toChar),
             new Right(new Cons('A', new Cons('B', new Cons('C', new Cons('D', new Nil())))))
         );
     }
@@ -513,7 +513,7 @@ class LinkedListTest extends TestCase
         $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
 
         $this->assertEquals(
-            $a->traverse(Either::class, Either::of()),
+            $a->traverse(Either::of(), Either::of()),
             Either::of($a)
         );
     }
@@ -524,8 +524,8 @@ class LinkedListTest extends TestCase
         $t = function ($m) {
             return $m->toMaybe();
         };
-        $F = Either::class;
-        $G = Maybe::class;
+        $F = Either::of();
+        $G = Maybe::of();
         $this->assertEquals(
             $t($u->traverse($F, identity())),
             $u->traverse($G, $t)
@@ -538,7 +538,7 @@ class LinkedListTest extends TestCase
         $t = function ($m) {
             return $m->toMaybe();
         };
-        $G = Maybe::class;
+        $G = Maybe::of();
         $traverse = $u->traverse;
         $traverse_ = $u->traverse();
         $traverse__ = $traverse();
@@ -558,28 +558,11 @@ class LinkedListTest extends TestCase
         $this->assertEquals($traverseMaybe__($t), $expected);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testConsTraverseInvalidClass()
-    {
-        $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
-        $a->traverse('Foo\Bar', Either::of());
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testNilTraverseInvalidClass()
-    {
-        Nil()->traverse('Foo\Bar', Either::of());
-    }
-
     public function testNilTraverse()
     {
         $a = new Nil();
         $this->assertEquals(
-            $a->traverse(Either::class, function ($x) {
+            $a->traverse(Either::of(), function ($x) {
                 return $x + 1;
             }),
             new Right(new Nil())
@@ -591,7 +574,7 @@ class LinkedListTest extends TestCase
         $a = new Nil();
 
         $this->assertEquals(
-            $a->traverse(Either::class, identity()),
+            $a->traverse(Either::of(), identity()),
             Either::of($a)
         );
     }
@@ -602,8 +585,8 @@ class LinkedListTest extends TestCase
         $t = function ($m) {
             return $m->toMaybe();
         };
-        $F = Either::class;
-        $G = Maybe::class;
+        $F = Either::of();
+        $G = Maybe::of();
         $this->assertEquals(
             $t($u->traverse($F, identity())),
             $u->traverse($G, $t)
@@ -616,7 +599,7 @@ class LinkedListTest extends TestCase
         $t = function ($m) {
             return $m->toMaybe();
         };
-        $G = Maybe::class;
+        $G = Maybe::of();
 
         $traverse = $u->traverse;
         $traverse_ = $u->traverse();
@@ -641,7 +624,7 @@ class LinkedListTest extends TestCase
     {
         $a = new Cons(new Right(1), new Cons(new Right(2), new Nil()));
         $this->assertEquals(
-            $a->sequence(Either::class),
+            $a->sequence(Either::of()),
             new Right(new Cons(1, new Cons(2, new Nil())))
         );
     }
@@ -653,16 +636,16 @@ class LinkedListTest extends TestCase
         $seq = $a->sequence;
         $seq_ = $a->sequence();
         $seq__ = $seq();
-        $this->assertEquals($seq(Either::class), $expected);
-        $this->assertEquals($seq_(Either::class), $expected);
-        $this->assertEquals($seq__(Either::class), $expected);
+        $this->assertEquals($seq(Either::of()), $expected);
+        $this->assertEquals($seq_(Either::of()), $expected);
+        $this->assertEquals($seq__(Either::of()), $expected);
     }
 
     public function testNilSequence()
     {
         $a = new Nil();
         $this->assertEquals(
-            $a->sequence(Either::class),
+            $a->sequence(Either::of()),
             new Right(new Nil())
         );
     }
@@ -674,9 +657,9 @@ class LinkedListTest extends TestCase
         $seq = $a->sequence;
         $seq_ = $a->sequence();
         $seq__ = $seq();
-        $this->assertEquals($seq(Either::class), $expected);
-        $this->assertEquals($seq_(Either::class), $expected);
-        $this->assertEquals($seq__(Either::class), $expected);
+        $this->assertEquals($seq(Either::of()), $expected);
+        $this->assertEquals($seq_(Either::of()), $expected);
+        $this->assertEquals($seq__(Either::of()), $expected);
     }
 
     public function testConsToString()

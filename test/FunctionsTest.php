@@ -362,15 +362,6 @@ class FunctionsTest extends TestCase
         $this->assertEquals(zero($a), 'bar');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testSequenceInvalidArgument()
-    {
-        $a = new Nil();
-        sequence($a, 'Foo');
-    }
-
     public function testSequenceObjectWithSequenceMethod()
     {
         $a = new class () {
@@ -380,7 +371,7 @@ class FunctionsTest extends TestCase
             }
         };
 
-        $this->assertEquals(sequence(LinkedList::class, $a), 'foo');
+        $this->assertEquals(sequence(LinkedList::of(), $a), 'foo');
     }
 
     public function testSequenceObjectWithTraverseMethod()
@@ -392,13 +383,13 @@ class FunctionsTest extends TestCase
             }
         };
 
-        $this->assertEquals(sequence(LinkedList::class, $a), 'foo');
+        $this->assertEquals(sequence(LinkedList::of(), $a), 'foo');
     }
 
     public function testSequenceCurried()
     {
         $a = new Cons(new Right(1), new Nil());
-        $sequenceEither = sequence(Either::class);
+        $sequenceEither = sequence(Either::of());
         $this->assertEquals($sequenceEither($a), new Right(new Cons(1, new Nil())));
     }
 
@@ -410,7 +401,7 @@ class FunctionsTest extends TestCase
         };
 
         $this->assertEquals(
-            traverse(Maybe::class, $f, $a),
+            traverse(Maybe::of(), $f, $a),
             new Just(new Cons(1, new Nil()))
         );
     }
@@ -424,19 +415,9 @@ class FunctionsTest extends TestCase
             }
         };
 
-        $this->assertEquals(traverse(LinkedList::class, function ($x) {
+        $this->assertEquals(traverse(LinkedList::of(), function ($x) {
             return $x + 1;
         }, $a), 'foo');
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testTraverseInvalidArgument()
-    {
-        traverse('Foo', function ($x) {
-            return $x + 1;
-        }, null);
     }
 
     public function testTraverseCurried()
@@ -448,7 +429,7 @@ class FunctionsTest extends TestCase
             }
         };
 
-        $traverseLinkedList = traverse(LinkedList::class);
+        $traverseLinkedList = traverse(LinkedList::of());
         $traverseLLAddOne = $traverseLinkedList(function ($x) {
             return $x + 1;
         });
@@ -2121,13 +2102,13 @@ class FunctionsTest extends TestCase
     {
         $a = [new Just(1), new Just(2), new Just(3)];
         $this->assertEquals(
-            sequence(Maybe::class, $a),
+            sequence(Maybe::of(), $a),
             new Just([1, 2, 3])
         );
 
         $b = [new Just(1), new Nothing()];
         $this->assertEquals(
-            sequence(Maybe::class, $b),
+            sequence(Maybe::of(), $b),
             new Nothing()
         );
     }
@@ -2136,13 +2117,13 @@ class FunctionsTest extends TestCase
     {
         $a = [1, 2, 3];
         $this->assertEquals(
-            traverse(Maybe::class, Maybe::fromNullable(), $a),
+            traverse(Maybe::of(), Maybe::fromNullable(), $a),
             new Just([1, 2, 3])
         );
 
         $b = [1, null];
         $this->assertEquals(
-            traverse(Maybe::class, Maybe::fromNullable(), $b),
+            traverse(Maybe::of(), Maybe::fromNullable(), $b),
             new Nothing()
         );
     }

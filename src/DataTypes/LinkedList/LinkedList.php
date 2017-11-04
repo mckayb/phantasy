@@ -20,8 +20,8 @@ abstract class LinkedList
     abstract protected function bind(callable $f) : LinkedList;
     abstract protected function flatMap(callable $f) : LinkedList;
     abstract protected function reduce(callable $f, $acc);
-    abstract protected function traverse(string $className, callable $f);
-    abstract protected function sequence(string $className);
+    abstract protected function traverse(callable $of, callable $f);
+    abstract protected function sequence(callable $of);
     abstract protected function alt(LinkedList $l) : LinkedList;
     abstract public function join() : LinkedList;
     abstract public function __toString() : string;

@@ -981,20 +981,10 @@ class ValidationTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testSuccessTraverseInvalidClass()
-    {
-        Success(1)->traverse('FOO', function ($x) {
-            return $x . 'bar';
-        });
-    }
-
     public function testSuccessTraverse()
     {
         $this->assertEquals(
-            Success(1)->traverse(Maybe::class, function ($x) {
+            Success(1)->traverse(Maybe::of(), function ($x) {
                 return Just($x + 1);
             }),
             Just(Success(2))
@@ -1008,9 +998,9 @@ class ValidationTest extends TestCase
         $trav_ = $a->traverse();
         $trav__ = $trav();
 
-        $travMaybe = $trav(Maybe::class);
-        $travMaybe_ = $trav_(Maybe::class);
-        $travMaybe__ = $trav__(Maybe::class);
+        $travMaybe = $trav(Maybe::of());
+        $travMaybe_ = $trav_(Maybe::of());
+        $travMaybe__ = $trav__(Maybe::of());
 
         $f = function ($x) {
             return Just($x + 1);
@@ -1018,9 +1008,9 @@ class ValidationTest extends TestCase
 
         $expected = Just(Success(2));
 
-        $this->assertEquals($trav(Maybe::class, $f), $expected);
-        $this->assertEquals($trav_(Maybe::class, $f), $expected);
-        $this->assertEquals($trav__(Maybe::class, $f), $expected);
+        $this->assertEquals($trav(Maybe::of(), $f), $expected);
+        $this->assertEquals($trav_(Maybe::of(), $f), $expected);
+        $this->assertEquals($trav__(Maybe::of(), $f), $expected);
         $this->assertEquals($travMaybe($f), $expected);
         $this->assertEquals($travMaybe_($f), $expected);
         $this->assertEquals($travMaybe__($f), $expected);
@@ -1031,7 +1021,7 @@ class ValidationTest extends TestCase
         $a = Success(Just(1));
 
         $this->assertEquals(
-            $a->traverse(Maybe::class, Maybe::of()),
+            $a->traverse(Maybe::of(), Maybe::of()),
             Maybe::of($a)
         );
     }
@@ -1042,26 +1032,18 @@ class ValidationTest extends TestCase
         $t = function (Maybe $m) : Either {
             return $m->toEither(null);
         };
-        $F = Maybe::class;
-        $G = Either::class;
+        $F = Maybe::of();
+        $G = Either::of();
         $this->assertEquals(
             $t($u->traverse($F, identity())),
             $u->traverse($G, $t)
         );
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testSuccessSequenceInvalidClass()
-    {
-        Success(1)->sequence('FOO');
-    }
-
     public function testSuccessSequence()
     {
         $this->assertEquals(
-            Success(Just(1))->sequence(Maybe::class),
+            Success(Just(1))->sequence(Maybe::of()),
             Just(Success(1))
         );
     }
@@ -1074,25 +1056,15 @@ class ValidationTest extends TestCase
         $seq__ = $seq();
 
         $expected = Just(Success(1));
-        $this->assertEquals($seq(Maybe::class), $expected);
-        $this->assertEquals($seq_(Maybe::class), $expected);
-        $this->assertEquals($seq__(Maybe::class), $expected);
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testFailureTraverseInvalidClass()
-    {
-        Failure('foo')->traverse('FOO', function ($x) {
-            return $x . 'bar';
-        });
+        $this->assertEquals($seq(Maybe::of()), $expected);
+        $this->assertEquals($seq_(Maybe::of()), $expected);
+        $this->assertEquals($seq__(Maybe::of()), $expected);
     }
 
     public function testFailureTraverse()
     {
         $this->assertEquals(
-            Failure('foo')->traverse(Maybe::class, function ($x) {
+            Failure('foo')->traverse(Maybe::of(), function ($x) {
                 return $x . 'bar';
             }),
             Just(Failure('foo'))
@@ -1112,9 +1084,9 @@ class ValidationTest extends TestCase
 
         $expected = Just(Failure('foo'));
 
-        $this->assertEquals($trav(Maybe::class, $f), $expected);
-        $this->assertEquals($trav_(Maybe::class, $f), $expected);
-        $this->assertEquals($trav__(Maybe::class, $f), $expected);
+        $this->assertEquals($trav(Maybe::of(), $f), $expected);
+        $this->assertEquals($trav_(Maybe::of(), $f), $expected);
+        $this->assertEquals($trav__(Maybe::of(), $f), $expected);
     }
 
     public function testFailureTraverseIdentity()
@@ -1122,7 +1094,7 @@ class ValidationTest extends TestCase
         $a = Failure('Failed');
 
         $this->assertEquals(
-            $a->traverse(Maybe::class, Maybe::of()),
+            $a->traverse(Maybe::of(), Maybe::of()),
             Maybe::of($a)
         );
     }
@@ -1133,25 +1105,18 @@ class ValidationTest extends TestCase
         $t = function (Maybe $m) : Either {
             return $m->toEither(10);
         };
-        $F = Maybe::class;
-        $G = Either::class;
+        $F = Maybe::of();
+        $G = Either::of();
         $this->assertEquals(
             $t($u->traverse($F, identity())),
             $u->traverse($G, $t)
         );
     }
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testFailureSequenceInvalidClass()
-    {
-        Failure(1)->sequence('FOO');
-    }
 
     public function testFailureSequence()
     {
         $this->assertEquals(
-            Failure('Request Failed')->sequence(Maybe::class),
+            Failure('Request Failed')->sequence(Maybe::of()),
             Just(Failure('Request Failed'))
         );
     }
@@ -1164,8 +1129,8 @@ class ValidationTest extends TestCase
         $seq__ = $seq();
 
         $expected = Just(Failure('Request Failed'));
-        $this->assertEquals($seq(Maybe::class), $expected);
-        $this->assertEquals($seq_(Maybe::class), $expected);
-        $this->assertEquals($seq__(Maybe::class), $expected);
+        $this->assertEquals($seq(Maybe::of()), $expected);
+        $this->assertEquals($seq_(Maybe::of()), $expected);
+        $this->assertEquals($seq__(Maybe::of()), $expected);
     }
 }

@@ -251,10 +251,10 @@ class CollectionTest extends TestCase
 
     public function testSequence()
     {
-        $a = Collection(Just(1), Just(2), Just(3))->sequence(Maybe::class);
+        $a = Collection(Just(1), Just(2), Just(3))->sequence(Maybe::of());
         $this->assertEquals($a, Just(Collection(1, 2, 3)));
 
-        $b = Collection(Just(1), Just(2), Nothing())->sequence(Maybe::class);
+        $b = Collection(Just(1), Just(2), Nothing())->sequence(Maybe::of());
         $this->assertEquals($b, Nothing());
     }
 
@@ -267,25 +267,17 @@ class CollectionTest extends TestCase
         $seq_ = $a->sequence();
         $seq__ = $seq();
 
-        $this->assertEquals($seq(Maybe::class), $e);
-        $this->assertEquals($seq_(Maybe::class), $e);
-        $this->assertEquals($seq__(Maybe::class), $e);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testTraverseInvalid()
-    {
-        $a = Collection(1, 2, 3)->traverse('Foo', Maybe::fromNullable());
+        $this->assertEquals($seq(Maybe::of()), $e);
+        $this->assertEquals($seq_(Maybe::of()), $e);
+        $this->assertEquals($seq__(Maybe::of()), $e);
     }
 
     public function testTraverse()
     {
-        $a = Collection(1, 2, 3)->traverse(Maybe::class, Maybe::fromNullable());
+        $a = Collection(1, 2, 3)->traverse(Maybe::of(), Maybe::fromNullable());
         $this->assertEquals($a, Just(Collection(1, 2, 3)));
 
-        $b = Collection(1, 2, null)->traverse(Maybe::class, Maybe::fromNullable());
+        $b = Collection(1, 2, null)->traverse(Maybe::of(), Maybe::fromNullable());
         $this->assertEquals($b, Nothing());
     }
 
@@ -301,13 +293,13 @@ class CollectionTest extends TestCase
         $atraverse_ = $a->traverse();
         $atraverse__ = $atraverse();
 
-        $atraverseMaybe = $atraverse(Maybe::class);
-        $atraverseMaybe_ = $atraverse_(Maybe::class);
-        $atraverseMaybe__ = $atraverse__(Maybe::class);
+        $atraverseMaybe = $atraverse(Maybe::of());
+        $atraverseMaybe_ = $atraverse_(Maybe::of());
+        $atraverseMaybe__ = $atraverse__(Maybe::of());
 
-        $this->assertEquals($atraverse(Maybe::class, $f), $ae);
-        $this->assertEquals($atraverse_(Maybe::class, $f), $ae);
-        $this->assertEquals($atraverse__(Maybe::class, $f), $ae);
+        $this->assertEquals($atraverse(Maybe::of(), $f), $ae);
+        $this->assertEquals($atraverse_(Maybe::of(), $f), $ae);
+        $this->assertEquals($atraverse__(Maybe::of(), $f), $ae);
         $this->assertEquals($atraverseMaybe($f), $ae);
         $this->assertEquals($atraverseMaybe_($f), $ae);
         $this->assertEquals($atraverseMaybe__($f), $ae);
@@ -316,13 +308,13 @@ class CollectionTest extends TestCase
         $btraverse_ = $b->traverse();
         $btraverse__ = $btraverse();
 
-        $btraverseMaybe = $btraverse(Maybe::class);
-        $btraverseMaybe_ = $btraverse_(Maybe::class);
-        $btraverseMaybe__ = $btraverse__(Maybe::class);
+        $btraverseMaybe = $btraverse(Maybe::of());
+        $btraverseMaybe_ = $btraverse_(Maybe::of());
+        $btraverseMaybe__ = $btraverse__(Maybe::of());
 
-        $this->assertEquals($btraverse(Maybe::class, $f), $be);
-        $this->assertEquals($btraverse_(Maybe::class, $f), $be);
-        $this->assertEquals($btraverse__(Maybe::class, $f), $be);
+        $this->assertEquals($btraverse(Maybe::of(), $f), $be);
+        $this->assertEquals($btraverse_(Maybe::of(), $f), $be);
+        $this->assertEquals($btraverse__(Maybe::of(), $f), $be);
         $this->assertEquals($btraverseMaybe($f), $be);
         $this->assertEquals($btraverseMaybe_($f), $be);
         $this->assertEquals($btraverseMaybe__($f), $be);

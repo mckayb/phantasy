@@ -308,20 +308,10 @@ class MaybeTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testJustTraverseInvalidClass()
-    {
-        Just(1)->traverse('FOO', function ($x) {
-            return $x . 'bar';
-        });
-    }
-
     public function testJustTraverse()
     {
         $this->assertEquals(
-            Just(1)->traverse(Either::class, function ($x) {
+            Just(1)->traverse(Either::of(), function ($x) {
                 return Right($x + 1);
             }),
             Right(Just(2))
@@ -341,9 +331,9 @@ class MaybeTest extends TestCase
 
         $expected = Right(Just(2));
 
-        $this->assertEquals($trav(Either::class, $f), $expected);
-        $this->assertEquals($trav_(Either::class, $f), $expected);
-        $this->assertEquals($trav__(Either::class, $f), $expected);
+        $this->assertEquals($trav(Either::of(), $f), $expected);
+        $this->assertEquals($trav_(Either::of(), $f), $expected);
+        $this->assertEquals($trav__(Either::of(), $f), $expected);
     }
 
     public function testJustTraverseIdentity()
@@ -351,7 +341,7 @@ class MaybeTest extends TestCase
         $a = Just(Right(1));
 
         $this->assertEquals(
-            $a->traverse(Either::class, Either::of()),
+            $a->traverse(Either::of(), Either::of()),
             Either::of($a)
         );
     }
@@ -362,26 +352,18 @@ class MaybeTest extends TestCase
         $t = function (Either $m) : Validation {
             return $m->toValidation();
         };
-        $F = Either::class;
-        $G = Validation::class;
+        $F = Either::of();
+        $G = Validation::of();
         $this->assertEquals(
             $t($u->traverse($F, identity())),
             $u->traverse($G, $t)
         );
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testJustSequenceInvalidClass()
-    {
-        Just(1)->sequence('FOO');
-    }
-
     public function testJustSequence()
     {
         $this->assertEquals(
-            Just(Right(1))->sequence(Either::class),
+            Just(Right(1))->sequence(Either::of()),
             Right(Just(1))
         );
     }
@@ -394,25 +376,15 @@ class MaybeTest extends TestCase
         $seq__ = $seq();
 
         $expected = Right(Just(1));
-        $this->assertEquals($seq(Either::class), $expected);
-        $this->assertEquals($seq_(Either::class), $expected);
-        $this->assertEquals($seq__(Either::class), $expected);
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testNothingTraverseInvalidClass()
-    {
-        Nothing()->traverse('FOO', function ($x) {
-            return $x . 'bar';
-        });
+        $this->assertEquals($seq(Either::of()), $expected);
+        $this->assertEquals($seq_(Either::of()), $expected);
+        $this->assertEquals($seq__(Either::of()), $expected);
     }
 
     public function testNothingTraverse()
     {
         $this->assertEquals(
-            Nothing()->traverse(Either::class, function ($x) {
+            Nothing()->traverse(Either::of(), function ($x) {
                 return Right($x + 1);
             }),
             Right(Nothing())
@@ -432,9 +404,9 @@ class MaybeTest extends TestCase
 
         $expected = Right(Nothing());
 
-        $this->assertEquals($trav(Either::class, $f), $expected);
-        $this->assertEquals($trav_(Either::class, $f), $expected);
-        $this->assertEquals($trav__(Either::class, $f), $expected);
+        $this->assertEquals($trav(Either::of(), $f), $expected);
+        $this->assertEquals($trav_(Either::of(), $f), $expected);
+        $this->assertEquals($trav__(Either::of(), $f), $expected);
     }
 
     public function testNothingTraverseIdentity()
@@ -442,7 +414,7 @@ class MaybeTest extends TestCase
         $a = Nothing();
 
         $this->assertEquals(
-            $a->traverse(Either::class, Either::of()),
+            $a->traverse(Either::of(), Either::of()),
             Either::of($a)
         );
     }
@@ -453,8 +425,8 @@ class MaybeTest extends TestCase
         $t = function ($m) {
             return $m->toValidation();
         };
-        $F = Either::class;
-        $G = Validation::class;
+        $F = Either::of();
+        $G = Validation::of();
 
         $this->assertEquals(
             $t($u->traverse($F, identity())),
@@ -462,18 +434,10 @@ class MaybeTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testNothingSequenceInvalidClass()
-    {
-        Nothing()->sequence('FOO');
-    }
-
     public function testNothingSequence()
     {
         $this->assertEquals(
-            Nothing()->sequence(Either::class),
+            Nothing()->sequence(Either::of()),
             Right(Nothing())
         );
     }
@@ -486,9 +450,9 @@ class MaybeTest extends TestCase
         $seq__ = $seq();
 
         $expected = Right(Nothing());
-        $this->assertEquals($seq(Either::class), $expected);
-        $this->assertEquals($seq_(Either::class), $expected);
-        $this->assertEquals($seq__(Either::class), $expected);
+        $this->assertEquals($seq(Either::of()), $expected);
+        $this->assertEquals($seq_(Either::of()), $expected);
+        $this->assertEquals($seq__(Either::of()), $expected);
     }
 
     public function testJustAltCurried()

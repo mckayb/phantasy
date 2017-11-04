@@ -5,7 +5,7 @@ namespace Phantasy\DataTypes\Collection;
 use Phantasy\Traits\CurryNonPublicMethods;
 use Phantasy\DataTypes\Set\Set;
 use Phantasy\DataTypes\LinkedList\LinkedList;
-use function Phantasy\Core\{curry, map, concat, identity, head, tail};
+use function Phantasy\Core\{curry, map, concat, identity, head, tail, liftA2};
 
 final class Collection
 {
@@ -82,24 +82,21 @@ final class Collection
         return array_reduce($this->xs, $f, $acc);
     }
 
-    protected function traverse(string $className, callable $f)
+    protected function traverse(callable $of, callable $f)
     {
-        if (!class_exists($className) || !is_callable([$className, 'of'])) {
-            throw new \InvalidArgumentException(
-                'Method must be a class name of an Applicative (must have an \'of\' method).'
-            );
-        }
-
         return $this->reduce(function ($ys, $x) use ($f) {
-            return $ys->ap($f($x)->map(curry(function ($a, $b) {
+            // $ys = Compose(Collection())
+            // $x = Compose(Just(Success(0)))
+            // $f($x) = Compose(Just(Success(0)))
+            return liftA2(curry(function ($a, $b) {
                 return $b->concat(Collection::of($a));
-            })));
-        }, call_user_func([$className, 'of'], Collection::empty()));
+            }), $f($x), $ys);
+        }, call_user_func($of, Collection::empty()));
     }
 
-    protected function sequence(string $className)
+    protected function sequence(callable $of)
     {
-        return $this->traverse($className, identity());
+        return $this->traverse($of, identity());
     }
 
     protected function equals(Collection $c) : bool

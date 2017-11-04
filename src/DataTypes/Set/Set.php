@@ -74,24 +74,18 @@ final class Set
         return array_reduce($this->xs, $f, $acc);
     }
 
-    protected function traverse(string $className, callable $f)
+    protected function traverse(callable $of, callable $f)
     {
-        if (!class_exists($className) || !is_callable([$className, 'of'])) {
-            throw new \InvalidArgumentException(
-                'Method must be a class name of an Applicative (must have an \'of\' method).'
-            );
-        }
-
         return $this->reduce(function ($ys, $x) use ($f) {
             return $ys->ap($f($x)->map(curry(function ($a, $b) {
                 return $b->concat(Set::of($a));
             })));
-        }, call_user_func([$className, 'of'], Set::empty()));
+        }, call_user_func($of, Set::empty()));
     }
 
-    protected function sequence(string $className)
+    protected function sequence(callable $of)
     {
-        return $this->traverse($className, identity());
+        return $this->traverse($of, identity());
     }
 
     protected function concat(Set $s) : Set

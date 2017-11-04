@@ -56,20 +56,14 @@ final class Nil extends LinkedList
         return $this;
     }
 
-    protected function traverse(string $className, callable $f)
+    protected function traverse(callable $of, callable $f)
     {
-        if (!class_exists($className) || !is_callable([$className, 'of'])) {
-            throw new \InvalidArgumentException(
-                'Method must be a class name of an Applicative (must have an of method).'
-            );
-        }
-
-        return call_user_func([$className, 'of'], new Nil());
+        return call_user_func($of, new Nil());
     }
 
-    protected function sequence(string $className)
+    protected function sequence(callable $of)
     {
-        return $this->traverse($className, identity());
+        return $this->traverse($of, identity());
     }
 
     protected function bind(callable $f) : LinkedList

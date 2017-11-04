@@ -292,42 +292,71 @@ trait LawAssertions
 
                 // naturality
                 $this->assertEquals(
-                    $t($of(Maybe::of($a))->traverse(Maybe::class, id())),
-                    $of(Maybe::of($a))->traverse(Validation::class, $t)
+                    $t($of(Maybe::of($a))->traverse(Maybe::of(), id())),
+                    $of(Maybe::of($a))->traverse(Validation::of(), $t)
                 );
 
                 // identity
                 $this->assertEquals(
-                    $of($a)->traverse(Maybe::class, Maybe::of()),
+                    $of($a)->traverse(Maybe::of(), Maybe::of()),
                     Maybe::of($of($a))
                 );
 
-                $Compose = function ($c) {
-                    return new class ($c) {
-                        public $c = null;
+                $F = Maybe::of();
+                $G = Validation::of();
 
-                        public function __construct($c)
-                        {
-                            $this->c = $c;
-                        }
+                $Compose = new class (null, $F, $G) {
+                    private $c = null;
+                    private $F = null;
+                    private $G = null;
 
-                        public function ap($fc)
-                        {
-                            return new static($this->c->ap($f->c->map(curry(function ($a, $b) {
-                                return $b->ap($a);
-                            }))));
-                        }
+                    public function __construct($c = null, $F = null, $G = null)
+                    {
+                        $this->c = $c;
+                        $this->F = $F;
+                        $this->G = $G;
+                    }
 
-                        public function map($f)
-                        {
-                            return new static($this->c->map(function ($y) {
-                                return $y->map($f);
-                            }));
-                        }
-                    };
+                    public function __invoke($c)
+                    {
+                        return new static($c, $this->F, $this->G);
+                    }
+
+                    public function of($x)
+                    {
+                        $F = $this->F;
+                        $G = $this->G;
+                        return new static($F($G($x)), $this->F, $this->G);
+                    }
+
+                    public function ap($fc)
+                    {
+                        return new static($this->c->ap($fc->c->map(curry(function ($a, $b) {
+                            return $b->ap($a);
+                        }))), $this->F, $this->G);
+                    }
+
+                    public function map(callable $f)
+                    {
+                        return new static($this->c->map(function ($y) use ($f) {
+                            return $y->map($f);
+                        }), $this->F, $this->G);
+                    }
                 };
 
-                // composition
+                // composition - TODO: FIX ME
+                // t(F(G(x))) -- t Traversable; F,G Applicative
+                /* $this->assertEquals(
+                    // This part works...
+                    $Compose($of($F($G($a)))
+                        ->traverse($F, id())
+                        ->map(function ($x) use ($G) {
+                            return $x->traverse($G, id());
+                        })),
+
+                    // This part doesn't...
+                    $of($F($G($a)))->traverse($Compose, $Compose)
+                ); */
             });
     }
 
