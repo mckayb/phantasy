@@ -35,6 +35,8 @@ class LinkedListTest extends TestCase
         $this->assertApplicativeLaws(LinkedList::class, $g);
         $this->assertAltLaws($f);
         $this->assertAltLaws($g);
+        $this->assertTraversableLaws(LinkedList::class, $f);
+        $this->assertTraversableLaws(LinkedList::class, $g);
     }
 
     public function testConsNilFunc()

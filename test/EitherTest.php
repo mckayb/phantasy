@@ -28,8 +28,9 @@ class EitherTest extends TestCase
         $this->assertApplicativeLaws(Either::class, Right());
         $this->assertAltLaws(Left());
         $this->assertAltLaws(Right());
-        $this->assertPlusLaws(Left::class, Left());
-        $this->assertPlusLaws(Right::class, Right());
+        // $this->assertPlusLaws(Either::class, Left());
+        // $this->assertPlusLaws(Either::class, Right());
+        $this->assertTraversableLaws(Either::class, Right());
     }
 
     public function testLeftFunc()

@@ -68,7 +68,7 @@ class IOTest extends TestCase
     public function testIOMap()
     {
         $a = IO(function () {
-            return file_get_contents(dirname(__FILE__) . '/Fixtures/config.json');
+            return file_get_contents(dirname(__FILE__) . '/fixtures/config.json');
         })->map(function ($x) {
             return json_decode($x, true);
         })->run();
@@ -83,7 +83,7 @@ class IOTest extends TestCase
         };
 
         $a = IO(function () {
-            return file_get_contents(dirname(__FILE__) . '/Fixtures/config.json');
+            return file_get_contents(dirname(__FILE__) . '/fixtures/config.json');
         });
         $map = $a->map;
         $map_ = $a->map();

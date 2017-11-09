@@ -90,7 +90,7 @@ class DocsTest extends TestCase
             return 'Error: ' . $e;
         };
 
-        $a = $getContents('test/Fixtures/config.json')
+        $a = $getContents('test/fixtures/config.json')
             ->chain($parseJSON)
             ->map(prop('DB_HOST'))
             ->fold($handleError, function ($x) {

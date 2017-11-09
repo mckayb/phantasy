@@ -529,7 +529,6 @@ function liftA2(...$args)
 {
     $liftA2 = curry(function (callable $f, $a1, $a2) {
         return ap(map($f, $a1), $a2);
-        // return call_user_func([$a2, 'ap'], call_user_func([$a1, 'map'], $f));
     });
 
     return $liftA2(...$args);

@@ -2,9 +2,11 @@
 
 namespace Phantasy\Test\Traits;
 
-use function Phantasy\Core\{curry, compose, id, concat};
+use function Phantasy\Core\{curry, compose, id, concat, liftA2};
 use Phantasy\DataTypes\Maybe\Maybe;
 use Phantasy\DataTypes\Validation\Validation;
+use Phantasy\DataTypes\Collection\Collection;
+use Phantasy\DataTypes\Either\Either;
 use Eris\Generator;
 
 trait LawAssertions
@@ -305,58 +307,65 @@ trait LawAssertions
                 $F = Maybe::of();
                 $G = Validation::of();
 
-                $Compose = new class (null, $F, $G) {
+                $Compose = new class () {
                     private $c = null;
-                    private $F = null;
-                    private $G = null;
 
-                    public function __construct($c = null, $F = null, $G = null)
+                    public static function newClass()
+                    {
+                        return function ($x) {
+                            return new static($x);
+                        };
+                    }
+
+                    public static function f($x)
+                    {
+                        return Maybe::of($x);
+                    }
+
+                    public static function g($x)
+                    {
+                        return Validation::of($x);
+                    }
+
+                    public function __construct($c = null)
                     {
                         $this->c = $c;
-                        $this->F = $F;
-                        $this->G = $G;
                     }
 
                     public function __invoke($c)
                     {
-                        return new static($c, $this->F, $this->G);
+                        return static::of($c);
                     }
 
-                    public function of($x)
+                    public static function of($x)
                     {
-                        $F = $this->F;
-                        $G = $this->G;
-                        return new static($F($G($x)), $this->F, $this->G);
+                        return new static(static::f(static::g($x)));
                     }
 
-                    public function ap($fc)
+                    public function ap($f)
                     {
-                        return new static($this->c->ap($fc->c->map(curry(function ($a, $b) {
-                            return $b->ap($a);
-                        }))), $this->F, $this->G);
+                        return new static($this->c->ap($f->c->map(curry(function ($u, $y) {
+                            return $y->ap($u);
+                        }))));
                     }
 
                     public function map(callable $f)
                     {
                         return new static($this->c->map(function ($y) use ($f) {
                             return $y->map($f);
-                        }), $this->F, $this->G);
+                        }));
                     }
                 };
 
-                // composition - TODO: FIX ME
-                // t(F(G(x))) -- t Traversable; F,G Applicative
-                /* $this->assertEquals(
-                    // This part works...
-                    $Compose($of($F($G($a)))
+                // composition
+                $this->assertEquals(
+                    $Compose::newClass()($of($F($G($a)))
                         ->traverse($F, id())
                         ->map(function ($x) use ($G) {
                             return $x->traverse($G, id());
                         })),
-
-                    // This part doesn't...
-                    $of($F($G($a)))->traverse($Compose, $Compose)
-                ); */
+                    $of($F($G($a)))->traverse($Compose, $Compose::newClass())
+                );
             });
     }
 

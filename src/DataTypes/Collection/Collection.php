@@ -85,9 +85,6 @@ final class Collection
     protected function traverse(callable $of, callable $f)
     {
         return $this->reduce(function ($ys, $x) use ($f) {
-            // $ys = Compose(Collection())
-            // $x = Compose(Just(Success(0)))
-            // $f($x) = Compose(Just(Success(0)))
             return liftA2(curry(function ($a, $b) {
                 return $b->concat(Collection::of($a));
             }), $f($x), $ys);
