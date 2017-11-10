@@ -405,7 +405,6 @@ trait LawAssertions
                     return $of($x + 1);
                 };
                 $i = 0;
-
                 // Equivalence
                 $first = $clssName::chainRec(function ($next, $done, $v) use ($p, $d, $n) {
                     return $p($v) ? $d($v)->map($done) : $n($v)->map($next);
@@ -414,11 +413,8 @@ trait LawAssertions
                 $second = function ($v) use (&$second, $p, $d, $n) {
                     return $p($v) ? $d($v) : $n($v)->chain($second);
                 };
-                $this->assertEquals($first, $second($i));
 
-                if (method_exists($first, 'run')) {
-                    $this->assertEquals($first->run(), $second($i)->run());
-                }
+                $this->assertEquals($first, $second($i));
             });
     }
 
