@@ -35,7 +35,7 @@ IO::of('foo')->map(function($x) {
 // 'foobar'
 ```
 #### ap (IO $g) : IO
-Used when you have a `IO` whose computation value is a function, and you want to apply that function to the value inside of a different `IO`.
+Used when you have an `IO` whose computation value is a function, and you want to apply that function to the value inside of a different `IO`.
 ```php
 $a = IO::of('foo');
 $b = IO::of(function($x) {
@@ -46,7 +46,7 @@ $a->ap($b)->run();
 // 'foobar'
 ```
 #### chain (callable $f) : IO (aliases: bind, flatMap)
-Used when you want to map with a function that returns a `IO`. The computation value becomes the result of the parameter function `$f`, while the state value is accessible to be read and changed.
+Used when you want to map with a function that returns an `IO`. You can use this to chain multiple IO actions together.
 ```php
 IO::of('/path/to/my/file')->chain(function($x) {
     return IO(function() use ($x) {
