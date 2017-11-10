@@ -273,6 +273,19 @@ class FunctionsTest extends TestCase
         $appendBa = $h('a', 'b');
         $appendBac = $appendBa('c');
         $this->assertEquals($appendBac('d'), 'bacd');
+
+        $h = $g('a', 'b');
+        $flippedH = flip($h);
+        $this->assertEquals($flippedH('c', 'd'), 'badc');
+
+        $flipFlippedH = flip($flippedH);
+        $this->assertEquals($flipFlippedH('c', 'd'), 'bacd');
+
+        $flipArrayFilter = curryN(2, flip('array_filter'));
+        $filterEvens = compose('array_values', $flipArrayFilter(function ($x) {
+            return $x % 2 !== 0;
+        }));
+        $this->assertEquals($filterEvens([1, 2, 3]), [1, 3]);
     }
 
     public function testCompose()

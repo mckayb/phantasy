@@ -173,6 +173,29 @@ $getStateCode(['user' => null]); // Nothing();
 $getStateCode(['user' => ['address' => ['state' => null]]]); // Nothing()
 ```
 
+## flip (callable $f)
+### Usage
+```php
+use function Phantasy\Core\flip;
+```
+### Description
+A function that swaps the first two parameters of a function.
+### Examples
+```php
+use function Phantasy\Core\{flip, concat, curryN};
+
+$flipConcat = flip(concat());
+$flipConcat('foo', 'bar');
+// 'barfoo'
+
+$flipFilter = curryN(2, flip('array_filter'));
+$filterEvens = compose('array_values', $flipFilter(function ($x) {
+    return $x % 2 !== 0;
+}));
+$filterEvens([1, 2, 3]);
+// [1, 3]
+```
+
 ## prop (string $s, $x)
 ### Usage
 ```php
