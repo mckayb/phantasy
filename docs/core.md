@@ -182,7 +182,7 @@ use function Phantasy\Core\flip;
 A function that swaps the first two parameters of a function.
 ### Examples
 ```php
-use function Phantasy\Core\{flip, concat, curryN};
+use function Phantasy\Core\{flip, concat, compose, curryN};
 
 $flipConcat = flip(concat());
 $flipConcat('foo', 'bar');
