@@ -85,8 +85,8 @@ trait LawAssertions
             ->then(function ($a, $b, $c) use ($of) {
                 // associativity
                 $this->assertEquals(
-                    $of($a)->concat($of($b))->concat($of($c)),
-                    $of($a)->concat($of($b)->concat($of($c)))
+                    $of([$a])->concat($of([$b]))->concat($of([$c])),
+                    $of([$a])->concat($of([$b])->concat($of([$c])))
                 );
             });
     }
@@ -376,6 +376,7 @@ trait LawAssertions
                 $f = function ($x) use ($of) {
                     return $of($x % 2);
                 };
+
                 $g = function ($x) use ($of) {
                     return $of($x / 3);
                 };
@@ -383,15 +384,42 @@ trait LawAssertions
                 // associativity
                 $this->assertEquals(
                     $of($a)->chain($f)->chain($g),
-                    $of($a)->chain(function ($x) {
+                    $of($a)->chain(function ($x) use ($f, $g) {
                         return $f($x)->chain($g);
                     })
                 );
             });
     }
 
-    public function assertChainRecLaws($a)
+    public function assertChainRecLaws(string $clssName, callable $of)
     {
+        $this->forAll(Generator\int())
+            ->then(function ($a) use ($clssName, $of) {
+                $p = function ($x) {
+                    return $x >= 50;
+                };
+                $d = function ($x) use ($of) {
+                    return $of($x);
+                };
+                $n = function ($x) use ($of) {
+                    return $of($x + 1);
+                };
+                $i = 0;
+
+                // Equivalence
+                $first = $clssName::chainRec(function ($next, $done, $v) use ($p, $d, $n) {
+                    return $p($v) ? $d($v)->map($done) : $n($v)->map($next);
+                }, $i);
+
+                $second = function ($v) use (&$second, $p, $d, $n) {
+                    return $p($v) ? $d($v) : $n($v)->chain($second);
+                };
+                $this->assertEquals($first, $second($i));
+
+                if (method_exists($first, 'run')) {
+                    $this->assertEquals($first->run(), $second($i)->run());
+                }
+            });
     }
 
     public function assertMonadLaws(string $clssName, callable $of)

@@ -21,12 +21,32 @@ class MaybeTest extends TestCase
             return Nothing();
         };
 
+        $this->assertSetoidLaws(Just());
+        $this->assertSetoidLaws($n);
+        $this->assertSemigroupLaws(Just());
+        $this->assertSemigroupLaws($n);
+        $this->assertMonoidLaws(Maybe::class, Just());
+        $this->assertMonoidLaws(Maybe::class, $n);
         $this->assertFunctorLaws(Just());
         $this->assertFunctorLaws($n);
         $this->assertApplyLaws($n);
         $this->assertApplyLaws(Just());
         $this->assertApplicativeLaws(Maybe::class, $n);
         $this->assertApplicativeLaws(Maybe::class, Just());
+        $this->assertAltLaws($n);
+        $this->assertAltLaws(Just());
+        $this->assertPlusLaws(Maybe::class, $n);
+        $this->assertPlusLaws(Maybe::class, Just());
+        $this->assertAlternativeLaws(Maybe::class, $n);
+        $this->assertAlternativeLaws(Maybe::class, Just());
+        $this->assertTraversableLaws(Maybe::class, $n);
+        $this->assertTraversableLaws(Maybe::class, Just());
+        $this->assertChainLaws($n);
+        $this->assertChainLaws(Just());
+        $this->assertMonadLaws(Maybe::class, $n);
+        $this->assertMonadLaws(Maybe::class, Just());
+        $this->assertExtendLaws($n);
+        $this->assertExtendLaws(Just());
     }
 
     public function testJustFunc()

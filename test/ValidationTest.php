@@ -17,12 +17,24 @@ class ValidationTest extends TestCase
 
     public function testLaws()
     {
+        $this->assertSetoidLaws(Success());
+        $this->assertSetoidLaws(Failure());
+        $this->assertSemigroupLaws(Success());
+        $this->assertSemigroupLaws(Failure());
         $this->assertFunctorLaws(Success());
         $this->assertFunctorLaws(Failure());
         $this->assertApplyLaws(Success());
         $this->assertApplyLaws(Failure());
         $this->assertApplicativeLaws(Validation::class, Success());
         $this->assertApplicativeLaws(Validation::class, Failure());
+        $this->assertAltLaws(Success());
+        $this->assertAltLaws(Failure());
+        $this->assertExtendLaws(Success());
+        $this->assertExtendLaws(Failure());
+        $this->assertTraversableLaws(Validation::class, Success());
+        $this->assertTraversableLaws(Validation::class, Failure());
+        $this->assertBifunctorLaws(Success());
+        $this->assertBifunctorLaws(Failure());
     }
 
     public function testSuccessFunc()

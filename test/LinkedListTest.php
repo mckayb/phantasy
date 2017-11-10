@@ -27,14 +27,26 @@ class LinkedListTest extends TestCase
             return Nil();
         };
 
+        $this->assertSetoidLaws($f);
+        $this->assertSetoidLaws($g);
         $this->assertFunctorLaws($f);
         $this->assertFunctorLaws($g);
         $this->assertApplyLaws($f);
         $this->assertApplyLaws($g);
         $this->assertApplicativeLaws(LinkedList::class, $f);
         $this->assertApplicativeLaws(LinkedList::class, $g);
+        $this->assertChainLaws($f);
+        $this->assertChainLaws($g);
+        $this->assertSemigroupLaws($f);
+        $this->assertSemigroupLaws($g);
+        $this->assertMonoidLaws(LinkedList::class, $f);
+        $this->assertMonoidLaws(LinkedList::class, $g);
         $this->assertAltLaws($f);
         $this->assertAltLaws($g);
+        $this->assertPlusLaws(LinkedList::class, $f);
+        $this->assertPlusLaws(LinkedList::class, $g);
+        $this->assertAlternativeLaws(LinkedList::class, $f);
+        $this->assertAlternativeLaws(LinkedList::class, $g);
         $this->assertTraversableLaws(LinkedList::class, $f);
         $this->assertTraversableLaws(LinkedList::class, $g);
     }

@@ -18,19 +18,27 @@ class EitherTest extends TestCase
 
     public function testLaws()
     {
-        $this->assertFunctorLaws(Left());
-        $this->assertFunctorLaws(Right());
         $this->assertSetoidLaws(Left());
         $this->assertSetoidLaws(Right());
+        $this->assertSemigroupLaws(Left());
+        $this->assertSemigroupLaws(Right());
+        $this->assertFunctorLaws(Left());
+        $this->assertFunctorLaws(Right());
         $this->assertApplyLaws(Left());
         $this->assertApplyLaws(Right());
         $this->assertApplicativeLaws(Either::class, Left());
         $this->assertApplicativeLaws(Either::class, Right());
+        $this->assertChainLaws(Left());
+        $this->assertChainLaws(Right());
+        $this->assertMonadLaws(Either::class, Left());
+        $this->assertMonadLaws(Either::class, Right());
         $this->assertAltLaws(Left());
         $this->assertAltLaws(Right());
-        // $this->assertPlusLaws(Either::class, Left());
-        // $this->assertPlusLaws(Either::class, Right());
         $this->assertTraversableLaws(Either::class, Right());
+        $this->assertExtendLaws(Left());
+        $this->assertExtendLaws(Right());
+        $this->assertBifunctorLaws(Left());
+        $this->assertBifunctorLaws(Right());
     }
 
     public function testLeftFunc()

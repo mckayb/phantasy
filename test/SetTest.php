@@ -18,9 +18,18 @@ class SetTest extends TestCase
 
     public function testLaws()
     {
+        $this->assertSemigroupLaws(Set::of());
+        $this->assertMonoidLaws(Set::class, Set::of());
         $this->assertFunctorLaws(Set::of());
         $this->assertApplyLaws(Set::of());
         $this->assertApplicativeLaws(Set::class, Set::of());
+        $this->assertChainLaws(Set::of());
+        $this->assertMonadLaws(Set::class, Set::of());
+        $this->assertTraversableLaws(Set::class, Set::of());
+        $this->assertAltLaws(Set::of());
+        $this->assertPlusLaws(Set::class, Set::of());
+        $this->assertAlternativeLaws(Set::class, Set::of());
+        $this->assertSetoidLaws(Set::of());
     }
 
     public function testFunc()
