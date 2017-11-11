@@ -5,9 +5,21 @@ namespace Phantasy\Test;
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\State\State;
 use function Phantasy\DataTypes\State\State;
+use Phantasy\Test\Traits\LawAssertions;
 
 class StateTest extends TestCase
 {
+    use LawAssertions;
+
+    public function testLaws()
+    {
+        $this->assertFunctorLaws(State::of());
+        $this->assertApplyLaws(State::of());
+        $this->assertApplicativeLaws(State::class, State::of());
+        $this->assertChainLaws(State::of());
+        $this->assertMonadLaws(State::class, State::of());
+    }
+
     public function testStateFunc()
     {
         $a = function ($s) {

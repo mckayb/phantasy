@@ -73,20 +73,14 @@ final class Left extends Either
         return $acc;
     }
 
-    protected function traverse(string $className, callable $f)
+    protected function traverse(callable $of, callable $f)
     {
-        if (!class_exists($className) || !is_callable([$className, 'of'])) {
-            throw new \InvalidArgumentException(
-                'Method must be a class name of an Applicative (must have an \'of\' method).'
-            );
-        }
-
-        return call_user_func([$className, 'of'], new static($this->value));
+        return call_user_func($of, new static($this->value));
     }
 
-    protected function sequence(string $className)
+    protected function sequence(callable $of)
     {
-        return $this->traverse($className, identity());
+        return $this->traverse($of, identity());
     }
 
     // Aliases

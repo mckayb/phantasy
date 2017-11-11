@@ -16,11 +16,13 @@
   "require-dev": {
     "phpunit/phpunit": "^6.0",
     "squizlabs/php_codesniffer": "^2.8",
-    "satooshi/php-coveralls": "^1.0"
+    "satooshi/php-coveralls": "^1.0",
+    "giorgiosironi/eris": "^0.9.0"
   },
   "autoload": {
     "psr-4": {
-      "Phantasy\\": "src/"
+      "Phantasy\\": "src/",
+      "Phantasy\\Test\\": "test/"
     },
     "files": [
       "src/Core/functions.php",
@@ -36,7 +38,8 @@
       "src/DataTypes/Writer/Writer.php",
       "src/DataTypes/State/State.php",
       "src/DataTypes/Set/Set.php",
-      "src/DataTypes/Collection/Collection.php"
+      "src/DataTypes/Collection/Collection.php",
+      "src/DataTypes/IO/IO.php"
     ]
   },
   "scripts": {

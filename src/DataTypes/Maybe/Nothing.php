@@ -56,20 +56,14 @@ final class Nothing extends Maybe
         return $acc;
     }
 
-    protected function traverse(string $className, callable $f)
+    protected function traverse(callable $of, callable $f)
     {
-        if (!class_exists($className) || !is_callable([$className, 'of'])) {
-            throw new \InvalidArgumentException(
-                'Method must be a class name of an Applicative (must have an \'of\' method).'
-            );
-        }
-
-        return call_user_func([$className, 'of'], new static());
+        return call_user_func($of, new static());
     }
 
-    protected function sequence(string $className)
+    protected function sequence(callable $of)
     {
-        return $this->traverse($className, identity());
+        return $this->traverse($of, identity());
     }
 
 

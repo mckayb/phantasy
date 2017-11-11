@@ -61,6 +61,18 @@ function compose(callable ...$fns)
     );
 }
 
+// +flip :: (a -> b -> c) -> b -> a -> c
+function flip(...$args)
+{
+    $flip = curry(function (callable $f) {
+        return curry(function ($a, $b, ...$args) use ($f) {
+            return curry($f)($b, $a, ...$args);
+        });
+    });
+
+    return $flip(...$args);
+}
+
 // +constant :: a -> (b -> a)
 function constant(...$args)
 {
@@ -374,19 +386,13 @@ function zero(...$args)
 
 function sequence(...$args)
 {
-    $sequence = curry(function (string $className, $x) {
-        if (!is_callable([$className, 'of'])) {
-            throw new \InvalidArgumentException(
-                'Method must be a class name of an Applicative (must have an of method).'
-            );
-        }
-
+    $sequence = curry(function (callable $of, $x) {
         if (is_callable([$x, 'sequence'])) {
-            return call_user_func([$x, 'sequence'], $className);
+            return call_user_func([$x, 'sequence'], $of);
         } elseif (is_callable([$x, 'traverse'])) {
-            return call_user_func([$x, 'traverse'], $className, identity());
+            return call_user_func([$x, 'traverse'], $of, identity());
         } else {
-            return traverse($className, identity(), $x);
+            return traverse($of, identity(), $x);
         }
     });
 
@@ -395,21 +401,15 @@ function sequence(...$args)
 
 function traverse(...$args)
 {
-    $traverse = curry(function (string $className, callable $f, $x) {
-        if (!is_callable([$className, 'of'])) {
-            throw new \InvalidArgumentException(
-                'Method must be a class name of an Applicative (must have an of method).'
-            );
-        }
-
+    $traverse = curry(function (callable $of, callable $f, $x) {
         if (is_callable([$x, 'traverse'])) {
-            return call_user_func([$x, 'traverse'], $className, $f);
+            return call_user_func([$x, 'traverse'], $of, $f);
         } elseif (is_array($x)) {
-            return reduce(function ($ys, $z) use ($f, $className) {
+            return reduce(function ($ys, $z) use ($f, $of) {
                 return liftA2(curry(function ($a, $b) {
                     return concat($b, of('array', $a));
                 }), $f($z), $ys);
-            }, of($className, mempty($x)), $x);
+            }, $of(mempty($x)), $x);
         }
     });
 
@@ -529,7 +529,6 @@ function liftA2(...$args)
 {
     $liftA2 = curry(function (callable $f, $a1, $a2) {
         return ap(map($f, $a1), $a2);
-        // return call_user_func([$a2, 'ap'], call_user_func([$a1, 'map'], $f));
     });
 
     return $liftA2(...$args);

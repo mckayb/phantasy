@@ -8,9 +8,24 @@ use function Phantasy\Core\concat;
 use function Phantasy\DataTypes\Writer\Writer;
 use function Phantasy\DataTypes\Either\Right;
 use function Phantasy\DataTypes\Maybe\Just;
+use Phantasy\Test\Traits\LawAssertions;
 
 class WriterTest extends TestCase
 {
+    use LawAssertions;
+
+    public function testLaws()
+    {
+        $this->assertFunctorLaws(Writer::of());
+        $this->assertApplyLaws(Writer::of());
+        $this->assertApplicativeLaws(Writer::class, Writer::of());
+        $this->assertChainLaws(Writer::of());
+        $this->assertMonadLaws(Writer::class, Writer::of());
+        $this->assertChainRecLaws(Writer::class, Writer::of());
+        $this->assertExtendLaws(Writer::of());
+        $this->assertComonadLaws(Writer::of());
+    }
+
     public function testWriterFunc()
     {
         $a = function () {

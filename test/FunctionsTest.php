@@ -18,6 +18,7 @@ use function Phantasy\Core\{
     of,
     pure,
     constant,
+    flip,
     compose,
     composeK,
     curry,
@@ -52,7 +53,6 @@ use function Phantasy\Core\{
     concat,
     contramap,
     cmap,
-    flip,
     foldl,
     foldr,
     reduceRight,
@@ -248,6 +248,46 @@ class FunctionsTest extends TestCase
         $this->assertEquals(pure($a, 'foo'), 'foobar');
     }
 
+    public function testFlip()
+    {
+        $f = flip(concat());
+        $this->assertEquals($f('a', 'b'), 'ba');
+
+        $g = flip(function ($a, $b, $c, $d) {
+            return $a . $b . $c . $d;
+        });
+        $this->assertEquals($g('a', 'b', 'c', 'd'), 'bacd');
+
+        $appendA = $f('a');
+        $this->assertEquals($appendA('b'), 'ba');
+
+        $appendBa = $g('a', 'b');
+        $appendBac = $appendBa('c');
+        $this->assertEquals($appendBac('d'), 'bacd');
+
+        $h = flip(curry(function ($a, $b, $c, $d) {
+            return $a . $b. $c . $d;
+        }));
+        $this->assertEquals($h('a', 'b', 'c', 'd'), 'bacd');
+
+        $appendBa = $h('a', 'b');
+        $appendBac = $appendBa('c');
+        $this->assertEquals($appendBac('d'), 'bacd');
+
+        $h = $g('a', 'b');
+        $flippedH = flip($h);
+        $this->assertEquals($flippedH('c', 'd'), 'badc');
+
+        $flipFlippedH = flip($flippedH);
+        $this->assertEquals($flipFlippedH('c', 'd'), 'bacd');
+
+        $flipArrayFilter = curryN(2, flip('array_filter'));
+        $filterEvens = compose('array_values', $flipArrayFilter(function ($x) {
+            return $x % 2 !== 0;
+        }));
+        $this->assertEquals($filterEvens([1, 2, 3]), [1, 3]);
+    }
+
     public function testCompose()
     {
         $a = function ($x) {
@@ -335,15 +375,6 @@ class FunctionsTest extends TestCase
         $this->assertEquals(zero($a), 'bar');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testSequenceInvalidArgument()
-    {
-        $a = new Nil();
-        sequence($a, 'Foo');
-    }
-
     public function testSequenceObjectWithSequenceMethod()
     {
         $a = new class () {
@@ -353,7 +384,7 @@ class FunctionsTest extends TestCase
             }
         };
 
-        $this->assertEquals(sequence(LinkedList::class, $a), 'foo');
+        $this->assertEquals(sequence(LinkedList::of(), $a), 'foo');
     }
 
     public function testSequenceObjectWithTraverseMethod()
@@ -365,13 +396,13 @@ class FunctionsTest extends TestCase
             }
         };
 
-        $this->assertEquals(sequence(LinkedList::class, $a), 'foo');
+        $this->assertEquals(sequence(LinkedList::of(), $a), 'foo');
     }
 
     public function testSequenceCurried()
     {
         $a = new Cons(new Right(1), new Nil());
-        $sequenceEither = sequence(Either::class);
+        $sequenceEither = sequence(Either::of());
         $this->assertEquals($sequenceEither($a), new Right(new Cons(1, new Nil())));
     }
 
@@ -383,7 +414,7 @@ class FunctionsTest extends TestCase
         };
 
         $this->assertEquals(
-            traverse(Maybe::class, $f, $a),
+            traverse(Maybe::of(), $f, $a),
             new Just(new Cons(1, new Nil()))
         );
     }
@@ -397,19 +428,9 @@ class FunctionsTest extends TestCase
             }
         };
 
-        $this->assertEquals(traverse(LinkedList::class, function ($x) {
+        $this->assertEquals(traverse(LinkedList::of(), function ($x) {
             return $x + 1;
         }, $a), 'foo');
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testTraverseInvalidArgument()
-    {
-        traverse('Foo', function ($x) {
-            return $x + 1;
-        }, null);
     }
 
     public function testTraverseCurried()
@@ -421,7 +442,7 @@ class FunctionsTest extends TestCase
             }
         };
 
-        $traverseLinkedList = traverse(LinkedList::class);
+        $traverseLinkedList = traverse(LinkedList::of());
         $traverseLLAddOne = $traverseLinkedList(function ($x) {
             return $x + 1;
         });
@@ -2094,13 +2115,13 @@ class FunctionsTest extends TestCase
     {
         $a = [new Just(1), new Just(2), new Just(3)];
         $this->assertEquals(
-            sequence(Maybe::class, $a),
+            sequence(Maybe::of(), $a),
             new Just([1, 2, 3])
         );
 
         $b = [new Just(1), new Nothing()];
         $this->assertEquals(
-            sequence(Maybe::class, $b),
+            sequence(Maybe::of(), $b),
             new Nothing()
         );
     }
@@ -2109,13 +2130,13 @@ class FunctionsTest extends TestCase
     {
         $a = [1, 2, 3];
         $this->assertEquals(
-            traverse(Maybe::class, Maybe::fromNullable(), $a),
+            traverse(Maybe::of(), Maybe::fromNullable(), $a),
             new Just([1, 2, 3])
         );
 
         $b = [1, null];
         $this->assertEquals(
-            traverse(Maybe::class, Maybe::fromNullable(), $b),
+            traverse(Maybe::of(), Maybe::fromNullable(), $b),
             new Nothing()
         );
     }

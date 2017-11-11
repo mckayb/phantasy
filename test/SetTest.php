@@ -1,4 +1,6 @@
-<?php
+<?php declare(strict_types=1);
+
+namespace Phantasy\Test;
 
 use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Set\Set;
@@ -8,9 +10,28 @@ use function Phantasy\DataTypes\LinkedList\{Cons, Nil};
 use function Phantasy\DataTypes\Collection\Collection;
 use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 use function Phantasy\Core\concat;
+use Phantasy\Test\Traits\LawAssertions;
 
 class SetTest extends TestCase
 {
+    use LawAssertions;
+
+    public function testLaws()
+    {
+        $this->assertSemigroupLaws(Set::of());
+        $this->assertMonoidLaws(Set::class, Set::of());
+        $this->assertFunctorLaws(Set::of());
+        $this->assertApplyLaws(Set::of());
+        $this->assertApplicativeLaws(Set::class, Set::of());
+        $this->assertChainLaws(Set::of());
+        $this->assertMonadLaws(Set::class, Set::of());
+        $this->assertTraversableLaws(Set::class, Set::of());
+        $this->assertAltLaws(Set::of());
+        $this->assertPlusLaws(Set::class, Set::of());
+        $this->assertAlternativeLaws(Set::class, Set::of());
+        $this->assertSetoidLaws(Set::of());
+    }
+
     public function testFunc()
     {
         $this->assertEquals(new Set(1, 2, 3), Set(1, 2, 3));
@@ -267,8 +288,8 @@ class SetTest extends TestCase
         $b = Set(Just(1), Just(2), Nothing());
         $be = Nothing();
 
-        $this->assertEquals($a->sequence(Maybe::class), $ae);
-        $this->assertEquals($b->sequence(Maybe::class), $be);
+        $this->assertEquals($a->sequence(Maybe::of()), $ae);
+        $this->assertEquals($b->sequence(Maybe::of()), $be);
     }
 
     public function testSequenceCurried()
@@ -280,9 +301,9 @@ class SetTest extends TestCase
         $aseq_ = $a->sequence();
         $aseq__ = $aseq();
 
-        $this->assertEquals($aseq(Maybe::class), $ae);
-        $this->assertEquals($aseq_(Maybe::class), $ae);
-        $this->assertEquals($aseq__(Maybe::class), $ae);
+        $this->assertEquals($aseq(Maybe::of()), $ae);
+        $this->assertEquals($aseq_(Maybe::of()), $ae);
+        $this->assertEquals($aseq__(Maybe::of()), $ae);
 
         $b = Set(Just(1), Just(2), Nothing());
         $be = Nothing();
@@ -291,28 +312,20 @@ class SetTest extends TestCase
         $bseq_ = $b->sequence();
         $bseq__ = $bseq();
 
-        $this->assertEquals($bseq(Maybe::class), $be);
-        $this->assertEquals($bseq_(Maybe::class), $be);
-        $this->assertEquals($bseq__(Maybe::class), $be);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testTraverseInvalid()
-    {
-        Set(1, 2, 3)->traverse('Foo', Maybe::fromNullable());
+        $this->assertEquals($bseq(Maybe::of()), $be);
+        $this->assertEquals($bseq_(Maybe::of()), $be);
+        $this->assertEquals($bseq__(Maybe::of()), $be);
     }
 
     public function testTraverse()
     {
         $this->assertEquals(
-            Set(1, 2, 3)->traverse(Maybe::class, Maybe::fromNullable()),
+            Set(1, 2, 3)->traverse(Maybe::of(), Maybe::fromNullable()),
             Just(Set(1, 2, 3))
         );
 
         $this->assertEquals(
-            Set(1, 2, 3, null)->traverse(Maybe::class, Maybe::fromNullable()),
+            Set(1, 2, 3, null)->traverse(Maybe::of(), Maybe::fromNullable()),
             Nothing()
         );
     }
@@ -327,13 +340,13 @@ class SetTest extends TestCase
         $atrav_ = $a->traverse();
         $atrav__ = $atrav();
 
-        $atravM = $atrav(Maybe::class);
-        $atravM_ = $atrav_(Maybe::class);
-        $atravM__ = $atrav__(Maybe::class);
+        $atravM = $atrav(Maybe::of());
+        $atravM_ = $atrav_(Maybe::of());
+        $atravM__ = $atrav__(Maybe::of());
 
-        $this->assertEquals($atrav(Maybe::class, $f), $ae);
-        $this->assertEquals($atrav_(Maybe::class, $f), $ae);
-        $this->assertEquals($atrav__(Maybe::class, $f), $ae);
+        $this->assertEquals($atrav(Maybe::of(), $f), $ae);
+        $this->assertEquals($atrav_(Maybe::of(), $f), $ae);
+        $this->assertEquals($atrav__(Maybe::of(), $f), $ae);
         $this->assertEquals($atravM($f), $ae);
         $this->assertEquals($atravM_($f), $ae);
         $this->assertEquals($atravM__($f), $ae);
@@ -345,13 +358,13 @@ class SetTest extends TestCase
         $btrav_ = $b->traverse();
         $btrav__ = $btrav();
 
-        $btravM = $btrav(Maybe::class);
-        $btravM_ = $btrav_(Maybe::class);
-        $btravM__ = $btrav__(Maybe::class);
+        $btravM = $btrav(Maybe::of());
+        $btravM_ = $btrav_(Maybe::of());
+        $btravM__ = $btrav__(Maybe::of());
 
-        $this->assertEquals($btrav(Maybe::class, $f), $be);
-        $this->assertEquals($btrav_(Maybe::class, $f), $be);
-        $this->assertEquals($btrav__(Maybe::class, $f), $be);
+        $this->assertEquals($btrav(Maybe::of(), $f), $be);
+        $this->assertEquals($btrav_(Maybe::of(), $f), $be);
+        $this->assertEquals($btrav__(Maybe::of(), $f), $be);
         $this->assertEquals($btravM($f), $be);
         $this->assertEquals($btravM_($f), $be);
         $this->assertEquals($btravM__($f), $be);

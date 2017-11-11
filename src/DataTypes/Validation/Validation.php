@@ -20,8 +20,8 @@ abstract class Validation
     abstract protected function bimap(callable $f, callable $g) : Validation;
     abstract protected function alt(Validation $e) : Validation;
     abstract protected function reduce(callable $f, $acc);
-    abstract protected function traverse(string $className, callable $f);
-    abstract protected function sequence(string $className);
+    abstract protected function traverse(callable $of, callable $f);
+    abstract protected function sequence(callable $of);
     abstract public function toMaybe() : Maybe;
     abstract public function toEither() : Either;
     abstract public function __toString() : string;

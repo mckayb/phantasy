@@ -22,8 +22,8 @@ abstract class Maybe
     abstract protected function cata(callable $f, callable $g);
     abstract protected function alt(Maybe $m) : Maybe;
     abstract protected function reduce(callable $f, $acc);
-    abstract protected function traverse(string $className, callable $f);
-    abstract protected function sequence(string $className);
+    abstract protected function traverse(callable $of, callable $f);
+    abstract protected function sequence(callable $of);
     abstract protected function toEither($failVal) : Either;
     abstract protected function toValidation($failVal) : Validation;
     abstract public function __toString() : string;

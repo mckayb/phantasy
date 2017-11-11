@@ -6,9 +6,23 @@ use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Reader\Reader;
 use function Phantasy\Core\concat;
 use function Phantasy\DataTypes\Reader\Reader;
+use Phantasy\Test\Traits\LawAssertions;
 
 class ReaderTest extends TestCase
 {
+    use LawAssertions;
+
+    public function testLaws()
+    {
+        $this->assertFunctorLaws(Reader::of());
+        $this->assertApplyLaws(Reader::of());
+        $this->assertApplicativeLaws(Reader::class, Reader::of());
+        $this->assertChainLaws(Reader::of());
+        $this->assertMonadLaws(Reader::class, Reader::of());
+        $this->assertExtendLaws(Reader::of());
+        $this->assertComonadLaws(Reader::of());
+    }
+
     public function testReaderFunc()
     {
         $a = function ($x) {

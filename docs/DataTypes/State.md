@@ -9,6 +9,7 @@ You can think of the `State` type as a combination of the `Reader` and `Writer` 
 The `State` holds 2 objects, the first being the value of the computation and the second being the current state the computation is managing.
 ### Methods
 #### static of ($x) : State
+Creates a `State` who's value when run is just the parameter. This is a way of lifting a value into the `State` context.
 ```php
 State::of('foo')->run('bar');
 // ['foo', 'bar']

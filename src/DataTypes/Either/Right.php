@@ -78,22 +78,16 @@ final class Right extends Either
         return $f($acc, $this->value);
     }
 
-    protected function traverse(string $className, callable $f)
+    protected function traverse(callable $of, callable $f)
     {
-        if (!class_exists($className) || !is_callable([$className, 'of'])) {
-            throw new \InvalidArgumentException(
-                'Method must be a class name of an Applicative (must have an \'of\' method).'
-            );
-        }
-
         return map(function ($x) {
             return new Right($x);
         }, $f($this->value));
     }
 
-    protected function sequence(string $className)
+    protected function sequence(callable $of)
     {
-        return $this->traverse($className, identity());
+        return $this->traverse($of, identity());
     }
 
     // Aliases
