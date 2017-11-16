@@ -471,7 +471,7 @@ bimap($left, $right, $a);
 // Right(0)
 ```
 
-## sequence (string $className, $x)
+## sequence (callable $of, $x)
 ### Usage
 ```php
 use function Phantasy\Core\sequence;
@@ -488,15 +488,15 @@ use Phantasy\DataTypes\Either\Either;
 
 $a = new Cons(new Right(1), new Nil());
 
-sequence(Either::class, $a);
+sequence(Either::of(), $a);
 // Right(Cons(1, Nil()))
 
-$sequenceEither = sequence(Either::class);
+$sequenceEither = sequence(Either::of());
 $sequenceEither($a);
 // Right(Cons(1, Nil()))
 ```
 
-## traverse (string $className, callable $f, $x)
+## traverse (callable $of, callable $f, $x)
 ### Usage
 ```php
 use function Phantasy\Core\traverse;
@@ -515,7 +515,7 @@ $f = function ($x) {
     return $x->toMaybe();
 };
 
-traverse(Maybe::class, $f, $a);
+traverse(Maybe::of(), $f, $a);
 // Just(Cons(1, Nil()))
 ```
 

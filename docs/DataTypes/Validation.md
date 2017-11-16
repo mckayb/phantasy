@@ -261,23 +261,23 @@ Failure(12)->reduce(function($carry, $val) {
 // 2
 ```
 
-#### sequence (string $className)
+#### sequence (callable $of)
 Helpful in swapping the types of the object you are
 working with.
 
-If the instance is a `Success`, it swaps the inner type (given by `$className`) and the `Success`.
+If the instance is a `Success`, it swaps the inner type (given by the result of `$of`) and the `Success`.
 ```php
-Success(Just(1))->sequence(Maybe::class);
+Success(Just(1))->sequence(Maybe::of());
 // Just(Right(1))
 ```
 If the instance is a `Failure`, it just wraps the current
-instance in the type defined by `$className`.
+instance in the type defined by the result of `$of`.
 ```php
-Failure('Request Failed')->sequence(Maybe::class);
+Failure('Request Failed')->sequence(Maybe::of());
 // Just(Left('Request Failed'))
 ```
 
-#### traverse (string $className, callable $f)
+#### traverse (callable $of, callable $f)
 Does the same as sequence, but lets you map over the
 value with `$f` before the types get swapped.
 
@@ -285,7 +285,7 @@ If the instance is a `Right`, it calls the function
 `$f` on the current value before wrapping it in the
 type given by `$className`.
 ```php
-Success(1)->traverse(Maybe::class, function ($x) {
+Success(1)->traverse(Maybe::of(), function ($x) {
     return Just($x + 1);
 });
 // Just(Success(2))
@@ -293,7 +293,7 @@ Success(1)->traverse(Maybe::class, function ($x) {
 If the instance is a `Failure`, it behaves the same as `sequence, by just wrapping the current instance
 in the new type.
 ```php
-Failure('Request Failed')->traverse(Maybe::class, function ($x) {
+Failure('Request Failed')->traverse(Maybe::of(), function ($x) {
     return $x + 1;
 });
 // Just(Failure('Request Failed'))

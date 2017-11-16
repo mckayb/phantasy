@@ -252,22 +252,22 @@ Nothing()->reduce(function($carry, $val) {
 // 2
 ```
 
-#### sequence (string $className)
+#### sequence (callable $of)
 Useful in swapping the types of the object you are dealing with.
 
 If the instance is a `Just`, it simply swaps the inner type (given by `$className`) with the outer type `Just`.
 ```php
-Just(Right(1))->sequence(Either::class);
+Just(Right(1))->sequence(Either::of());
 // Right(Just(1))
 ```
 If the instance is a `Nothing`, it just wraps it in the
 type given by `$className`.
 ```php
-Nothing()->sequence(Either::class);
+Nothing()->sequence(Either::of());
 // Right(Nothing())
 ```
 
-#### traverse (string $className, callable $f)
+#### traverse (callable $of, callable $f)
 Does the same as sequence, but lets you map over the
 value with `$f` before the types get swapped.
 
@@ -275,7 +275,7 @@ If the instance is a `Just`, it calls the function
 `$f` on the current value before wrapping it in the
 type given by `$className`.
 ```php
-Just(1)->traverse(Either::class, function ($x) {
+Just(1)->traverse(Either::of(), function ($x) {
     return Right($x + 1);
 });
 // Right(Just(2))
@@ -283,7 +283,7 @@ Just(1)->traverse(Either::class, function ($x) {
 If the instance is `Nothing`, it just wraps the
 instance in the type given by `$className`.
 ```php
-Nothing()->traverse(Either::class, function ($x) {
+Nothing()->traverse(Either::of(), function ($x) {
     return Right($x + 1);
 });
 // Right(Nothing())
