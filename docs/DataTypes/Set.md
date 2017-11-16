@@ -132,20 +132,20 @@ Set::of(Set::of(2))->join();
 // Set(2)
 ```
 
-#### sequence (string $className)
+#### sequence (callable $of)
 Used when you have types that you want to swap. For example, converting
 a `Set` of `Maybe` to a `Maybe` of a `Set`.
 It simply swaps the types.
 ```php
 $a = Set(Right(1), Right(2));
-$a->sequence(Either::class);
+$a->sequence(Either::of());
 // Right(Set(1, 2));
 
-Set(Right(1), Left('foo'))->sequence(Either::class);
+Set(Right(1), Left('foo'))->sequence(Either::of());
 // Left(Set());
 ```
 
-#### traverse (string $className, callable $f)
+#### traverse (callable $of, callable $f)
 Used when you have types that you want to swap, but also apply a
 transformation function. For example, converting
 a `Set` of `Maybe` to a `Maybe` of a `Set`.
@@ -157,7 +157,7 @@ $toChar = function($n) {
         ? Left($n . ' is out of bounds!')
         : Right(chr(833 + $n));
 };
-$a->traverse(Either::class, $toChar);
+$a->traverse(Either::of(), $toChar);
 // Right(Set('A', 'B', 'C', 'D'))
 ```
 

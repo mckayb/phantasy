@@ -144,7 +144,7 @@ If the instance was `Nil`, it just returns `Nil`.
 Nil()->join();
 // Nil
 ```
-#### sequence (string $className)
+#### sequence (callable $of)
 Used when you have types that you want to swap. For example, converting
 a `LinkedList` of `Maybe` to a `Maybe` of a `LinkedList`.
 If the instance is a `Cons`, then it simply swaps the types.
@@ -154,7 +154,7 @@ use function Phantasy\DataTypes\Either\Right;
 use function Phantasy\DataTypes\LinkedList\{Cons, Nil};
 
 $a = Cons(Right(1), Cons(Right(2), Nil()));
-$a->sequence(Either::class);
+$a->sequence(Either::of());
 // Right(Cons(1, Cons(2, Nil)))
 ```
 If the instance is a `Nil`, then it just wraps it in the result of `$of`.
@@ -163,10 +163,10 @@ use Phantasy\DataTypes\Either\Either;
 use function Phantasy\DataTypes\LinkedList\Nil;
 
 $a = Nil();
-$a->sequence(Either::class);
+$a->sequence(Either::of());
 // Right(Nil)
 ```
-#### traverse (string $className, callable $f)
+#### traverse (callable $of, callable $f)
 Used when you have types that you want to swap, but also apply a
 transformation function. For example, converting
 a `LinkedList` of `Maybe` to a `Maybe` of a `LinkedList`.
@@ -182,7 +182,7 @@ $toChar = function($n) {
         ? Left($n . ' is out of bounds!')
         : Right(chr(833 + $n));
 };
-$a->traverse(Either::class, $toChar);
+$a->traverse(Either::of(), $toChar);
 // Right(Cons('A', Cons('B', Cons('C', Cons('D', Nil)))))
 ```
 If the instance is a `Nil`, then it just wraps it in the result of `$of`.
@@ -192,7 +192,7 @@ use function Phantasy\DataTypes\LinkedList\Nil;
 use function Phantasy\Core\identity;
 
 $a = Nil();
-$a->traverse(Either::class, identity());
+$a->traverse(Either::of(), identity());
 // Right(Nil)
 ```
 #### head ()

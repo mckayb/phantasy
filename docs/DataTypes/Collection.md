@@ -131,20 +131,20 @@ Collection::of(Collection::of(2))->join();
 // Collection(2)
 ```
 
-#### sequence (string $className)
+#### sequence (callable $of)
 Used when you have types that you want to swap. For example, converting
 a `Collection` of `Maybe` to a `Maybe` of a `Collection`.
 It simply swaps the types.
 ```php
 $a = Collection(Right(1), Right(2));
-$a->sequence(Either::class);
+$a->sequence(Either::of());
 // Right(Collection(1, 2));
 
-Collection(Right(1), Left('foo'))->sequence(Either::class);
+Collection(Right(1), Left('foo'))->sequence(Either::of());
 // Left(Collection());
 ```
 
-#### traverse (string $className, callable $f)
+#### traverse (callable $of, callable $f)
 Used when you have types that you want to swap, but also apply a
 transformation function. For example, converting
 a `Collection` of `Maybe` to a `Maybe` of a `Collection`.
@@ -156,7 +156,7 @@ $toChar = function($n) {
         ? Left($n . ' is out of bounds!')
         : Right(chr(833 + $n));
 };
-$a->traverse(Either::class, $toChar);
+$a->traverse(Either::of(), $toChar);
 // Right(Collection('A', 'B', 'C', 'D'))
 ```
 
