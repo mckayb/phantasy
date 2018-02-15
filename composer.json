@@ -1,8 +1,8 @@
 {
   "name": "mckayb/phantasy",
   "description": "A basic functional programming library for PHP",
-  "type": "package",
-  "license": "mit",
+  "type": "library",
+  "license": "MIT",
   "authors": [
     {
       "name": "McKay Broderick",
