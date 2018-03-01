@@ -28,6 +28,7 @@
       "src/Core/functions.php",
       "src/DataTypes/Either/Left.php",
       "src/DataTypes/Either/Right.php",
+      "src/DataTypes/Maybe/MaybeT.php",
       "src/DataTypes/Maybe/Just.php",
       "src/DataTypes/Maybe/Nothing.php",
       "src/DataTypes/Validation/Failure.php",

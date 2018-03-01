@@ -9,7 +9,7 @@ install:
 
 script:
   - mkdir -p build/logs
-  - composer coverage
+  - COMPOSER_PROCESS_TIMEOUT=600 composer coverage
   - composer lint
 
 after_success:
