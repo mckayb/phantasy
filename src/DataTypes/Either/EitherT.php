@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Phantasy\DataTypes\Maybe;
+namespace Phantasy\DataTypes\Either;
 
-use Phantasy\DataTypes\Maybe\{Maybe, Nothing};
+use Phantasy\DataTypes\Either\{Either, Left};
 use Phantasy\Traits\CurryNonPublicMethods;
 use function Phantasy\Core\{curry, map, ap, chain, of};
 
-final class MaybeT
+final class EitherT
 {
     use CurryNonPublicMethods;
 
@@ -17,38 +17,38 @@ final class MaybeT
         $this->f = $f;
     }
 
-    protected static function of(string $outer, $x) : MaybeT
+    protected static function of(string $outer, $x) : EitherT
     {
         return new static(function () use ($outer, $x) {
-            return of($outer, Maybe::of($x));
+            return of($outer, Either::of($x));
         });
     }
 
-    protected function map(callable $f) : MaybeT
+    protected function map(callable $f) : EitherT
     {
         return new static(function () use ($f) {
             return map(map($f), $this->run());
         });
     }
 
-    protected function ap(MaybeT $maybeTWithFunction) : MaybeT
+    protected function ap(EitherT $eitherTWithFunction) : EitherT
     {
-        return new static(function () use ($maybeTWithFunction) {
-            return chain(function (Maybe $mf) {
+        return new static(function () use ($eitherTWithFunction) {
+            return chain(function (Either $mf) {
                 return map(ap($mf), $this->run());
-            }, $maybeTWithFunction->run());
+            }, $eitherTWithFunction->run());
         });
     }
 
-    protected function chain(callable $f) : MaybeT
+    protected function chain(callable $f) : EitherT
     {
         return new static(function () use ($f) {
             $a = $this->run();
 
-            return chain(function (Maybe $mf) use ($f, $a) {
+            return chain(function (Either $mf) use ($f, $a) {
                 return $mf->fold(
-                    function () use ($a) {
-                        return of(get_class($a), new Nothing());
+                    function ($x) use ($a) {
+                        return of(get_class($a), $x);
                     },
                     function ($x) use ($f) {
                         return $f($x)->run();
@@ -58,12 +58,12 @@ final class MaybeT
         });
     }
 
-    protected function bind(callable $f) : MaybeT
+    protected function bind(callable $f) : EitherT
     {
         return $this->chain($f);
     }
 
-    protected function flatMap(callable $f) : MaybeT
+    protected function flatMap(callable $f) : EitherT
     {
         return $this->chain($f);
     }
@@ -74,9 +74,9 @@ final class MaybeT
     }
 }
 
-function MaybeT(...$args)
+function EitherT(...$args)
 {
     return curry(function (callable $f) {
-        return new MaybeT($f);
+        return new EitherT($f);
     })(...$args);
 }

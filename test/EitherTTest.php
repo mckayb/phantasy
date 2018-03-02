@@ -5,21 +5,21 @@ namespace Phantasy\Test;
 use PHPUnit\Framework\TestCase;
 use Phantasy\Test\Traits\LawAssertions;
 use Phantasy\Traits\CurryNonPublicMethods;
-use Phantasy\DataTypes\Maybe\MaybeT;
-use Phantasy\DataTypes\Either\Either;
-use function Phantasy\DataTypes\Maybe\{MaybeT, Just, Nothing};
-use function Phantasy\DataTypes\Either\Right;
+use Phantasy\DataTypes\Either\{EitherT, Either};
+use Phantasy\DataTypes\Maybe\Maybe;
+use function Phantasy\DataTypes\Either\{EitherT, Right};
+use function Phantasy\DataTypes\Maybe\{Just, Nothing};
 
-class MaybeTTest extends TestCase
+class EitherTTest extends TestCase
 {
     use LawAssertions;
 
     public function testLaws()
     {
-        $a = MaybeT::of(Either::class);
+        $a = EitherT::of(Maybe::class);
         $b = function () {
-            return MaybeT(function () {
-                return Right(Nothing());
+            return EitherT(function () {
+                return Nothing();
             });
         };
 
@@ -28,7 +28,7 @@ class MaybeTTest extends TestCase
 
             protected static function of($x)
             {
-                return MaybeT::of(Either::class, $x);
+                return EitherT::of(Maybe::class, $x);
             }
         };
 
@@ -46,148 +46,148 @@ class MaybeTTest extends TestCase
 
     public function testOf()
     {
-        $a = MaybeT::of(Either::class, 1)->run();
+        $a = EitherT::of(Maybe::class, 1)->run();
         $this->assertEquals(
             $a,
-            Right(Just(1))
+            Just(Right(1))
         );
     }
 
     public function testMapJust()
     {
-        $a = MaybeT::of(Either::class, 1)->map(function ($x) {
+        $a = EitherT::of(Maybe::class, 1)->map(function ($x) {
             return $x + 1;
         })->run();
         $this->assertEquals(
             $a,
-            Right(Just(2))
+            Just(Right(2))
         );
     }
 
     public function testMapNothing()
     {
-        $a = MaybeT(function () {
-            return Either::of(Nothing());
+        $a = EitherT(function () {
+            return Nothing();
         })->map(function ($x) {
             return $x + 1;
         })->run();
 
         $this->assertEquals(
             $a,
-            Right(Nothing())
+            Nothing()
         );
     }
 
     public function testAp()
     {
-        $a = MaybeT::of(Either::class, 1)->ap(MaybeT::of(Either::class, function ($x) {
+        $a = EitherT::of(Maybe::class, 1)->ap(EitherT::of(Maybe::class, function ($x) {
             return $x + 1;
         }));
 
         $this->assertEquals(
             $a->run(),
-            Right(Just(2))
+            Just(Right(2))
         );
     }
 
     public function testApNothing()
     {
-        $a = MaybeT(function () {
-            return Either::of(Nothing());
-        })->ap(MaybeT::of(Either::class, function ($x) {
+        $a = EitherT(function () {
+            return Nothing();
+        })->ap(EitherT::of(Maybe::class, function ($x) {
             return $x + 1;
         }));
 
-        $b = MaybeT::of(Either::class, 1)->ap(MaybeT(function () {
-            return Either::of(Nothing());
+        $b = EitherT::of(Maybe::class, 1)->ap(EitherT(function () {
+            return Nothing();
         }));
 
         $this->assertEquals(
             $a->run(),
-            Right(Nothing())
+            Nothing()
         );
 
         $this->assertEquals(
             $b->run(),
-            Right(Nothing())
+            Nothing()
         );
     }
 
     public function testChain()
     {
-        $a = MaybeT::of(Either::class, 124)->chain(function ($x) {
-            return MaybeT::of(Either::class, $x / 2);
+        $a = EitherT::of(Maybe::class, 124)->chain(function ($x) {
+            return EitherT::of(Maybe::class, $x / 2);
         });
 
         $this->assertEquals(
             $a->run(),
-            Right(Just(62))
+            Just(Right(62))
         );
     }
 
     public function testChainNothing()
     {
-        $a = MaybeT::of(Either::class, 124)->chain(function ($x) {
-            return MaybeT(function () {
-                return Either::of(Nothing());
+        $a = EitherT::of(Maybe::class, 124)->chain(function ($x) {
+            return EitherT(function () {
+                return Nothing();
             });
         });
 
         $this->assertEquals(
             $a->run(),
-            Right(Nothing())
+            Nothing()
         );
     }
 
     public function testBind()
     {
-        $a = MaybeT::of(Either::class, 124)->bind(function ($x) {
-            return MaybeT::of(Either::class, $x / 2);
+        $a = EitherT::of(Maybe::class, 124)->bind(function ($x) {
+            return EitherT::of(Maybe::class, $x / 2);
         });
 
         $this->assertEquals(
             $a->run(),
-            Right(Just(62))
+            Just(Right(62))
         );
     }
 
     public function testBindNothing()
     {
-        $a = MaybeT::of(Either::class, 124)->bind(function ($x) {
-            return MaybeT(function () {
-                return Either::of(Nothing());
+        $a = EitherT::of(Maybe::class, 124)->bind(function ($x) {
+            return EitherT(function () {
+                return Nothing();
             });
         });
 
         $this->assertEquals(
             $a->run(),
-            Right(Nothing())
+            Nothing()
         );
     }
 
     public function testFlatMap()
     {
-        $a = MaybeT::of(Either::class, 124)->flatMap(function ($x) {
-            return MaybeT::of(Either::class, $x / 2);
+        $a = EitherT::of(Maybe::class, 124)->flatMap(function ($x) {
+            return EitherT::of(Maybe::class, $x / 2);
         });
 
         $this->assertEquals(
             $a->run(),
-            Right(Just(62))
+            Just(Right(62))
         );
     }
 
     public function testFlatMapNothing()
     {
-        $a = MaybeT::of(Either::class, 124)->flatMap(function ($x) {
-            return MaybeT(function () {
-                return Either::of(Nothing());
+        $a = EitherT::of(Maybe::class, 124)->flatMap(function ($x) {
+            return EitherT(function () {
+                return Nothing();
             });
         });
 
         $this->assertEquals(
             $a->run(),
-            Right(Nothing())
+            Nothing()
         );
     }
 }
