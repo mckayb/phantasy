@@ -13,6 +13,21 @@ trait LawAssertions
 {
     use \Eris\TestTrait;
 
+    private function handleRun($a, $b)
+    {
+        if (is_null($a->run) && is_null($b->run)) {
+            $this->assertEquals($a, $b);
+        } else {
+            $refA = new \ReflectionMethod($a, 'run');
+
+            if ($refA->getNumberOfParameters() === 0) {
+                $this->assertEquals($a->run(), $b->run());
+            } else {
+                $this->assertEquals($a->run(['Blue']), $b->run(['Blue']));
+            }
+        }
+    }
+
     public function assertSetoidLaws(callable $of)
     {
         $this->forAll(Generator\int(), Generator\int(), Generator\int())
@@ -54,7 +69,7 @@ trait LawAssertions
         $this->forAll(Generator\int(), Generator\int(), Generator\int())
             ->then(function ($a, $b, $c) use ($of) {
                 // associativity
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->compose($of($b))->compose($of($c)),
                     $of($a)->compose($of($b)->compose($of($c)))
                 );
@@ -66,13 +81,13 @@ trait LawAssertions
         $this->forAll(Generator\int())
             ->then(function ($a) use ($clss, $of) {
                 // right identity
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->compose($clss::id()),
                     $of($a)
                 );
 
                 // left identity
-                $this->assertEquals(
+                $this->handleRun(
                     $clss::id()->compose($of($a)),
                     $of($a)
                 );
@@ -83,8 +98,9 @@ trait LawAssertions
     {
         $this->forAll(Generator\int(), Generator\int(), Generator\int())
             ->then(function ($a, $b, $c) use ($of) {
+
                 // associativity
-                $this->assertEquals(
+                $this->handleRun(
                     $of([$a])->concat($of([$b]))->concat($of([$c])),
                     $of([$a])->concat($of([$b])->concat($of([$c])))
                 );
@@ -96,13 +112,13 @@ trait LawAssertions
         $this->forAll(Generator\int())
             ->then(function ($a) use ($clss, $of) {
                 // right identity
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->concat($clss::empty()),
                     $of($a)
                 );
 
                 // left identity
-                $this->assertEquals(
+                $this->handleRun(
                     $clss::empty()->concat($of($a)),
                     $of($a)
                 );
@@ -114,13 +130,13 @@ trait LawAssertions
         $this->forAll(Generator\int())
             ->then(function ($a) use ($clss, $of) {
                 // right inverse
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->concat($of($a)->invert()),
                     $clss::empty()
                 );
 
                 // left inverse
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->invert()->concat($of($a)),
                     $clss::empty()
                 );
@@ -135,10 +151,10 @@ trait LawAssertions
                 $g = concat('bar');
 
                 // identity
-                $this->assertEquals($of($a)->map(id()), $of($a));
+                $this->handleRun($of($a)->map(id()), $of($a));
 
                 // composition
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->map($g)->map($f),
                     $of($a)->map(compose($f, $g))
                 );
@@ -153,10 +169,10 @@ trait LawAssertions
                 $g = concat('bar');
 
                 // identity
-                $this->assertEquals($of($a)->contramap(id()), $of($a));
+                $this->handleRun($of($a)->contramap(id()), $of($a));
 
                 // composition
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->contramap(compose($f, $g)),
                     $of($a)->contramap($f)->contramap($g)
                 );
@@ -180,7 +196,7 @@ trait LawAssertions
                 });
 
                 // composition
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->ap($of($g)->ap($of($f)->map($compose))),
                     $of($a)->ap($of($g))->ap($of($f))
                 );
@@ -196,19 +212,19 @@ trait LawAssertions
                 };
 
                 // identity
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->ap($clss::of(id())),
                     $of($a)
                 );
 
                 // homomorphism
-                $this->assertEquals(
+                $this->handleRun(
                     $clss::of($a)->ap($clss::of($f)),
                     $clss::of($f($a))
                 );
 
                 // interchange
-                $this->assertEquals(
+                $this->handleRun(
                     $clss::of($a)->ap($of($f)),
                     $of($f)->ap($clss::of(function ($f) use ($a) {
                         return $f($a);
@@ -226,13 +242,13 @@ trait LawAssertions
                 };
 
                 // associativity
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->alt($of($b))->alt($of($c)),
                     $of($a)->alt($of($b)->alt($of($c)))
                 );
 
                 // distributivity
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->alt($of($b))->map($f),
                     $of($a)->map($f)->alt($of($b)->map($f))
                 );
@@ -248,13 +264,13 @@ trait LawAssertions
                 };
 
                 // right identity
-                $this->assertEquals($of($a)->alt($clssName::zero()), $of($a));
+                $this->handleRun($of($a)->alt($clssName::zero()), $of($a));
 
                 // left identity
-                $this->assertEquals($clssName::zero()->alt($of($a)), $of($a));
+                $this->handleRun($clssName::zero()->alt($of($a)), $of($a));
 
                 // annihilation
-                $this->assertEquals($clssName::zero()->map($f), $clssName::zero());
+                $this->handleRun($clssName::zero()->map($f), $clssName::zero());
             });
     }
 
@@ -271,13 +287,13 @@ trait LawAssertions
                 };
 
                 // distributivity
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->ap($of($f)->alt($of($g))),
                     $of($a)->ap($of($f))->alt($of($a)->ap($of($g)))
                 );
 
                 // annihilation
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->ap($clssName::zero()),
                     $clssName::zero()
                 );
@@ -293,13 +309,13 @@ trait LawAssertions
                 };
 
                 // naturality
-                $this->assertEquals(
+                $this->handleRun(
                     $t($of(Maybe::of($a))->traverse(Maybe::of(), id())),
                     $of(Maybe::of($a))->traverse(Validation::of(), $t)
                 );
 
                 // identity
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->traverse(Maybe::of(), Maybe::of()),
                     Maybe::of($of($a))
                 );
@@ -374,7 +390,7 @@ trait LawAssertions
         $this->forAll(Generator\int())
             ->then(function ($a) use ($of) {
                 $f = function ($x) use ($of) {
-                    return $of($x % 2);
+                    return $of($x - 2);
                 };
 
                 $g = function ($x) use ($of) {
@@ -382,7 +398,7 @@ trait LawAssertions
                 };
 
                 // associativity
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->chain($f)->chain($g),
                     $of($a)->chain(function ($x) use ($f, $g) {
                         return $f($x)->chain($g);
@@ -414,7 +430,7 @@ trait LawAssertions
                     return $p($v) ? $d($v) : $n($v)->chain($second);
                 };
 
-                $this->assertEquals($first, $second($i));
+                $this->handleRun($first, $second($i));
             });
     }
 
@@ -427,10 +443,10 @@ trait LawAssertions
                 };
 
                 // left identity
-                $this->assertEquals($clssName::of($a)->chain($f), $f($a));
+                $this->handleRun($clssName::of($a)->chain($f), $f($a));
 
                 // right identity
-                $this->assertEquals($of($a)->chain($clssName::of()), $of($a));
+                $this->handleRun($of($a)->chain($clssName::of()), $of($a));
             });
     }
 
@@ -446,7 +462,7 @@ trait LawAssertions
                     return $a % 3;
                 };
 
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->extend($g)->extend($f),
                     $of($a)->extend(function ($w_) use ($f, $g) {
                         return $f($w_->extend($g));
@@ -484,7 +500,7 @@ trait LawAssertions
         $this->forAll(Generator\int())
             ->then(function ($a) use ($of) {
                 // identity
-                $this->assertEquals($of($a)->bimap(id(), id()), $of($a));
+                $this->handleRun($of($a)->bimap(id(), id()), $of($a));
 
                 $f = function ($x) {
                     return $x + 2;
@@ -503,7 +519,7 @@ trait LawAssertions
                 };
 
                 // composition
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->bimap(compose($f, $g), compose($h, $i)),
                     $of($a)->bimap($g, $i)->bimap($f, $h)
                 );
@@ -515,7 +531,7 @@ trait LawAssertions
         $this->forAll(Generator\int())
             ->then(function ($a) use ($of) {
                 // identity
-                $this->assertEquals($of($a)->promap(id(), id()), $of($a));
+                $this->handleRun($of($a)->promap(id(), id()), $of($a));
 
                 $f = function ($x) {
                     return $x + 2;
@@ -534,7 +550,7 @@ trait LawAssertions
                 };
 
                 // composition
-                $this->assertEquals(
+                $this->handleRun(
                     $of($a)->promap(compose($f, $g), compose($h, $i)),
                     $of($a)->promap($f, $i)->bimap($g, $h)
                 );

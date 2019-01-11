@@ -7,19 +7,23 @@ use Phantasy\Test\Traits\LawAssertions;
 use Phantasy\Traits\CurryNonPublicMethods;
 use Phantasy\DataTypes\Maybe\MaybeT;
 use Phantasy\DataTypes\Either\Either;
+use Phantasy\DataTypes\Reader\ReaderT;
+use Phantasy\DataTypes\State\StateT;
+use function Phantasy\DataTypes\Reader\{Reader, ReaderT};
 use function Phantasy\DataTypes\Maybe\{MaybeT, Just, Nothing};
 use function Phantasy\DataTypes\Either\Right;
+use function Phantasy\DataTypes\State\StateT;
 
-class MaybeTTest extends TestCase
+class StateTTest extends TestCase
 {
     use LawAssertions;
 
     public function testLaws()
     {
-        $a = MaybeT::of(Either::class);
-        $b = function ($x) {
-            return MaybeT(function () {
-                return Right(Nothing());
+        $a = StateT::of(Either::class);
+        $b = function () {
+            return StateT(function ($s) {
+                return Right(State::of("hello"));
             });
         };
 
@@ -28,23 +32,23 @@ class MaybeTTest extends TestCase
 
             protected static function of($x)
             {
-                return MaybeT::of(Either::class, $x);
+                return StateT::of(Either::class, $x);
             }
         };
 
         $this->assertFunctorLaws($a);
-        $this->assertFunctorLaws($b);
-        $this->assertApplyLaws($a);
-        $this->assertApplyLaws($b);
-        $this->assertApplicativeLaws(get_class($c), $a);
-        $this->assertApplicativeLaws(get_class($c), $b);
-        $this->assertChainLaws($a);
-        $this->assertChainLaws($b);
-        $this->assertMonadLaws(get_class($c), $a);
-        $this->assertMonadLaws(get_class($c), $b);
+        // $this->assertFunctorLaws($b);
+        // $this->assertApplyLaws($a);
+        // $this->assertApplyLaws($b);
+        // $this->assertApplicativeLaws(get_class($c), $a);
+        // $this->assertApplicativeLaws(get_class($c), $b);
+        // $this->assertChainLaws($a);
+        // $this->assertChainLaws($b);
+        // $this->assertMonadLaws(get_class($c), $a);
+        // $this->assertMonadLaws(get_class($c), $b);
     }
 
-    public function testOf()
+    /* public function testOf()
     {
         $a = MaybeT::of(Either::class, 1)->run();
         $this->assertEquals(
@@ -189,5 +193,5 @@ class MaybeTTest extends TestCase
             $a->run(),
             Right(Nothing())
         );
-    }
+    } */
 }

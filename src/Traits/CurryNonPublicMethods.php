@@ -53,7 +53,10 @@ trait CurryNonPublicMethods
         $refClass = new \ReflectionClass($calledClass);
         $ref = null;
         $methodsToCurry = null;
+        $parent = false;
         try {
+            $parent = $refClass->getParentClass();
+            $refClass = $parent === false ? $refClass : $parent;
             $ref = $refClass->getMethod($method);
             $props = $refClass->getDefaultProperties();
             $methodsToCurry = $props['methodsToCurry'] ?? null;
@@ -67,8 +70,8 @@ trait CurryNonPublicMethods
         if ($methodIsToBeCurried) {
             $numArgs = $ref->getNumberOfRequiredParameters();
             $returnType = (string)$ref->getReturnType();
-            $func = curryN($numArgs, function (...$args2) use ($calledClass, $method, $returnType) {
-                return call_user_func_array([$calledClass, $method], $args2);
+            $func = curryN($numArgs, function (...$args2) use ($refClass, $method, $returnType) {
+                return call_user_func_array([$refClass->getName(), $method], $args2);
             });
             return $func(...$args);
         }

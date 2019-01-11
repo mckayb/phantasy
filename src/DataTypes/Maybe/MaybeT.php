@@ -72,6 +72,11 @@ final class MaybeT
     {
         return call_user_func($this->f);
     }
+
+    public function __toString()
+    {
+        return "MaybeT(" . $this->run() . ")";
+    }
 }
 
 function MaybeT(...$args)

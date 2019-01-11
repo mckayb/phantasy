@@ -26,6 +26,7 @@
     },
     "files": [
       "src/Core/functions.php",
+      "src/DataTypes/Maybe/EitherT.php",
       "src/DataTypes/Either/Left.php",
       "src/DataTypes/Either/Right.php",
       "src/DataTypes/Maybe/MaybeT.php",
