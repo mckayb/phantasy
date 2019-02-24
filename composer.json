@@ -47,6 +47,6 @@
     "lint": "phpcs --standard=./ruleset.xml ./src ./test",
     "lint-fix": "phpcbf --standard=./ruleset.xml ./src ./test",
     "coverage": "phpunit --coverage-clover build/logs/clover.xml --coverage-html build/html",
-    "upload-coverage": "coveralls -v"
+    "upload-coverage": "php-coveralls -v"
   }
 }
