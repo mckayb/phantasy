@@ -1,4 +1,4 @@
-# Phantasy [![Build Status](https://travis-ci.org/mckayb/phantasy.svg?branch=master)](https://travis-ci.org/mckayb/phantasy) [![Coverage Status](https://coveralls.io/repos/github/mckayb/phantasy/badge.svg?branch=master)](https://coveralls.io/github/mckayb/phantasy)
+# Phantasy [![Coverage Status](https://coveralls.io/repos/github/mckayb/phantasy/badge.svg?branch=master)](https://coveralls.io/github/mckayb/phantasy)
 Functional Programming Helpers and Data Types for PHP.
 
 ## Getting Started
@@ -32,9 +32,10 @@ Just create an issue or open up a pull request.
 For other helpers not included in this repo, check out
   * [Phantasy-PHP](https://github.com/mckayb/phantasy-php)
   * [Phantasy-Types](https://github.com/mckayb/phantasy-types)
+  * [Phantasy-Recursion-Schemes](https://github.com/mckayb/phantasy-recursion-schemes)
 
 ## Inspiration
-  * [Monet](https://github.com/cwmyers/monet.js)
+  * [Monet](https://github.com/monet/monet.js)
   * [Folktale](https://github.com/origamitower/folktale)
   * [Fantasy Land](https://github.com/fantasyland/fantasy-land)
   * [Daggy](https://github.com/fantasyland/daggy)

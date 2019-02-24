@@ -4,3 +4,4 @@ coverage
 build
 *.swp
 .vscode
+.phpunit.result.cache

@@ -638,13 +638,11 @@ class FunctionsTest extends TestCase
         $this->assertEquals($f('foobar'), $m);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testSemigroupConcatNotAvailable()
     {
         $a = true;
         $b = false;
+        $this->expectException(\InvalidArgumentException::class);
         $this->assertNull(semigroupConcat($a, $b));
     }
 
@@ -2020,11 +2018,9 @@ class FunctionsTest extends TestCase
         $this->assertEquals(new Cons(1, new Nil()), $a);
     }
 
-    /**
-     * @expectedException TypeError
-     */
     public function testMDoFailsWithMultipleMonads()
     {
+        $this->expectException(\TypeError::class);
         mDo(function () {
             $foo = yield Either::of('foo');
             $bar = yield Maybe::of($foo . 'bar');
@@ -2032,11 +2028,9 @@ class FunctionsTest extends TestCase
         });
     }
 
-    /**
-     * @expectedException Exception
-     */
     public function testMDoFailsIfNotAMonad()
     {
+        $this->expectException(\Exception::class);
         mDo(function () {
             $foo = yield Validation::of('foo');
             $bar = yield Validation::of('bar');
