@@ -1,28 +1,5 @@
 version: 2
 jobs:
-  "php-7.0":
-    docker:
-      - image: circleci/php:7.0-node-browsers
-    working_directory: ~/circleci
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - php70-phantasy-composer-{{ checksum "composer.lock" }}
-            - php70-phantasy-composer-
-      - run: composer install -n --prefer-dist
-      - save_cache:
-          key: php70-phantasy-composer-{{ checksum "composer.lock" }}
-          paths:
-            - vendor
-      - run: mkdir -p build/logs
-      - run:
-          name: Run Linting
-          command: composer lint
-      - run:
-          name: Run Tests
-          command: composer test
-
   "php-7.1":
     docker:
       - image: circleci/php:7.1-node-browsers
@@ -93,13 +70,14 @@ jobs:
           command: composer coverage
       - run:
           name: Upload Coverage
-          command: upload-coverage
+          command: composer upload-coverage
+      - store_artifacts:
+          path:  build/html
 
 workflows:
   version: 2
   build:
     jobs:
-      - "php-7.0"
       - "php-7.1"
       - "php-7.2"
       - "php-7.3"
