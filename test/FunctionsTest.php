@@ -1971,14 +1971,17 @@ class FunctionsTest extends TestCase
 
     public function testConstant()
     {
-        $a = constant('foo');
-        $this->assertEquals($a('bar'), 'foo');
+        $a = constant('foo', 'bar');
+        $this->assertEquals($a, 'foo');
     }
 
     public function testConstantCurried()
     {
-        $c = constant();
-        $this->assertEquals($c('foo')('bar'), 'foo');
+        $constant = constant();
+        $this->assertEquals($constant('foo')('bar'), 'foo');
+
+        $constantFoo = constant('foo');
+        $this->assertEquals($constantFoo('bar'), 'foo');
     }
 
     public function testMDoSimpleMaybe()

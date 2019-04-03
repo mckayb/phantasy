@@ -73,14 +73,13 @@ function flip(...$args)
     return $flip(...$args);
 }
 
-// +constant :: a -> (b -> a)
+// +constant :: a -> b -> a
 function constant(...$args)
 {
-    $constant = curry(function ($x) {
-        return curry(function ($y) use ($x) {
-            return $x;
-        });
+    $constant = curry(function ($x, $y) {
+        return $x;
     });
+
     return $constant(...$args);
 }
 
