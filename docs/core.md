@@ -42,7 +42,20 @@ Useful when you need a function returning some constant value.
 ### Examples
 ```php
 use function Phantasy\Core\constant;
-use Phantasy\DataTypes\
+
+constant('foo', 'bar'); // 'foo'
+```
+
+```php
+use function Phantasy\Core\constant;
+
+// You can also call it curried!
+$constant = constant();
+$returnFoo = $constant('foo');
+$returnFoo('bar'); // "foo"
+
+$returnBaz = constant('baz');
+$returnBaz('bar'); // "baz"
 ```
 
 ## curry (callable $f)
