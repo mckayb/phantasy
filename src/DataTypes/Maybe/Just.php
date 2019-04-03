@@ -50,6 +50,21 @@ final class Just extends Maybe
         );
     }
 
+    protected function select(Maybe $maybeWithEither) : Maybe
+    {
+        $maybeWithFunction = $this;
+        return $maybeWithEither->chain(function ($e) use ($maybeWithFunction): Maybe {
+            return $e->fold(
+                function ($a) use ($maybeWithFunction): Maybe {
+                    return $maybeWithFunction->map(function (callable $f) use ($a) {
+                        return $f($a);
+                    });
+                },
+                Maybe::of()
+            );
+        });
+    }
+
     protected function chain(callable $f) : Maybe
     {
         return $f($this->value);

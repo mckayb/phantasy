@@ -217,6 +217,23 @@ trait LawAssertions
             });
     }
 
+    public function assertSelectiveLaws(callable $of)
+    {
+        $this->forAll(Generator\int())
+            ->then(function ($a) {
+                $this->assertEquals($a, $a);
+                // identity
+                // distributivity
+                // associativity
+            });
+    }
+
+    public function assertSelectiveMonadLaws()
+    {
+        // selectM
+        // selectA
+    }
+
     public function assertAltLaws(callable $of)
     {
         $this->forAll(Generator\int(), Generator\int(), Generator\int())

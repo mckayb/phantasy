@@ -14,6 +14,7 @@ abstract class Maybe
     abstract protected function concat(Maybe $e) : Maybe;
     abstract protected function map(callable $f) : Maybe;
     abstract protected function ap(Maybe $eitherWithFunction) : Maybe;
+    abstract protected function select(Maybe $either) : Maybe;
     abstract protected function chain(callable $f) : Maybe;
     abstract protected function bind(callable $f) : Maybe;
     abstract protected function flatMap(callable $f) : Maybe;

@@ -36,6 +36,11 @@ final class Nothing extends Maybe
         return $this;
     }
 
+    protected function select(Maybe $maybeWithEither) : Maybe
+    {
+        return $this;
+    }
+
     protected function chain(callable $f) : Maybe
     {
         return $this;

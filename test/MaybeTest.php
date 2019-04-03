@@ -1167,9 +1167,25 @@ class MaybeTest extends TestCase
         $this->assertEquals($ap__($b), $expected);
     }
 
+    public function testNothingSelect()
+    {
+        $a = Nothing();
+        $b = Nothing();
+        $c = Just(Either::of(1));
+
+        $expected = Nothing();
+
+        $this->assertEquals($a->select($b), $expected); 
+        $this->assertEquals($a->select($c), $expected); 
+    }
+
+    public function testNothingSelectCurried()
+    {
+    }
+
     public function testNothingChain()
     {
-        $a = Maybe::fromNullable(null)
+        $a = Nothing()
         ->chain(
             function ($x) {
                 return Maybe::of($x + 1);

@@ -224,6 +224,7 @@ function filter(...$args)
     return $filter(...$args);
 }
 
+// +bimap :: Bifunctor f => (a -> b) -> (c -> d) -> f a c -> f b d
 function bimap(...$args)
 {
     $bimap = curry(
@@ -309,6 +310,7 @@ function ap(...$args)
 }
 
 // +of :: a -> b -> f b
+// a bit hacky - no way to know what type f is without the class that a gives us
 function of(...$args)
 {
     $of = curry(function ($a, $x) {
@@ -327,6 +329,7 @@ function of(...$args)
 }
 
 // +pure :: a -> b -> f b
+// a bit hacky - no way to know what type f is without the class that a gives us
 function pure(...$args)
 {
     return of(...$args);
@@ -350,11 +353,13 @@ function chain(...$args)
     return $chain(...$args);
 }
 
+// +bind :: Chain m => (a -> m b) -> m a -> m b
 function bind(...$args)
 {
     return chain(...$args);
 }
 
+// +flatMap :: Chain m => (a -> m b) -> m a -> m b
 function flatMap(...$args)
 {
     return chain(...$args);
@@ -717,4 +722,87 @@ function arrayFromCollection(...$args)
     return curry(function (Collection $a) : array {
         return $a->toArray();
     })(...$args);
+}
+
+function maybe(...$args)
+{
+    return curry(function ($b, $f, Maybe $m) {
+        return $m->fold(function () use ($b) {
+            return $b;
+        }, $f);
+    })(...$args);
+}
+
+function either(...$args)
+{
+    return curry(function ($f, $g, Either $e) {
+        return $e->fold($f, $g);
+    })(...$args);
+}
+
+// +selectM :: Monad f => f (Either a b) -> f (a -> b) -> f b
+function selectM(...$args)
+{
+    return curry(function ($me, $mf) {
+        return chain(function ($e) use ($mf) {
+            return $e->fold(
+                function ($l) use ($mf) {
+                    return map(function ($f) use ($l) {
+                        return $f($l);
+                    }, $mf);
+                },
+                of(get_class($mf))
+            );
+        }, $me);
+    })(...$args);
+}
+
+// +selectA :: Applicative f => f (Either a b) -> f (a -> b) -> f b
+function selectA(...$args)
+{
+    return curry(function ($me, $mf) {
+        return ap(map(curry(function ($e, $f) {
+            return either($f, id(), $e);
+        }), $me), $mf);
+    })(...$args);
+}
+
+function apS(...$args)
+{
+
+}
+
+function whenS(...$args)
+{
+
+}
+
+function branch(...$args)
+{
+
+}
+
+function ifS(...$args)
+{
+
+}
+
+function fromMaybeS(...$args)
+{
+
+}
+
+function anyS(...$args)
+{
+
+}
+
+function allS(...$args)
+{
+
+}
+
+function whileS(...$args)
+{
+
 }
