@@ -39,7 +39,8 @@
       "src/DataTypes/State/State.php",
       "src/DataTypes/Set/Set.php",
       "src/DataTypes/Collection/Collection.php",
-      "src/DataTypes/IO/IO.php"
+      "src/DataTypes/IO/IO.php",
+      "src/DataTypes/Text/Text.php"
     ]
   },
   "scripts": {

@@ -9,17 +9,47 @@ final class Text
 {
     use CurryNonPublicMethods;
 
-    private $str = null;
+    private $s = null;
 
-    public function __construct(string $str)
+    public function __construct(string $s)
     {
-        $this->str = $str;
+        $this->s = $s;
+    }
+
+    protected function lte(Text $t) : bool
+    {
+        return strcmp($this->s, $t->__toString()) <= 0;
+    }
+
+    protected function equals(Text $t) : bool
+    {
+        return $this == $t;
+    }
+
+    protected function concat(Text $t) : Text
+    {
+        return new static($this->s . $t->__toString());
+    }
+
+    public static function empty() : Text
+    {
+        return new static("");
+    }
+
+    protected function map(callable $f) : Text
+    {
+        return new static($f($this->s));
+    }
+
+    public function __toString() : string
+    {
+        return $this->s;
     }
 }
 
 function Text(...$args)
 {
-    return curry(function (string $str) {
-        return new Text($str);
+    return curry(function (string $s) {
+        return new Text($s);
     })(...$args);
 }
