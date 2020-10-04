@@ -10,7 +10,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  gh-action-php74:
 
     runs-on: ubuntu-latest
 
