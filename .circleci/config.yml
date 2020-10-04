@@ -1,28 +1,5 @@
 version: 2
 jobs:
-  "php-7.1":
-    docker:
-      - image: circleci/php:7.1-node-browsers
-    working_directory: ~/circleci
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - php71-phantasy-composer-{{ checksum "composer.lock" }}
-            - php71-phantasy-composer-
-      - run: composer install -n --prefer-dist
-      - save_cache:
-          key: php71-phantasy-composer-{{ checksum "composer.lock" }}
-          paths:
-            - vendor
-      - run: mkdir -p build/logs
-      - run:
-          name: Run Linting
-          command: composer lint
-      - run:
-          name: Run Tests
-          command: composer test
-
   "php-7.2":
     docker:
       - image: circleci/php:7.2-node-browsers
