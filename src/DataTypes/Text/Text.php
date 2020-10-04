@@ -16,14 +16,14 @@ final class Text
         $this->s = $s;
     }
 
-    protected function lte(Text $t) : bool
-    {
-        return strcmp($this->s, $t->__toString()) <= 0;
-    }
-
     protected function equals(Text $t) : bool
     {
         return $this == $t;
+    }
+
+    protected function lte(Text $t) : bool
+    {
+        return strcmp($this->s, $t->__toString()) <= 0;
     }
 
     protected function concat(Text $t) : Text
@@ -36,9 +36,9 @@ final class Text
         return new static("");
     }
 
-    protected function map(callable $f) : Text
+    protected static function fromString(string $s) : Text
     {
-        return new static($f($this->s));
+        return new static($s);
     }
 
     public function __toString() : string

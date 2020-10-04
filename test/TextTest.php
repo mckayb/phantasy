@@ -17,7 +17,6 @@ class TextTest extends TestCase
         $this->assertOrdLaws(Text());
         $this->assertSemigroupLaws(Text());
         $this->assertMonoidLaws(Text::class, Text());
-        $this->assertFunctorLaws(Text());
     }
 
     public function testTextFunc()
@@ -74,21 +73,5 @@ class TextTest extends TestCase
         );
 
         $this->assertEquals($text->concat($text2), Text("FooBar"));
-    }
-
-    public function testTextMapCurried()
-    {
-        $text = Text("Foo");
-        $map = $text->map();
-        $f = function ($s) {
-            return $s . "Bar";
-        };
-
-        $this->assertEquals(
-            $text->map($f),
-            $map($f)
-        );
-
-        $this->assertEquals($text->map($f), Text("FooBar"));
     }
 }
