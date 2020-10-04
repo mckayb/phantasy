@@ -43,8 +43,8 @@ jobs:
           name: Run Linting
           command: composer lint
       - run:
-          name: Run Coverage
-          command: composer coverage
+          name: Run Tests
+          command: composer test
 
   "php-7.4":
     docker:
