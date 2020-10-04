@@ -1,4 +1,7 @@
-name: PHP Composer
+name: PHP 7.4
+uses: shivammathur/setup-php@v2
+with:
+  php-version: '7.4'
 
 on:
   push:
@@ -33,5 +36,11 @@ jobs:
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md
 
+    - name: Run linting
+      run: composer run-script lint
+
     - name: Run test suite
-      run: composer run-script test
+      run: composer run-script coverage
+
+    - name: Upload coverage
+      run: composer run-script upload-coverage
