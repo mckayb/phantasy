@@ -1,23 +1,25 @@
-- name: PHP 7.4
-  uses: shivammathur/setup-php@v2
-  with:
-    php-version: '7.4'
-    coverage: xdebug
-    tools: phpunit, phpcs
-
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
+name: Phantasy
+on: [push, pull_request]
 jobs:
-  gh-action-php74:
-
-    runs-on: ubuntu-latest
+  build:
+    name: Phantasy Build (PHP ${{ matrix.php-versions }} on ${{ matrix.operating-system }})
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ubuntu-latest, windows-latest, macos-latest]
+        php-versions: ['7.2', '7.3', '7.4']
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
+      with:
+        php-version: ${{ matrix.php-versions }}
+        coverage: xdebug
+        tools: phpcs, phpunit
 
     - name: Validate composer.json and composer.lock
       run: composer validate
