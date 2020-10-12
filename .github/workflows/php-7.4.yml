@@ -2,6 +2,8 @@ name: PHP 7.4
 uses: shivammathur/setup-php@v2
 with:
   php-version: '7.4'
+  coverage: xdebug
+  tools: phpunit, phpcs
 
 on:
   push:
