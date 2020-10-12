@@ -6,7 +6,9 @@ use PHPUnit\Framework\TestCase;
 use Phantasy\DataTypes\Either\{Either, Left, Right};
 use Phantasy\DataTypes\Maybe\{Maybe, Just, Nothing};
 use Phantasy\DataTypes\Validation\{Validation, Success, Failure};
+use Phantasy\DataTypes\Text\Text;
 use function Phantasy\Core\{map, prop, identity, curry, compose, liftA};
+use function Phantasy\DataTypes\Text\Text;
 
 class DocsTest extends TestCase
 {
@@ -167,5 +169,39 @@ class DocsTest extends TestCase
     public function testLiftAExample()
     {
         $this->assertEquals(Maybe::of('foo bar'), liftA('strtolower', Maybe::of('Foo Bar')));
+    }
+
+    public function testTextEquals()
+    {
+        $this->assertTrue(Text("foo")->equals(Text("foo")));
+        $this->assertFalse(Text("foo")->equals(Text("bar")));
+    }
+
+    public function testTextLte()
+    {
+        $this->assertTrue(Text("bar")->lte(Text("foo")));
+        $this->assertFalse(Text("foo")->lte(Text("bar")));
+        $this->assertTrue(Text("")->lte(Text("Something")));
+        $this->assertTrue(Text("foo")->lte(Text("foo")));
+    }
+
+    public function testTextConcat()
+    {
+        $this->assertEquals(Text("foo")->concat(Text("bar")), Text("foobar"));
+        $this->assertEquals(Text("")->concat(Text("foo")), Text("foo"));
+        $this->assertEquals(Text("foo")->concat(Text("")), Text("foo"));
+        $this->assertEquals(Text("foo") . Text("bar"), "foobar");
+    }
+
+    public function testTextEmpty()
+    {
+        $this->assertEquals(Text::empty(), Text(""));
+    }
+
+    public function testFromString()
+    {
+        $this->assertEquals(Text::fromString("Foo"), Text("Foo"));
+        $this->assertEquals(Text::fromString(""), Text(""));
+        $this->assertEquals(Text::fromString(""), Text::empty());
     }
 }

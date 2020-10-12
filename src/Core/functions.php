@@ -471,12 +471,12 @@ function semigroupConcat(...$args)
             return array_merge($x, $y);
         }
 
-        if (is_callable([$x, 'concat'])) {
-            return call_user_func([$x, 'concat'], $y);
-        }
-
         if (is_string($x) && is_string($y)) {
             return $x . $y;
+        }
+
+        if (is_callable([$x, 'concat'])) {
+            return call_user_func([$x, 'concat'], $y);
         }
 
         throw new \InvalidArgumentException(

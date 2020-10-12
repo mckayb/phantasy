@@ -81,19 +81,18 @@ trait LawAssertions
 
     public function assertSemigroupLaws(callable $of)
     {
-        $this->forAll(Generator\int(), Generator\int(), Generator\int())
+        $this->forAll(Generator\string(), Generator\string(), Generator\string())
             ->then(function ($a, $b, $c) use ($of) {
-                // associativity
                 $this->assertEquals(
-                    $of([$a])->concat($of([$b]))->concat($of([$c])),
-                    $of([$a])->concat($of([$b])->concat($of([$c])))
+                    $of($a)->concat($of($b))->concat($of($c)),
+                    $of($a)->concat($of($b)->concat($of($c)))
                 );
             });
     }
 
     public function assertMonoidLaws(string $clss, callable $of)
     {
-        $this->forAll(Generator\int())
+        $this->forAll(Generator\string())
             ->then(function ($a) use ($clss, $of) {
                 // right identity
                 $this->assertEquals(
